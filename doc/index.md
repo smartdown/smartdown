@@ -6,13 +6,12 @@ Smartdown is a *declarative*, *literate* and *reactive* authoring technology for
 
 Smartdown extends the simple expressivity of the [Markdown](https://en.wikipedia.org/wiki/Markdown) language commonly used on blogs, messaging systems, technical forums, and on [GitHub](https://help.github.com/articles/basic-writing-and-formatting-syntax/). The Smartdown **engine** is a Javascript library that interprets the content in these Smartdown source files and enacts the desired behavior and presentation.
 
-- [Smartdown Documentation](https://doctorbud.com/smartdown/doc/)
-- [Smartdown API](https://doctorbud.com/smartdown/doc/api/)
-- [Version History](https://doctorbud.com/smartdown/doc/versions/)
-- [License](https://doctorbud.com/smartdown/doc/license/)
-- [Contributing](https://doctorbud.com/smartdown/doc/contributing/)
-- [Code of Conduct](https://doctorbud.com/smartdown/doc/code_of_conduct/)
-
+- [Smartdown API](api/)
+- [Smartdown Helpers](api/helpers/)
+- [Version History](versions/)
+- [License](license/)
+- [Contributing](contributing/)
+- [Code of Conduct](code_of_conduct/)
 
 ## Markdown and Smartdown
 
@@ -130,4 +129,5 @@ email: [feedback@infoclay.com](mailto:feedback@infoclay.com)
 Twitter: @TheDoctorBud
 GitHub: DoctorBud
 Blog: [https://doctorbud.com](https://doctorbud.com)
+
 

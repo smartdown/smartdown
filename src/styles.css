@@ -1,0 +1,1753 @@
+// This is an SCSS file
+// If you try to process it as CSS, you will likely get an error reported
+// due to this type of comment
+//
+
+.smartdown-outer-container {
+  margin:0;
+  padding:0 20px 0 0;
+  background: rgb(250, 250, 255);
+
+  > .container-fluid {
+    margin: 0;
+    padding: 0 5px 10px 5px;
+  }
+}
+
+.smartdown-container {
+  border: 1px solid white;
+  background: rgb(250, 250, 255);
+  margin: 0;
+  padding: 4px 8px;
+  font-family: 'Asap', san-serif;
+  font-size: 18px;
+  line-height: 1.4; /* 1.42857143; */
+  overflow-x: visible;
+  overflow-y: visible;
+  resize:vertical;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  /* word-break: break-all; */
+  word-wrap: break-word;
+  display: inline-block;
+  user-select: none;  // autoprefixer should add the -webkit- etc
+}
+
+
+.smartdown-container div.smartdown-swatch {
+  vertical-align:middle;
+  display:inline-block;
+  height:1.3em;
+  width:1.3em;
+  border:1px dotted gray;
+}
+
+.smartdown-container br.smartdown_br {
+  display: block; /* makes it have a width */
+  content: ""; /* clears default height */
+  margin: 5px 0 5px 0;
+  padding: 0;
+}
+
+
+.smartdown-container blockquote br.smartdown_br {
+  margin: 7px 0 7px 0;
+}
+
+
+.smartdown-container p.smartdown_p {
+  margin: 4px 0 15px 0;
+  padding: 0 0 0 8px;
+}
+
+
+.smartdown-container blockquote {
+  margin: 0 0 0 8px;
+  padding: 2px 5px;
+  border: 2px solid #ddd;
+  font-size: 1em;
+  border-radius: 10px;
+  border-right: none;
+  border-top: none;
+  border-bottom: transparent;
+}
+
+
+.smartdown-container {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  .h1,
+  .h2,
+  .h3,
+  .h4,
+  .h5,
+  .h6 {
+    font-weight: 500;
+    text-transform: initial;
+    color: inherit;
+    font-family: 'Asap', san-serif;
+    line-height: unset;
+
+    user-select: text;
+  }
+
+  h1,
+  .h1,
+  h2,
+  .h2,
+  h3,
+  .h3 {
+    margin-top: 16px;
+    margin-bottom: 10px;
+  }
+
+  h4,
+  .h4,
+  h5,
+  .h5,
+  h6,
+  .h6 {
+    margin-top: 12px;
+    margin-bottom: 5px;
+  }
+
+  h1,
+  .h1 {
+    font-size: 2em;
+  }
+  h2,
+  .h2 {
+    font-size: 1.8em;
+  }
+  h3,
+  .h3 {
+    font-size: 1.6em;
+  }
+  h4,
+  .h4 {
+    font-size: 1.4em;
+  }
+  h5,
+  .h5 {
+    font-size: 1.2em;
+  }
+  h6,
+  .h6 {
+    font-size: 1em;
+  }
+}
+
+
+
+.smartdown-container hr {
+  height: 0;
+  box-sizing: content-box;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border: 0;
+  border-top: 1px solid #eee;
+}
+
+.smartdown-container .playable-bottom-spacer {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  height: 1px;
+  width: 100%;
+}
+
+.smartdown-container p {
+  margin: 0;
+  user-select: text;
+}
+
+.smartdown-container a {
+  font-size: 1.05em;
+  color: #639ad7;
+  color: #337ab7;
+  text-decoration: none;
+  word-break: break-all;
+  user-select: text;
+}
+
+.smartdown-container a:hover,
+.smartdown-container a:focus {
+  color: #5382ac;
+  color: #23527c;
+  text-decoration: underline;
+}
+.smartdown-container a:focus {
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
+}
+
+
+.smartdown-container pre {
+  display: block;
+  padding: 5px;
+  margin: 0 0 10px;
+  font-size: inherit;
+  line-height: 1.2;
+  color: inherit;
+  word-break: break-all;
+  xword-wrap: break-word;
+  background-color: #f5f5f5;
+
+  border-left: 1px solid #CCC;
+  border-top-left-radius:5px;
+  border-bottom-left-radius:5px;
+
+  background-color: white;  /* rgba(27, 31, 35, 0.05); */
+  user-select: text;
+}
+
+.smartdown-container code {
+  word-break: break-all;
+  xword-wrap: break-word;
+  font-size: inherit;
+  white-space: pre-wrap;
+  border: none;
+  border-radius: 0;
+  border-left: 1px solid #CCCCBB;
+  border-right: 1px solid #CCCCBB;
+  border-top-left-radius:6px;
+  border-bottom-right-radius:6px;
+  color: black;
+  padding: 2px 6px;
+  background: #FFFFFA;
+  font-family: 'Ubuntu Mono', monospace;
+  font-weight: 500;
+}
+
+.smartdown-container pre > code {
+  background: inherit;
+  border: none;
+
+  padding: 0;
+  font-size: 0.9em;
+  line-height: 0.9em;
+}
+
+.smartdown-container .pre-scrollable {
+  max-height: 340px;
+  overflow-y: scroll;
+}
+
+
+.smartdown-container input[type="radio"],
+.smartdown-container input[type="checkbox"] {
+  margin: 5px !important;
+  vertical-align: bottom !important;
+  border:1px solid red !important;
+}
+
+.smartdown-container input[type="range"] {
+  display: inline-block;
+}
+
+.smartdown-container .infocell-group-btn {
+  position: relative;
+  font-size: 0;
+  white-space: nowrap;
+
+  > .btn {
+    position: relative;
+  }
+  > .btn + .btn {
+    margin-left: -1px;
+  }
+  > .btn:hover,
+  > .btn:focus,
+  > .btn:active {
+    z-index: 2;
+  }
+  :first-child > .btn,
+  :first-child > .btn-group {
+    margin-right: -1px;
+  }
+  :last-child > .btn,
+  :last-child > .btn-group {
+    z-index: 2;
+    margin-left: -1px;
+  }
+}
+
+.smartdown-container .smartdown-playable {
+  display: none;
+  width:100%;
+  height:100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+
+  &:empty {
+    height: 2px;
+    background: transparent;
+  }
+}
+
+
+.smartdown-container .smartdown-graphviz {
+  overflow-x: auto;
+  overflow-y: auto;
+  width: unset;
+  height: unset;
+  text-align: center;
+
+  svg {
+    margin: auto;
+    width: unset;
+    height: unset;
+    max-width: 100%;
+    max-height: 100%;
+    xwidth: 100%;
+    xheight: 100%;
+  }
+}
+
+
+.smartdown-container .smartdown-mermaid {
+  background: white;
+  overflow-x: auto;
+  overflow-y: auto;
+  width: unset;
+  height: unset;
+  text-align: center;
+
+  svg {
+    margin: auto;
+    width: unset;
+    height: unset;
+    max-width: 100%;
+    max-height: 100%;
+  }
+}
+
+.smartdown-container .smartdown-p5js {
+}
+
+.smartdown-container .smartdown-d3 {
+}
+
+.smartdown-container .smartdown-plotly {
+  width: 100%;
+  xmin-height: 300px;
+  height:100%;
+  resize: vertical;
+  overflow-y: visible;
+
+  &:empty {
+    display: none;
+  }
+}
+
+.smartdown-container .smartdown-leaflet {
+  width:100%;
+  min-height:300px;
+  height:100%;
+  resize: vertical;
+  overflow-y: visible;
+
+  &:empty {
+    display: none;
+  }
+}
+
+/* disable selection/Copy of UIWebView */
+/* disable the IOS tooltip when long-press on a link */
+/*
+.smartdown-plotly *:not(input):not(textarea) {
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  border:1px solid red;
+}
+*/
+
+.smartdown-container .playable-wrapper {
+  margin: 0;
+  padding: 0;
+  border:none;
+}
+
+
+.smartdown-container h1,
+.smartdown-container h2,
+.smartdown-container h3,
+.smartdown-container h4,
+.smartdown-container h5,
+.smartdown-container h6,
+.smartdown-container .h1,
+.smartdown-container .h2,
+.smartdown-container .h3,
+.smartdown-container .h4,
+.smartdown-container .h5,
+.smartdown-container .h6
+{
+  font-family: 'Asap', san-serif;
+}
+
+.smartdown-container .btn {
+  text-transform: none;
+}
+
+
+.smartdown-container .btn-infocell {
+  line-height: 1em;
+  display: inline-block;
+  margin:0 4px 0 4px;
+  padding: 3px 5px;
+  font-family: 'Asap', san-serif;
+  font-size: 0.9em;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: text-bottom;
+  touch-action: manipulation;
+  cursor: pointer;
+
+  user-select: none;
+
+  background-image: linear-gradient(rgb(255, 255, 255) 0px, rgb(234, 234, 234) 100%);
+  border: 1px solid transparent;
+  border-radius: 4px;
+
+  color: #333;
+  background-color: #fff;
+  border-color: #ccc;
+  max-width:100%;
+  width: auto;
+}
+
+.smartdown-container .btn-infocell:focus,
+.smartdown-container .btn-infocell:active:focus,
+.smartdown-container .btn-infocell.active:focus,
+.smartdown-container .btn-infocell.focus,
+.smartdown-container .btn-infocell:active.focus,
+.smartdown-container .btn-infocell.active.focus {
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
+}
+.smartdown-container .btn-infocell:hover,
+.smartdown-container .btn-infocell:focus,
+.smartdown-container .btn-infocell.focus {
+  color: #333;
+  text-decoration: none;
+}
+.smartdown-container .btn-infocell:hover {
+  color: #333;
+  background-color: rgb(234, 234, 234);
+  background-image: none;
+  border-color: #adadad;
+}
+
+.smartdown-container .btn-infocell:focus,
+.smartdown-container .btn-infocell.focus {
+  color: #333;
+  background-color: #e6e6e6;
+  border-color: #8c8c8c;
+}
+
+.smartdown-container .btn-infocell:active,
+.smartdown-container .btn-infocell.active {
+  background-image: none;
+  outline: 0;
+  box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+}
+
+.smartdown-container .btn-infocell:active,
+.smartdown-container .btn-infocell.active,
+.open > .dropdown-toggle.smartdown-container .btn-infocell {
+  color: #333;
+  background-color: #e6e6e6;
+  border-color: #adadad;
+}
+
+
+.smartdown-container .btn-infocell:active:hover,
+.smartdown-container .btn-infocell.active:hover,
+.open > .dropdown-toggle.smartdown-container .btn-infocell:hover,
+.smartdown-container .btn-infocell:active:focus,
+.smartdown-container .btn-infocell.active:focus,
+.open > .dropdown-toggle.smartdown-container .btn-infocell:focus,
+.smartdown-container .btn-infocell:active.focus,
+.smartdown-container .btn-infocell.active.focus,
+.open > .dropdown-toggle.smartdown-container .btn-infocell.focus {
+  color: #333;
+  background-color: #d4d4d4;
+  border-color: #8c8c8c;
+}
+
+
+.smartdown-container .btn-infocell.disabled,
+.smartdown-container .btn-infocell[disabled],
+fieldset[disabled] .smartdown-container .btn-infocell {
+  cursor: not-allowed;
+  filter: alpha(opacity=65);
+  box-shadow: none;
+  opacity: .65;
+}
+a.smartdown-container .btn-infocell.disabled,
+fieldset[disabled] a.smartdown-container .btn-infocell {
+  pointer-events: none;
+}
+
+.smartdown-container .btn-infocell:active,
+.smartdown-container .btn-infocell.active,
+.open > .dropdown-toggle.smartdown-container .btn-infocell {
+  background-image: none;
+}
+.smartdown-container .btn-infocell.disabled:hover,
+.smartdown-container .btn-infocell[disabled]:hover,
+fieldset[disabled] .smartdown-container .btn-infocell:hover,
+.smartdown-container .btn-infocell.disabled:focus,
+.smartdown-container .btn-infocell[disabled]:focus,
+fieldset[disabled] .smartdown-container .btn-infocell:focus,
+.smartdown-container .btn-infocell.disabled.focus,
+.smartdown-container .btn-infocell[disabled].focus,
+fieldset[disabled] .smartdown-container .btn-infocell.focus {
+  background-color: #fff;
+  border-color: #ccc;
+}
+
+.smartdown-container .btn-infocell img {
+  display: block;
+  margin:0;
+  padding:0;
+  max-height:100%;
+  max-width:100%;
+  width: auto;
+  height: auto;
+}
+
+//
+// Triggering Disclosables: Buttons and Tooltips
+//
+.smartdown-container .disclosable-trigger-button {
+}
+
+.smartdown-container .disclosable-trigger-tooltip-wrapper {
+  display: inline;
+  padding: 15px;
+  margin: -15px;
+}
+
+.smartdown-container .disclosable-trigger-tooltip {
+  display: inline-block;
+  color: #639ad7;
+}
+
+.smartdown-container .disclosable-trigger-tooltip:hover {
+  text-decoration: none;
+  color: #337ab7;
+  font-weight: bold;
+}
+
+$disclosable-height: 300px;
+$disclosable-width: 400px;
+
+.smartdown-container .disclosable-wrapper {
+  display: none;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: white;
+
+  &.disclosable-open {
+    display: block;
+    animation: fadeIn 2s;
+  }
+
+  .disclosable-header {
+  }
+
+  .disclosable-content {
+    padding: 0;
+    margin: 0;
+  }
+
+  &.disclosable-position {
+    width: ($disclosable-width);
+    position: fixed;
+    padding: 0;
+    z-index: 1050;
+    border: none;
+
+    .disclosable-header {
+      background: lightgray;
+      margin: 0;
+      padding: 0;
+      line-height: 0;
+
+      button.disclosable-button-close {
+        height: 16px;
+        line-height: 0;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        margin: 0 0 0 2px;
+        padding: 0 0 2px 0;
+      }
+    }
+
+    &.disclosable-scrollable {
+      height: 50%;
+      resize: both;
+      overflow: auto;
+    }
+
+    .disclosable-content {
+      padding: 0;
+      margin: 0;
+    }
+  }
+}
+
+
+.smartdown-container .disclosable-attach {
+  background: white;
+  display: block;
+  overflow: auto;
+  position: absolute;
+  padding: 5px;
+  z-index: 100;
+  font-size: 0.95em;
+  max-width: 90%;
+}
+
+@media (min-width: 770px) {
+  .smartdown-container .disclosable-attach {
+    max-width: 66%;
+  }
+}
+
+//
+// Decorations are distinct from Disclosables. Do not confuse them.
+// One confusing aspect is that a Disclosable trigger can contain decoration
+// names.
+//
+
+
+.smartdown-container .decoration-outlinebox {
+  display: block;
+  color:black;
+  background: white;
+  padding: 20px;
+  margin: 0;
+  border: 2px solid gray;
+  border-radius: 10px;
+}
+
+
+.smartdown-container .decoration-colorbox {
+  display: block;
+  color: white;
+  background: #67A;
+  padding: 20px;
+  margin: 0;
+  border-radius: 10px;
+}
+
+.smartdown-container .decoration-partialborder {
+  display: block;
+  color: black;
+  background: #EEF;
+  border-top: double;
+  border-bottom: double;
+  padding: 20px;
+}
+
+.smartdown-container .decoration-aliceblue {
+  display: block;
+  animation: fadeIn 2s;
+  background: aliceblue;
+  padding: 5px;
+  margin: 0;
+  border: 1px solid lightgray;
+  border-radius: 8px;
+}
+
+
+.smartdown-container .decoration-shadow {
+  box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.5);
+}
+
+
+.smartdown-container .decoration-lightbox {
+  outline: 9999px solid rgba(0,0,0,0.5);
+}
+
+
+/* Add animation (fade in the tooltip) */
+
+@keyframes fadeIn {
+  from {opacity: 0;}
+  to {opacity:1 ;}
+}
+
+.smartdown-container .infocell-group {
+  position: relative;
+  display: table;
+  border-collapse: separate;
+
+  padding: 0;
+  margin: 0;
+
+  user-select: none;
+
+  border:2px solid transparent;
+  border-radius: 3px;
+  background: rgb(250, 250, 255);
+  color: black;
+}
+
+.smartdown-container textarea.infocell-textarea {
+  font-size: inherit;
+  overflow:hidden;
+  resize:vertical;
+  border:1px solid lightblue;
+  margin: 0;
+  padding: 1px 4px;
+  vertical-align: middle;
+}
+
+.smartdown-container input.infocell-input {
+  font-size: inherit;
+  vertical-align: middle;
+  border:1px solid lightblue;
+  padding: 1px 4px;
+}
+
+
+.smartdown-container .infocell-group textarea.infocell-textarea {
+  xdisplay: table-cell;
+  xposition: relative;
+  xz-index: 2;
+  float: left;
+  height: 100%;
+  width: 100%;
+}
+
+.smartdown-container .infocell-group textarea.infocell-textarea:focus {
+  z-index: 3;
+}
+
+
+.smartdown-container .infocell-group input.infocell-input {
+  float: left;
+  height: 100%;
+  width: 100%;
+}
+
+.smartdown-container .infocell-group input.infocell-input:focus {
+  z-index: 3;
+}
+
+
+.smartdown-container .infocell-group-addon,
+.smartdown-container .infocell-group-btn {
+  display: table-cell;
+
+  width: 1%;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+
+.smartdown-container .infocell-group-addon {
+  padding: 2px 6px;
+  font-size: inherit;
+  font-weight: normal;
+  line-height: 1;
+  color: #555;
+  text-align: center;
+  background: transparent;
+  border:1px solid darkslateblue;
+  border-top-right-radius:3px;
+  border-bottom-right-radius:3px;
+}
+
+.smartdown-container .infocell-label {
+  display: inline-block;
+  color: darkslateblue;
+  word-break:break-all;
+  word-wrap:break-word;
+  font-weight: 500;
+  margin:0;
+  padding:0;
+  border:10px solid orange;
+}
+
+.smartdown-container .infocell-group .infocell-label {
+  display: table-cell;
+  height: 100%;
+  width: 100%;
+  border:none;
+}
+
+.smartdown-container .infocell-output {
+  display: inline-block;
+  user-select: text;
+  margin:0;
+  padding: 1px 4px;
+}
+
+.smartdown-container .infocell-output.smartdown-svg {
+  width:100%;
+}
+
+.smartdown-container .infocell-output.smartdown-openjscad {
+  width:100%;
+}
+
+.smartdown-container .infocell-output.smartdown-code {
+  width:100% !important;
+  max-width:95vw !important;
+  padding:5px;
+}
+
+.smartdown-container .infocell-group .infocell-output {
+  display: table-cell;
+  height: 100%;
+  width: 100%;
+  border:none;
+}
+
+
+.smartdown-container .infocell-output-pre {
+  height: 40vh;
+  display: block;
+  border:1px solid lightgray;
+  font-size: 0.9em;
+  color: black;
+  resize: both;
+  overflow-y: scroll;
+  margin: 0;
+  padding: 5px 10px;
+  font-family: 'Ubuntu Mono', monospace;
+  font-weight: 500;
+}
+
+.smartdown-container .infocell-output-list .infocell-output-pre {
+  height: 100%;
+}
+
+
+.smartdown-container .infocell-output-pre:empty {
+  height: 10px;
+  background: lightgray;
+}
+
+.smartdown-container ul.infocell-output-list {
+  list-style-type: none;
+  height: auto;
+  max-height: 400px;
+  max-width: 100%;
+  width: auto;
+  overflow-y: scroll;
+  border: none;
+  padding: 0;
+}
+
+.smartdown-container ul.infocell-output-list > li {
+  margin: 0;
+  padding: 0;
+}
+
+.smartdown-container ul.infocell-output-list pre {
+  font-size: 0.9em;
+}
+
+.smartdown-container ul > li > img {
+  width: auto;
+  height: auto;
+  max-height: 100%;
+  max-width: 100%;
+  margin: auto;
+  display: inline-block;
+}
+
+.smartdown-container img {
+  display: inline-block;
+  margin: auto;
+  padding:0;
+  pointer-events: none;
+}
+
+.smartdown-container a > * {
+  pointer-events: initial;
+}
+
+
+.smartdown-container .smartdown_p > img,
+.smartdown-container .infocell-output td > img,
+.smartdown-container .smartdown_p > a > img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  xmax-height: 70vh;
+  margin: auto;
+  display: block;
+  pointer-events: initial;
+}
+
+.smartdown-container .smartdown_p img.thumbnail,
+.smartdown-container .infocell-output td > img.thumbnail {
+  width: 400px;
+}
+
+.smartdown-container .smartdown_p img.halfwidth,
+.smartdown-container .infocell-output td > img.halfwidth {
+  width:50%;
+  max-height:unset;
+}
+
+.smartdown-container .smartdown_p img.fullwidth,
+.smartdown-container .infocell-output td > img.fullwidth {
+  width:100%;
+  max-height:unset;
+}
+
+.smartdown-container div.media-image svg,
+.smartdown-container img.media-image svg {
+  height: 100px;
+  max-width: 100%;
+}
+
+.smartdown-container button div.media-image svg,
+.smartdown-container button img.media-image svg {
+  height: 100px;
+  width: auto;
+}
+
+.smartdown-container div.media-image path,
+.smartdown-container img.media-image path {
+  fill: #EEE;
+  stroke: black;
+  stroke-width: 5px;
+}
+
+.smartdown-container div.media-image svg:hover path,
+.smartdown-container img.media-image svg:hover path {
+  cursor: pointer;
+  fill: rgba(200,200,200,.8);
+  stroke: royalblue;
+}
+
+div.media-image path,
+img.media-image path {
+  fill: #EEE;
+  stroke: black;
+  stroke-width: 5px;
+}
+
+
+.smartdown-container ul,
+.smartdown-container ol {
+  list-style-position: inside;
+  margin: 0;
+  padding: 4px 0 4px 8px;
+  line-height: 1.25;
+
+  user-select: text;
+}
+
+.smartdown-container ul {
+  list-style-type: square;
+}
+
+.smartdown-container ol {
+}
+
+.smartdown-container ul li,
+.smartdown-container ol li {
+  padding: 0 3px;
+}
+
+.smartdown-container ul li .infocell-group
+{
+  display:inline-table;
+  width:95%;
+  margin:0;
+  padding:0;
+}
+
+
+.smartdown-container /* li > .item */ table,
+.smartdown-container .markdown table
+ {
+    margin: auto;
+    padding: 0;
+    user-select: text;
+}
+
+.smartdown-container table thead tr th,
+.smartdown-container .markdown table thead tr th {
+  text-align: center;
+}
+
+.smartdown-container table thead tr th,
+.smartdown-container .markdown table thead tr th,
+.smartdown-container table tbody tr td,
+.smartdown-container .markdown table tbody tr td
+{
+    margin: 0;
+    padding: 2px 4px;
+    border: 1px solid lightgray;
+    vertical-align: text-bottom;
+}
+
+.smartdown-container table td[align="left"] {
+    text-align: left;
+}
+
+.smartdown-container table td[align="right"] {
+    text-align: right;
+}
+
+.smartdown-container table td[align="center"] {
+    text-align: center;
+}
+
+.smartdown-container div.media-image {
+  display: inline-block;
+}
+
+.smartdown-container div.media-image.clockwise {
+    animation-name: clockwise;
+    animation-duration: 15.5s;
+    animation-iteration-count: infinite;
+    transform-origin: 50% 50%;
+}
+
+.smartdown-container div.media-image.cclockwise {
+    animation-name: cclockwise;
+    animation-duration: 15.5s;
+    animation-iteration-count: infinite;
+    transform-origin: 50% 50%;
+}
+
+.smartdown-container div.media-image.pulse {
+    animation-name: pulse;
+    animation-duration: 10s;
+    animation-iteration-count: infinite;
+    transform-origin: 50% 50%;
+}
+
+.smartdown-container div.media-image.bluegreen svg path {
+  fill: lightblue !important;
+  stroke: green !important;
+}
+
+@keyframes clockwise {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes cclockwise {
+    0% {
+        transform: rotate(360deg);
+    }
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1.0);
+  }
+  50% {
+    transform: scale(0.5);
+  }
+  100% {
+    transform: scale(1.0);
+  }
+}
+
+.smartdown-container node polygon {
+  fill: red !important;
+  stroke: green !important;
+}
+
+.smartdown-container node {
+  fill: red !important;
+  stroke: green !important;
+}
+
+
+.smartdown-container .smartdown-mermaid.mermaid g.label,
+.smartdown-container .smartdown-mermaid.mermaid g.cluster text,
+.smartdown-container .smartdown-mermaid.mermaid g.grid g.tick text,
+.smartdown-container .smartdown-mermaid.mermaid text.sectionTitle,
+.smartdown-container .smartdown-mermaid.mermaid text.actor,
+.smartdown-container .smartdown-mermaid.mermaid text.messageText,
+.smartdown-container .smartdown-mermaid.mermaid text.noteText {
+  fill: black;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.smartdown-container .smartdown-mermaid.mermaid text.taskText,
+.smartdown-container .smartdown-mermaid.mermaid text.taskText.taskText0 {
+  fill: black;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.smartdown-container .smartdown-mermaid.mermaid text.taskTextOutsideRight,
+.smartdown-container .smartdown-mermaid.mermaid text.taskTextOutside2 {
+  fill: darkslateblue;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.smartdown-container table img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.smartdown-container .btn-mobile-button {
+  background: white;
+  margin: 0;
+  padding: 1px;
+  position: absolute;
+  font-weight: 600;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.smartdown-container .btn-mobile-button * {
+  margin: 0;
+  padding: 1px;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+
+.smartdown-container div.playable-wrapper div.playable-source {
+  height: 300px;
+  overflow-y: scroll;
+  resize: vertical;
+}
+
+.smartdown-container pre.playable-debug-source {
+  display: none;
+  border:1px solid dimgray;
+  border-radius: 0;
+  border-top: none;
+  border-right: none;
+  border-bottom-left-radius: 5px;
+  height: 200px;
+  overflow-y: scroll;
+  resize: vertical;
+}
+
+.smartdown-container pre.playable-debug-source.hidden {
+  display: none;
+}
+
+.smartdown-container button.playable-button {
+  display: inline-block;
+  padding: 0;
+  margin: auto;
+  font-size: 12px;
+  font-weight: 600;
+  xtext-align: text-top;
+  vertical-align: middle;
+  white-space: nowrap;
+  touch-action: manipulation;
+  cursor: pointer;
+  user-select: none;
+  background: #dbe4f0;
+  border: none;
+  border-radius: 4px;
+  height: 16px;
+  width: 100%;
+  color: dimgray;
+}
+
+.smartdown-container button.playable-button:focus,
+.smartdown-container button.playable-button:active:focus,
+.smartdown-container button.playable-button.active:focus,
+.smartdown-container button.playable-button.focus,
+.smartdown-container button.playable-button:active.focus,
+.smartdown-container button.playable-button.active.focus {
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
+}
+.smartdown-container button.playable-button:hover,
+.smartdown-container button.playable-button:focus,
+.smartdown-container button.playable-button.focus {
+  color: #333;
+  text-decoration: none;
+}
+.smartdown-container button.playable-button:active,
+.smartdown-container button.playable-button.active {
+  outline: 0;
+  -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+          box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+}
+.smartdown-container button.playable-button.disabled,
+.smartdown-container button.playable-button[disabled],
+.smartdown-container fieldset[disabled] button.playable-button {
+  cursor: not-allowed;
+  filter: alpha(opacity=50);
+  -webkit-box-shadow: none;
+          box-shadow: none;
+  opacity: .50;
+}
+
+
+.smartdown-container .api-button {
+  border: none;
+  border-radius:5px;
+  height: 20px;
+  background: black;
+  color: orange;
+  font-size: 10px;
+}
+
+.smartdown-container .debug-button {
+  border: none;
+  border-radius:5px;
+  width: 100%;
+  height: 16px;
+  margin: 1px 0;
+  padding: 0;
+  background: black;
+  line-height: 0;
+  color: lightgreen;
+  font-size: 10px;
+}
+
+
+
+.smartdown-container .video-container {
+  position: relative;
+  overflow: hidden;
+  height: 0;
+  background: black;
+}
+
+
+
+.smartdown-container .video-container.youtube.thumbnail {
+  width: 426px;
+  height: 240px;
+  /*width: 426px;*/
+  /*height: 240px;*/
+  padding: 0;
+}
+
+.smartdown-container .video-container.youtube.thumbnail iframe {
+  width: 426px;
+  height: 240px;
+}
+
+.smartdown-container .video-container.youtube.halfwidth {
+  width: 640px;
+  height: 360px;
+  padding: 0;
+}
+
+.smartdown-container .video-container.youtube.halfwidth iframe {
+  width: 640px;
+  height: 360px;
+}
+
+.smartdown-container .video-container.youtube.fullwidth {
+  padding-bottom: 56.25%; /* 16:9 */
+}
+
+
+.smartdown-container .video-container.youtube.fullwidth iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.smartdown-container .video-container.vimeo.thumbnail {
+  width: 320px;
+  height: 180px;
+  padding: 0;
+}
+
+.smartdown-container .video-container.vimeo.thumbnail iframe {
+  width: 320px;
+  height: 180px;
+}
+
+.smartdown-container .video-container.vimeo.fullwidth {
+  padding-bottom: 56.25%; /* 16:9 */
+}
+
+
+.smartdown-container .video-container.vimeo.fullwidth iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+
+/* -----------------------------------------------------
+  Pure CSS Progress Bars
+  GitHub Project: https://github.com/rkchauhan/pure-css-progress-bars/
+  By: Ravikumar Chauhan
+  Find me on -
+  Twitter: https://twitter.com/rkchauhan01
+  Facebook: https://www.facebook.com/ravi032chauhan
+  GitHub: https://github.com/rkchauhan
+  CodePen: http://codepen.io/rkchauhan
+-------------------------------------------------------- */
+
+/* -----------------------------------------------------
+   CSS Progress Bars
+-------------------------------------------------------- */
+.smartdown-container .smartdown-progress {
+  width: 100%;
+  height: 14px;
+  position: relative;
+  display: none;
+  background-color: #EEE;
+}
+
+.smartdown-container .smartdown-progress .smartdown-progress-bar {
+  display: block;
+  float: left;
+  width: 0%;
+  height: 100%;
+  background: #3798d9;
+  border-radius: 9px;
+  transition: width 0.8s ease-in-out;
+}
+.smartdown-container .smartdown-progress .smartdown-progress-label {
+  position: absolute;
+  overflow: hidden;
+  left: 0px;
+  right: 0px;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.7em;
+  text-align: center;
+  text-shadow: 0px 1px rgba(0, 0, 0, 0.3);
+}
+
+.smartdown-container .smartdown-progress .smartdown-progress-active {
+  background-image: -webkit-linear-gradient(135deg, rgba(255, 255, 255, 0.125) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.125) 50%, rgba(255, 255, 255, 0.125) 75%, transparent 75%, transparent);
+  background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.125) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.125) 50%, rgba(255, 255, 255, 0.125) 75%, transparent 75%, transparent);
+  background-size: 35px 35px;
+}
+.smartdown-container .smartdown-progress .smartdown-progress-active {
+  animation: smartdown-progressActive 2s linear infinite;
+}
+@keyframes smartdown-progressActive {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 35px 35px;
+  }
+}
+
+/*https://www.thecssninja.com/css/pointer-events-60fps*/
+
+.disable-hover,
+.disable-hover * {
+  pointer-events: none !important;
+}
+
+
+.disable-hover .smartdown-container a.smartdown-link,
+.disable-hover .smartdown-container button.btn-infocell,
+.disable-hover .smartdown-container button.api-button,
+.disable-hover .smartdown-container button.debug-button,
+.disable-hover .smartdown-container button.playable-button,
+.disable-hover .smartdown-container button.btn-infocell,
+.disable-hover .smartdown-container input,
+.disable-hover .smartdown-container textarea,
+.disable-hover .smartdown-container audio
+{
+  pointer-events: none !important;
+  opacity: 0.8 !important;
+}
+
+.disable-hover .smartdown-container .gifffer-container,
+.disable-hover .smartdown-container .video-container,
+.disable-hover .smartdown-container .twitter-tweet,
+.disable-hover .smartdown-container .playable-wrapper,
+.disable-hover .smartdown-container .smartdown-playable
+{
+  pointer-events: none !important;
+}
+
+.smartdown-container table {
+  border-spacing: 0;
+  border-collapse: collapse;
+  width: 100%;
+}
+.smartdown-container td,
+.smartdown-container th {
+  padding: 0;
+}
+
+.smartdown-container div audio {
+  display: inline-block;
+}
+
+.smartdown-container .MathJax_Display {
+  padding: 10px 0;
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+}
+
+
+.smartdown-container div.resp-iframe-container {
+  position: relative;
+  overflow: hidden;
+  padding-top: 100%;
+  height:0;
+}
+
+.smartdown-container .disclosable-wrapper.disclosable-tooltip div.resp-iframe-container {
+  background: white;
+  height: 60vh;
+  min-height: 400px;
+  margin: 0;
+  padding: 0;
+}
+
+.smartdown-container div.resp-iframe-container > iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  min-height: 100%;
+  border: 0;
+}
+
+@media (min-width: 770px) {
+  .smartdown-container {
+    font-size: 21px;
+    line-height: 1.5; /* 1.42857143; */
+  }
+
+  .smartdown-container h1,
+  .smartdown-container .h1,
+  .smartdown-container h2,
+  .smartdown-container .h2,
+  .smartdown-container h3,
+  .smartdown-container .h3 {
+    margin-top: 30px;
+    margin-bottom: 15px;
+  }
+
+  .smartdown-container h4,
+  .smartdown-container .h4,
+  .smartdown-container h5,
+  .smartdown-container .h5,
+  .smartdown-container h6,
+  .smartdown-container .h6 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+
+  .smartdown-container table thead tr th,
+  .smartdown-container .markdown table thead tr th,
+  .smartdown-container table tbody tr td,
+  .smartdown-container .markdown table tbody tr td
+  {
+      padding: 3px 6px;
+  }
+}
+
+
+/* smartdown-theme-dark theme */
+
+.smartdown-theme-dark .smartdown-container .MathJax_Display {
+  background:ghostwhite !important;
+  color: black;
+}
+
+.smartdown-outer-container.smartdown-theme-dark {
+  margin: 0;
+  padding: 0;
+  background: #2E2E2E;
+}
+
+.smartdown-outer-container.smartdown-theme-dark .smartdown-container .infocell-group {
+  background: #2E2E2E;
+  color: black;
+}
+
+.smartdown-outer-container.smartdown-theme-dark > .container-fluid {
+  margin:0;
+  padding:0;
+}
+
+.smartdown-theme-dark .smartdown-container {
+  border:1px solid black;
+  background: #2E2E2E;
+  color: #EBEBEB;
+}
+
+
+.smartdown-theme-dark .smartdown-container .json-formatter-row {
+  background:lightgray;
+}
+
+
+.smartdown-theme-dark .smartdown-container .btn.btn-sm.btn-infocell {
+  background: #444;
+  text-shadow: none;
+  color: #EFEFEF;
+}
+
+
+.smartdown-theme-dark .smartdown-container textarea.infocell-textarea {
+  background: #444;
+  color: #EBEBEB;
+}
+
+
+.smartdown-theme-dark .smartdown-container h1,
+.smartdown-theme-dark .smartdown-container h2,
+.smartdown-theme-dark .smartdown-container h3,
+.smartdown-theme-dark .smartdown-container h4,
+.smartdown-theme-dark .smartdown-container h5,
+.smartdown-theme-dark .smartdown-container h6
+{
+  color: #EBEBEB;
+}
+
+
+.smartdown-theme-dark .smartdown-container .infocell-label {
+  color: #EBEBEB;
+}
+
+
+.smartdown-theme-dark .smartdown-container .btn-infocell {
+  display: inline-block;
+  padding: 3px 5px;
+  margin-bottom: 0;
+  background-image: linear-gradient(rgb(124, 124, 124) 0px, rgb(104, 104, 104) 100%);
+  border: 1px solid transparent;
+  color: #EBEBEB;
+}
+
+
+/* Chat theme (aka Scape) */
+
+.smartdown-outer-container.smartdown-theme-chat {
+  margin:0;
+  padding:0;
+}
+
+.smartdown-theme-chat .smartdown-container {
+  margin: 0;
+  background: rgb(251, 251, 254);
+  padding: 2px 4px;
+  font-family: 'Asap', san-serif;
+  font-size: 16px;
+  line-height: 1.35; /* 1.42857143; */
+}
+
+.smartdown-theme-chat .smartdown-container h1,
+.smartdown-theme-chat .smartdown-container .h1,
+.smartdown-theme-chat .smartdown-container h2,
+.smartdown-theme-chat .smartdown-container .h2,
+.smartdown-theme-chat .smartdown-container h3,
+.smartdown-theme-chat .smartdown-container .h3 {
+  margin-top: 15px;
+  margin-bottom: 5px;
+}
+
+.smartdown-theme-chat .smartdown-container h4,
+.smartdown-theme-chat .smartdown-container .h4,
+.smartdown-theme-chat .smartdown-container h5,
+.smartdown-theme-chat .smartdown-container .h5,
+.smartdown-theme-chat .smartdown-container h6,
+.smartdown-theme-chat .smartdown-container .h6 {
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+
+.smartdown-theme-chat p.smartdown_p {
+  margin: 5px 0;
+  padding: 0 0 0 4px;
+}
+
+
+
+@media (min-width: 770px) {
+  .smartdown-theme-chat .smartdown-container {
+    font-size: 16px;
+    line-height: 1.35; /* 1.42857143; */
+  }
+}
+
+
+
+/* Blog theme (for Celestial Toys) */
+
+.smartdown-outer-container.smartdown-theme-blog {
+  margin:0;
+  padding:0;
+}
+
+.smartdown-theme-blog .smartdown-container {
+  margin: 0;
+  background: rgb(251, 251, 254);
+  padding: 2px 4px;
+  font-family: 'Asap', san-serif;
+  font-size: 18px;
+  line-height: 1.29; /* 1.42857143; */
+}
+
+.smartdown-theme-blog .smartdown-container h1,
+.smartdown-theme-blog .smartdown-container .h1,
+.smartdown-theme-blog .smartdown-container h2,
+.smartdown-theme-blog .smartdown-container .h2,
+.smartdown-theme-blog .smartdown-container h3,
+.smartdown-theme-blog .smartdown-container .h3 {
+  margin-top: 12px;
+  margin-bottom: 6px;
+}
+
+.smartdown-theme-blog .smartdown-container h4,
+.smartdown-theme-blog .smartdown-container .h4,
+.smartdown-theme-blog .smartdown-container h5,
+.smartdown-theme-blog .smartdown-container .h5,
+.smartdown-theme-blog .smartdown-container h6,
+.smartdown-theme-blog .smartdown-container .h6 {
+  margin-top: 8px;
+  margin-bottom: 4px;
+}
+
+.smartdown-theme-blog .smartdown-container table thead tr th,
+.smartdown-theme-blog .smartdown-container .markdown table thead tr th,
+.smartdown-theme-blog .smartdown-container table tbody tr td,
+.smartdown-theme-blog .smartdown-container .markdown table tbody tr td
+{
+    padding: 1px 3px;
+}
+
+
+.smartdown-theme-blog .smartdown-container .btn-infocell {
+  margin:0 3px;
+  padding: 2px 4px;
+}
+
+.smartdown-theme-blog p.smartdown_p {
+  margin: 4px 0;
+  padding: 0 0 0 4px;
+}
+
+
+
+@media (min-width: 770px) {
+  .smartdown-theme-blog .smartdown-container {
+    font-size: 20px;
+    line-height: 1.35; /* 1.42857143; */
+  }
+}
+
+
+/* Playful theme (aka XKCD) */
+
+.smartdown-outer-container.smartdown-theme-playful {
+  margin:0;
+  padding:0;
+}
+
+.smartdown-theme-playful .smartdown-container {
+  margin: 0;
+  background: rgb(251, 251, 254);
+  padding: 2px 4px;
+  font-family: 'Neucha', san-serif;
+  font-size: 18px;
+  line-height: 1.35; /* 1.42857143; */
+
+  h1,
+  .h1,
+  h2,
+  .h2,
+  h3,
+  .h3 {
+    margin-top: 15px;
+    margin-bottom: 5px;
+    font-family: 'Cabin Sketch', san-serif;
+  }
+
+}
+
+
+.smartdown-theme-playful .smartdown-container h4,
+.smartdown-theme-playful .smartdown-container .h4,
+.smartdown-theme-playful .smartdown-container h5,
+.smartdown-theme-playful .smartdown-container .h5,
+.smartdown-theme-playful .smartdown-container h6,
+.smartdown-theme-playful .smartdown-container .h6 {
+  margin-top: 10px;
+  margin-bottom: 5px;
+  font-family: 'Cabin Sketch', san-serif;
+}
+
+.smartdown-theme-playful p.smartdown_p {
+  margin: 5px 0;
+  padding: 0 0 0 4px;
+}
+
+.smartdown-theme-playful .smartdown-container .btn-infocell {
+  font-family: 'Neucha', san-serif;
+  display: inline-block;
+  margin: 1px 4px 1px 4px;
+  padding: 3px 5px 0 5px;
+}
+
+
+@media (min-width: 770px) {
+  .smartdown-theme-playful .smartdown-container {
+    font-size: 20px;
+    line-height: 1.45; /* 1.42857143; */
+  }
+}
+
+.openjscad-container {
+  margin: 5px;
+
+  .viewerContext {
+  }
+
+  .viewerCanvas {
+    width: 100%;
+    height: 300px;
+  }
+
+  .viewer-footer {
+    border: 1px solid lightgray;
+    border-radius: 4px;
+    background: aliceblue;
+    padding: 5px;
+
+    table.openjscad-parametersTable {
+      line-height: 0.9;
+      font-size: 0.8em;
+    }
+  }
+
+}
+
+
