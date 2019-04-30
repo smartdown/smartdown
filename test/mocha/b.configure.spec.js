@@ -24,7 +24,7 @@ describe('b.configure', function() {
   });
 
   describe('smartdown.version()', function() {
-    it('should return "1.0.0"', function() {
+    it('should return "1.0.1"', function() {
       assert.equal(smartdown.version, '1.0.0');
     });
   });

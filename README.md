@@ -6,12 +6,13 @@ Smartdown is a *declarative*, *literate* and *reactive* authoring technology for
 
 Smartdown extends the simple expressivity of the [Markdown](https://en.wikipedia.org/wiki/Markdown) language commonly used on blogs, messaging systems, technical forums, and on [GitHub](https://help.github.com/articles/basic-writing-and-formatting-syntax/). The Smartdown **engine** is a Javascript library that interprets the content in these Smartdown source files and enacts the desired behavior and presentation.
 
-- [Smartdown Documentation](https://doctorbud.com/smartdown/doc/)
-- [Smartdown API](https://doctorbud.com/smartdown/doc/api/)
-- [Version History](https://doctorbud.com/smartdown/doc/versions/)
-- [License](https://doctorbud.com/smartdown/doc/license/)
-- [Contributing](https://doctorbud.com/smartdown/doc/contributing/)
-- [Code of Conduct](https://doctorbud.com/smartdown/doc/code_of_conduct/)
+- [Smartdown Documentation](https://smartdown.github.io/smartdown/doc/)
+- [Smartdown API](https://smartdown.github.io/smartdown/doc/api/)
+- [Version History](https://smartdown.github.io/smartdown/doc/versions/)
+- [License](https://smartdown.github.io/smartdown/doc/license/)
+- [Contributing](https://smartdown.github.io/smartdown/doc/contributing/)
+- [Code of Conduct](https://smartdown.github.io/smartdown/doc/code_of_conduct/)
+- [Smartdown Source](https://github.com/smartdown/smartdown/)
 
 
 ## Markdown and Smartdown
@@ -34,7 +35,7 @@ Smartdown utilizes Markdown's link syntax and if it detects a Smartdown-formatte
 - Tweet: `![](https://twitter.com/nasa/status/735978603431768065)`
 - Tweet+: `![](https://twitter.com/nasa/status/735978603431768065&showMedia)`
 
-See [Cells](https://smartdown.site/lib/#Cells) for detailed examples of Smartdown Cells.
+See [Cells](https://smartdown.github.io/smartdown/#Cells) for detailed examples of Smartdown Cells.
 
 ### Smartdown Playables
 
@@ -54,20 +55,11 @@ There is also an `/autoplay` option, which will ensure that the playable content
 
 ## Philosophy
 
-[Smartdown](http://smartdown.site) is a flexible system for authoring and interacting with [Explorable explanations](https://medium.com/@Max_Goldstein/exploring-explorable-explanations-92f865c8d6ba#.10uo10u6k), which are *micro-apps* composed of text, multimedia and code. Smartdown projects are written using an enhanced version of Markdown called **Smartdown**, which integrates MarkDown's ease-of-use with a reactive process engine.
+[Smartdown](https://smartdown.io) is a flexible system for authoring and interacting with [Explorable explanations](https://medium.com/@Max_Goldstein/exploring-explorable-explanations-92f865c8d6ba#.10uo10u6k), which are *micro-apps* composed of text, multimedia and code. Smartdown projects are written using an enhanced version of Markdown called **Smartdown**, which integrates MarkDown's ease-of-use with a reactive process engine.
 
 Users of this technology include teachers, students, bloggers, and anyone who wants to easily create and publish their ideas, research, questions or explanations. The mission of Smartdown is to nurture idea inspiration, simplify the process of creation, and to encourage sharing and exploration of the resulting knowledge.
 
 Smartdown is intended for teacher and student alike; the philosophy being that the best ways to learn a skill or concept are to **use it** and to **teach it**. A teacher might produce a Smartdown project for the purposes of teaching, and may then assign a student the task of *explaining* a learned concept by authoring their own project, which can then be shared (*show and tell* is a powerful technique).
-
-## FAQ
-
-- **Is this Beta Software?** Yes. It is useful and usable, but it lacks many of the finishing touches necessary for it to be complete.
-- **Is this open source?** No, not yet. It is currently *Copyright Daniel B Keith, 2015*. I'm currently working on establishing a core team of developers and the necessary license agreements to assure sustainability of the project. Please contact [feedback@infoclay.com](mailto:feedback@infoclay.com) if you'd like to help, have advice, or want to cheer me on.
-- **How are you going to make a living off of this?** I have no idea! Smartdown is something I want to exist. I'm hoping that someone else finds it useful and that maybe there will be a way for me to keep working on it. Right now, it's a weekend and spare time project unassociated with my day job.
-- **How can I provide feedback?** - Send an email to [feedback@infoclay.com](mailto:feedback@infoclay.com); any feedback is appreciated. I am working on creating a more flexible and interactive means of user feedback.
-- **What is InfoClay?** InfoClay is the name of an interactive authoring environment wherein Smartdown was initially conceived, and then isolated as a separate library. InfoClay is still under development as [KnowBench](https://knowbench.com), but my priorities have been on stabilizing and releasing Smartdown. In some of the earlier documentation and examples, InfoClay and Smartdown mean the same thing: markdown-based, interactive, reactive explorable explanations.
-
 
 ## Ways to Share and Publish Smartdown
 
@@ -80,7 +72,7 @@ The [Smartdown](https://github.com/smartdown) GitHub organization contains sever
 
 ### Simple Site Example
 
-This repository (smartdown) a simple example of a Smartdown-enabled site that includes the Smartdown library, initializes it, and displays the Smartdown Gallery of examples. This can be viewed at [https://smartdown.site/lib](https://smartdown.site/lib). Unlike the Smartdown Source Viewer Site below, this site does not support editing or the display of the Smartdown source files. It's basically an example of a static site of Smartdown content; in this case, the Smartdown Example Gallery. The source for this Simple Viewer is in `src/SimpleSiteExample/index.ejs` *(TBD... Create a simple example that is pure HTML without templating)*
+This repository (smartdown) a simple example of a Smartdown-enabled site that includes the Smartdown library, initializes it, and displays the Smartdown Gallery of examples. This can be viewed at [https://smartdown.github.io/smartdown](https://smartdown.github.io/smartdown). Unlike the Smartdown Source Viewer Site below, this site does not support editing or the display of the Smartdown source files. It's basically an example of a static site of Smartdown content; in this case, the Smartdown Example Gallery. The source for this Simple Viewer is in `src/SimpleSiteExample/index.ejs` *(TBD... Create a simple example that is pure HTML without templating)*
 
 The Simple Site Example does support the ability to view arbitrary Markdown or Smartdown files by appending the desired URL to the above URL, along with a hash (`#`) marker. For example, the following Markdown file:
 
@@ -88,7 +80,7 @@ The Simple Site Example does support the ability to view arbitrary Markdown or S
 
 can be viewed via the URL:
 
-[`https://smartdown.site/lib/#https://cdn.rawgit.com/mozilla/mentat/ae91603b/README.md`](https://smartdown.site/lib/#https://cdn.rawgit.com/mozilla/mentat/ae91603b/README.md)
+[`https://smartdown.github.io/smartdown/#https://cdn.rawgit.com/mozilla/mentat/ae91603b/README.md`](https://smartdown.github.io/smartdown/#https://cdn.rawgit.com/mozilla/mentat/ae91603b/README.md)
 
 
 ### Smartdown Source Viewer Application
@@ -104,30 +96,26 @@ For example, the URL above can be viewed via the Smartdown Source Viewer
 
 ### Using GitHub Gists to store Smartdown files
 
-See [Gists](https://smartdown.site/lib/#Gists) for details on how Smartdown deals with Gists.
+See [Gists](https://smartdown.github.io/smartdown/#Gists) for details on how Smartdown deals with Gists.
 
-See [Smartdown Via Gists](https://smartdown.site/gist/#DoctorBud/3b5cbab3424e08199b8046cf98d19c8f/Home) for a very detailed tutorial on how to author Smartdown documents in GitHub Gists and then display.
+See [Smartdown Via Gists](https://smartdown.github.io/smartdown/#gist/DoctorBud/3b5cbab3424e08199b8046cf98d19c8f/Home) for a very detailed tutorial on how to author Smartdown documents in GitHub Gists and then display.
 
 
 ### Via a Blog
 
 TBD: Document the blog-starter-kit here.
 
-### Current State of the Project
+## Current State of the Smartdown Project
 
-### Pre-Release Warning
+#### 1.0.0 Open Sourced via BSD-3 License April 28, 2019
 
-This software is still incomplete in its implementation, documentation, and attribution. I intend to add much better documentation as well as proper citation of the software I use. Right now, the only way to test it in the real world is to deploy it with a bunch of disclaimers like this one.
+This software is still incomplete in its implementation, documentation, and attribution. I intend to add much better documentation as well as proper citation of the software I use. Right now, the only way to test it in the real world is to deploy it with a bunch of disclaimers like this one, and to fix problems as we discover them.
 
-I am in the process of making the elements of the Smartdown project Open Source, and have Open Sourced several related tools. The core Smartdown parser and engine is still in a private repository while I do some cleanup of the code. Soon I will move the code into this repository and associate it with the BSD-3. Until then, the GitHub repository for `smartdown` will remain a Private repository and the software will be Copyright 2015, Daniel B Keith.
+#### Contact Info
 
-This software is still incomplete in its implementation, documentation, and attribution. I intend to add much better documentation as well as proper citation of the software I use. Right now, the only way to test it in the real world is to deploy it with a bunch of disclaimers like this one.
-
-### Contact Info
-
-Principal Author: Daniel B Keith
-email: [feedback@infoclay.com](mailto:feedback@infoclay.com)
-Twitter: @TheDoctorBud
-GitHub: DoctorBud
-Blog: [https://doctorbud.com](https://doctorbud.com)
+- Principal Author: Daniel B Keith
+- email: [smartdown@quantumclay.com](mailto:smartdown@quantumclay.com)
+- Twitter: @TheDoctorBud
+- GitHub: DoctorBud
+- Blog: [https://doctorbud.com](https://doctorbud.com)
 

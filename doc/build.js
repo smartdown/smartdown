@@ -27,7 +27,7 @@ const buildConfig = {
 
     // using an object to rename the route for the given markdown files
     {
-      guide: './doc/index.md'
+      guide: './README.md'
     }
   ],
   'assets': {
