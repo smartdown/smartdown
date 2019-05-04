@@ -38,7 +38,7 @@ var themeName = '';
 
 function starter(basePrefix) {
   var defaultHome = 'Home';
-  var baseURL = 'https://smartdown.site/';
+  var baseURL = 'https://https://smartdown.github.io/smartdown/';
   var resourceURL = baseURL + 'lib/resources/';
   var rawPrefix = window.location.origin + window.location.pathname;
   var gistPathPrefix = '';
@@ -112,13 +112,18 @@ function starter(basePrefix) {
     if (themeName !== '') {
       window.location.search = `?theme=${themeName}`;
     }
-    // console.log('cardLoaded', cardKey, window.location.hash, window.location.search, window.location);
 
     let defaultPart = '_default_';
-    if (cardKey.indexOf(':') >= 0) {
+    if (cardKey.indexOf('http:') !== 0 &&
+        cardKey.indexOf('https:') !== 0 &&
+        cardKey.indexOf(':') >= 0) {
       const keyParts = cardKey.split(':');
       defaultPart = keyParts[keyParts.length - 1];
     }
+
+    // console.log(sourceText);
+    // console.log('defaultPart', defaultPart);
+    // console.log(JSON.stringify(multiparts, null, 2));
     smartdown.setHome(multiparts[defaultPart], output, function() {
       document.body.scrollTop = 0; // For Chrome, Safari and Opera
       document.documentElement.scrollTop = 0; // For IE and Firefox
@@ -206,11 +211,20 @@ function starter(basePrefix) {
           // console.log('gistFile', gistFile);
           var gistFileURL = gistFile.raw_url;
           cardKey = gistHashPrefix + gistOrg + '/' + gistID + '/' + cardKey;
+          lastLoadedRawPrefix = 'https://gist.githubusercontent.com/' + gistOrg + '/' + gistID + '/raw/';
+
           loadAsyncCard(cardKey, gistFileURL);
         }
       });
       oReq.open('GET', gistAPIBase);
       oReq.send();
+    }
+    else if (cardKey.indexOf(':') >= 0) {
+      const keyParts = cardKey.split(':');
+      const loadableKey = keyParts.slice(0, -1).join(':');
+      var suffix = (loadableKey === '') ? '' : (loadableKey + '.md');
+      var cardURL = lastLoadedRawPrefix + suffix;
+      loadAsyncCard(cardKey, cardURL);
     }
     else {
       gistOrg = '';
@@ -309,8 +323,21 @@ function starter(basePrefix) {
         result = 'https://gist.githubusercontent.com/' + matchGistOrg + '/' + matchGistID + '/raw/';
       }
     }
+    else if (hash.indexOf('#https://gist.githubusercontent.com/') === 0) {
+      var re = '^#https://gist.githubusercontent.com/([^/]+)/([^/]+)/.*$';
+      var gistRE = new RegExp(re, 'g');
+      var match = gistRE.exec(hash);
+      if (match) {
+        var matchGistOrg = match[1];
+        var matchGistID = match[2];
+        result = 'https://gist.githubusercontent.com/' + matchGistOrg + '/' + matchGistID + '/raw/';
+      }
+    }
+
     /* eslint-enable block-scoped-var */
     /* eslint-enable no-redeclare */
+
+    // console.log('gistPrefix', result, lastLoadedRawPrefix, hash);
 
     return result;
   }
@@ -405,6 +432,9 @@ function starter(basePrefix) {
   function loadHomeDefault() {
     loadHome(basePrefix);
   }
+
+  // console.log(JSON.stringify(media, null, 2));
+  // console.log(JSON.stringify(linkRules, null, 2));
   smartdown.initialize(media, baseURL, loadHomeDefault, relativeCardLoader, calcHandlers, linkRules);
 }
 

@@ -230,6 +230,7 @@ var config = {
     }),
 
     new CopyWebpackPlugin([
+        { from: 'SimpleSiteExample/index_unpkg.html', to: '../index_unpkg.html' },
         { from: '../distdoc/', to: '../doc/' },
         { from: 'favicons', to: '../' },
         { from: '../CODE_OF_CONDUCT.md', to: '../' },

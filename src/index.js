@@ -336,7 +336,8 @@ function expandHrefWithLinkRules(href) {
     }
   }
 
-  // console.log('expandHrefWithLinkRules', linkRules, href, result, JSON.stringify(window.location, null, 2));
+  // console.log('expandHrefWithLinkRules', linkRules, href, result);
+  // console.log(JSON.stringify(linkRules, null, 2));
 
   return result;
 }
@@ -4498,7 +4499,7 @@ module.exports = {
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
   showAugmentedCode: false,
-  version: '1.0.1',
+  version: '1.0.2',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,
