@@ -40,6 +40,8 @@ var leafletJSDir = path.join(nm, '/leaflet/dist');
 var leafletJS = path.join(leafletJSDir, 'leaflet.js');
 var ldfJS = path.join(app, 'external/ldf-client-browser.js');
 var openjscadJS = path.join(app, 'external/openjscad.reentrant.umd.js');
+var abcjsJS = path.join(app, 'external/abcjs_midi_5.6.11-min.js');
+var abcjsCSS = path.join(app, 'external/abcjs_midi.css');
 var giffferJS = path.join(nm, 'gifffer/build/gifffer.min.js');
 var stacktraceJS = path.join(nm, 'stacktrace-js/dist/stacktrace.min.js');
 // var mermaidJS = path.join(nm, 'mermaid/dist/mermaid.min.js');
@@ -62,6 +64,7 @@ var useLocalForage = true && !test;
 var useLeaflet = true && !test;
 var useGraphviz = !useOlderBrowsers && !test;
 var useBrython = true && !test;
+var useABCJS = true && !test;
 var useD3 = true && !test;
 var useGifffer = true && !test;
 var useLDF = true && !test;
@@ -217,6 +220,7 @@ var config = {
       useLeaflet: useLeaflet,
       useGraphviz: useGraphviz,
       useBrython: useBrython,
+      useABCJS: useABCJS,
       useD3: useD3,
       useGifffer: useGifffer,
       useLDF: useLDF,
@@ -239,7 +243,6 @@ var config = {
         { from: '../README.md', to: '../' },
         { from: 'fonts.css' },
         { from: 'fonts/', to: './fonts/' },
-        { from: 'extensions/p5.play.js' },
         { from: 'starter.js' },
         { from: 'blocks_helper.js' },
         { from: 'inline_helper.js' },
@@ -249,6 +252,8 @@ var config = {
         { from: vizJS },
         { from: vizLiteJS },
         { from: openjscadJS },
+        { from: abcjsJS },
+        { from: abcjsCSS },
         { from: brythonJS },
         { from: brythonStdlibJS },
         { from: 'xypic.js' },

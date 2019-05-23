@@ -311,6 +311,9 @@
   }
 }
 
+.smartdown-container .smartdown-abcmidi {
+  min-width: 200px !important;
+}
 
 .smartdown-container .smartdown-mermaid {
   background: white;

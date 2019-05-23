@@ -14,6 +14,7 @@
 /* global useLeaflet */
 /* global useGraphviz */
 /* global useBrython */
+/* global useABCJS */
 /* global useD3 */
 /* global useGifffer */
 /* global useLDF */
@@ -122,6 +123,14 @@ const playableTypes = {
   },
   'graphviz': {
     highlight: 'graphviz',
+    javascript: false
+  },
+  'abc': {
+    highlight: 'abc',
+    javascript: false
+  },
+  'abcmidi': {
+    highlight: 'abc',
     javascript: false
   },
   'mermaid': {
@@ -262,6 +271,7 @@ const OpenJSCAD = require('./extensions/OpenJSCAD');
 const Leaflet = require('./extensions/Leaflet');
 const graphvizImages = require('./extensions/Graphviz');
 const Mermaid = require('./extensions/Mermaid.js');
+const ABCJS = require('./extensions/ABCJS.js');
 
 
 var P5 = require('./extensions/P5.js');
@@ -602,6 +612,8 @@ function getPrelude(language, code) {
     'plotly',
     'openjscad',
     'graphviz',
+    'abc',
+    'abcmidi',
     'mermaid',
   ];
 
@@ -615,10 +627,7 @@ function getPrelude(language, code) {
     const includePrefix = '//smartdown.include=';
     lines.forEach(line => {
       if (line.indexOf(usePrefix) === 0) {
-        let rhs = line.slice(usePrefix.length);
-        if (rhs === 'https://cdn.rawgit.com/code-dot-org/p5.play/master/lib/p5.play.js') {
-          rhs = window.smartdown.baseURL + 'lib/p5.play.js';
-        }
+        const rhs = line.slice(usePrefix.length);
         imports.push(rhs);
       }
       else if (line.indexOf(includePrefix) === 0) {
@@ -2474,6 +2483,31 @@ ${e}
       });
     });
   }
+  else if (language === 'abc') {
+    div.innerHTML = '<i>...renderingx abc...</i>';
+    window.smartdownJSModules.abc.loader(function () {
+      /* global ABCJS */
+      // https://github.com/paulrosen/abcjs/blob/master/src/api/abc_tunebook_svg.js#L143
+      window.ABCJS.renderAbc([div], script.text);
+      if (progress) {
+        progress.style.display = 'none';
+      }
+    });
+  }
+  else if (language === 'abcmidi') {
+    div.innerHTML = '<i>...rendering abc...</i>';
+    window.smartdownJSModules.abc.loader(function () {
+      /* global ABCJS */
+      // https://github.com/paulrosen/abcjs/blob/master/src/api/abc_tunebook_svg.js#L143
+      window.ABCJS.renderMidi([div], script.text);
+      if (progress) {
+        progress.style.display = 'none';
+      }
+    });
+  }
+  else {
+    console.log('language: ', language);
+  }
 }
 
 
@@ -2527,6 +2561,11 @@ function recursivelyLoadImports(language, divId, importsRemaining, done) {
     }
     else if (nextImport === 'graphviz') {
       window.smartdownJSModules.graphviz.loader(function () {
+        recursivelyLoadImports(language, divId, importsRemaining, done);
+      });
+    }
+    else if (nextImport === 'abc' || nextImport === 'abcmidi') {
+      window.smartdownJSModules.abc.loader(function () {
         recursivelyLoadImports(language, divId, importsRemaining, done);
       });
     }
@@ -3614,6 +3653,22 @@ function renderCell(cellID, variableId, newValue) {
       });
     }
   }
+  else if (cellInfo.datatype === 'abc') {
+    element.innerHTML = '<i>...rendering abc...</i>';
+    if (typeof newValue === 'string' && newValue.length > 0) {
+      window.smartdownJSModules.abc.loader(function () {
+        window.ABCJS.renderAbc([element], newValue);
+      });
+    }
+  }
+  else if (cellInfo.datatype === 'abcmidi') {
+    element.innerHTML = '<i>...rendering abcmidi...</i>';
+    if (typeof newValue === 'string' && newValue.length > 0) {
+      window.smartdownJSModules.abc.loader(function () {
+        window.ABCJS.renderMidi([element], newValue);
+      });
+    }
+  }
   else if (cellInfo.datatype === 'graphviz') {
     element.innerHTML = '<i>...rendering graphviz...</i>';
     if (typeof newValue === 'string' && newValue.length > 0) {
@@ -4499,7 +4554,7 @@ module.exports = {
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
   showAugmentedCode: false,
-  version: '1.0.2',
+  version: '1.0.3',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,
