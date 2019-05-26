@@ -311,9 +311,27 @@
   }
 }
 
-.smartdown-container .smartdown-abcmidi {
-  min-width: 200px !important;
+
+.smartdown-container .abc-wrapper,
+.smartdown-container .infocell-output .abc-wrapper {
+  background: ivory;
+  margin: 0 !important;
+  width: 100%;
 }
+
+.smartdown-container .smartdown-abc,
+.smartdown-container .infocell-output .smartdown-abc {
+  width: 100%;
+}
+.smartdown-container .smartdown-abcsheet,
+.smartdown-container .infocell-output .smartdown-abcsheet {
+  width: 100%;
+}
+.smartdown-container .smartdown-abcmidi,
+.smartdown-container .infocell-output .smartdown-abcmidi {
+  width: 100%;
+}
+
 
 .smartdown-container .smartdown-mermaid {
   background: white;
@@ -623,7 +641,7 @@ $disclosable-width: 400px;
   max-width: 90%;
 }
 
-@media (min-width: 770px) {
+@media (min-width: 800px) {
   .smartdown-container .disclosable-attach {
     max-width: 66%;
   }
@@ -1441,7 +1459,7 @@ img.media-image path {
   border: 0;
 }
 
-@media (min-width: 770px) {
+@media (min-width: 800px) {
   .smartdown-container {
     font-size: 21px;
     line-height: 1.5; /* 1.42857143; */
@@ -1594,7 +1612,7 @@ img.media-image path {
 
 
 
-@media (min-width: 770px) {
+@media (min-width: 800px) {
   .smartdown-theme-chat .smartdown-container {
     font-size: 16px;
     line-height: 1.35; /* 1.42857143; */
@@ -1660,7 +1678,7 @@ img.media-image path {
 
 
 
-@media (min-width: 770px) {
+@media (min-width: 800px) {
   .smartdown-theme-blog .smartdown-container {
     font-size: 20px;
     line-height: 1.35; /* 1.42857143; */
@@ -1721,7 +1739,7 @@ img.media-image path {
 }
 
 
-@media (min-width: 770px) {
+@media (min-width: 800px) {
   .smartdown-theme-playful .smartdown-container {
     font-size: 20px;
     line-height: 1.45; /* 1.42857143; */

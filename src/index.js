@@ -24,6 +24,7 @@
 /* global useMathJax */
 /* global useStdlib */
 /* global useMermaid */
+/* global ABCJS */
 
 import './polyfills';
 
@@ -130,6 +131,10 @@ const playableTypes = {
     javascript: false
   },
   'abcmidi': {
+    highlight: 'abc',
+    javascript: false
+  },
+  'abcsheet': {
     highlight: 'abc',
     javascript: false
   },
@@ -528,6 +533,33 @@ function convertVimeoFragmentToEmbed(href, title) {
 }
 
 
+function queueContentLoad(contentType, baseId, href, title, text) {
+  // console.log('queueContentLoad', contentType, baseId, href, title, text);
+
+  if (contentType.indexOf('abc') === 0) {
+    window.smartdownJSModules.abc.loader(function () {
+      axios.get(href)
+        .then(function(result) {
+          const params = {
+            responsive: 'resize',
+          };
+          if (text !== 'abcmidi') {
+            const sheetDiv = document.getElementById(`${baseId}-sheet`);
+            window.ABCJS.renderAbc([sheetDiv], result.data, params);
+          }
+          if (text !== 'abcsheet') {
+            const midiDiv = document.getElementById(`${baseId}-midi`);
+            window.ABCJS.renderMidi([midiDiv], result.data, params);
+          }
+        })
+        .catch(function(err) {
+          console.log('queueContentLoad error', err);
+        });
+    });
+  }
+}
+
+
 function areValuesSameEnough(varname, oldValue, newValue) {
   // const oldValueJSON = JSON.stringify(oldValue);
   // const newValueJSON = JSON.stringify(newValue);
@@ -613,6 +645,7 @@ function getPrelude(language, code) {
     'openjscad',
     'graphviz',
     'abc',
+    'abcsheet',
     'abcmidi',
     'mermaid',
   ];
@@ -1207,6 +1240,31 @@ function renderImage(href, title, text) {
     out += '<source type="audio/mpeg" src="' + href + '"/>\n';
     out += '</audio>\n';
     out += '</div>\n';
+  }
+  else if (href.endsWith('.abc')) {
+    const abcIndex = uniqueCellIndex++;
+    const abcBaseId = `abc-wrapper-${abcIndex}`;
+    out +=
+`
+  <div class="abc-wrapper">
+    <div
+      id="${abcBaseId}-sheet"
+      class="smartdown-abcsheet">
+    </div>
+    <div
+      id="${abcBaseId}-midi"
+      class="smartdown-abcmidi">
+    </div>
+  </div>
+`;
+    let contentType = 'abc';
+    if (text === 'abcsheet') {
+      contentType = text;
+    }
+    else if (text === 'abcmidi') {
+      contentType = text;
+    }
+    queueContentLoad(contentType, abcBaseId, href, title, text);
   }
   else {
     var youtubeEmbed = convertYoutubeFragmentToEmbed(href, text);
@@ -2483,23 +2541,39 @@ ${e}
       });
     });
   }
-  else if (language === 'abc') {
-    div.innerHTML = '<i>...renderingx abc...</i>';
+  else if (language.indexOf('abc') === 0) {
+    const abcBaseId = div.id;
+    div.innerHTML =
+`
+  <div class="abc-wrapper">
+    <div
+      id="${abcBaseId}-sheet"
+      class="smartdown-abcsheet">
+    </div>
+    <div
+      id="${abcBaseId}-midi"
+      class="smartdown-abcmidi">
+    </div>
+  </div>
+`;
+
     window.smartdownJSModules.abc.loader(function () {
       /* global ABCJS */
       // https://github.com/paulrosen/abcjs/blob/master/src/api/abc_tunebook_svg.js#L143
-      window.ABCJS.renderAbc([div], script.text);
-      if (progress) {
-        progress.style.display = 'none';
+      // https://github.com/paulrosen/abcjs/blob/master/docs/api.md#abcjs-basic
+      const params = {
+        responsive: 'resize',
+      };
+
+      if (language !== 'abcmidi') {
+        const sheetDiv = document.getElementById(`${abcBaseId}-sheet`);
+        window.ABCJS.renderAbc([sheetDiv], script.text, params);
       }
-    });
-  }
-  else if (language === 'abcmidi') {
-    div.innerHTML = '<i>...rendering abc...</i>';
-    window.smartdownJSModules.abc.loader(function () {
-      /* global ABCJS */
-      // https://github.com/paulrosen/abcjs/blob/master/src/api/abc_tunebook_svg.js#L143
-      window.ABCJS.renderMidi([div], script.text);
+      if (language !== 'abcsheet') {
+        const midiDiv = document.getElementById(`${abcBaseId}-midi`);
+        window.ABCJS.renderMidi([midiDiv], script.text, params);
+      }
+
       if (progress) {
         progress.style.display = 'none';
       }
@@ -2564,7 +2638,7 @@ function recursivelyLoadImports(language, divId, importsRemaining, done) {
         recursivelyLoadImports(language, divId, importsRemaining, done);
       });
     }
-    else if (nextImport === 'abc' || nextImport === 'abcmidi') {
+    else if (nextImport.indexOf('abc') === 0) {
       window.smartdownJSModules.abc.loader(function () {
         recursivelyLoadImports(language, divId, importsRemaining, done);
       });
@@ -3653,19 +3727,36 @@ function renderCell(cellID, variableId, newValue) {
       });
     }
   }
-  else if (cellInfo.datatype === 'abc') {
-    element.innerHTML = '<i>...rendering abc...</i>';
+  else if (cellInfo.datatype.indexOf('abc') === 0) {
+    const abcBaseId = element.id;
+    element.innerHTML =
+`
+  <div class="abc-wrapper">
+    <div
+      id="${abcBaseId}-sheet"
+      class="smartdown-abcsheet">
+    </div>
+    <div
+      id="${abcBaseId}-midi"
+      class="smartdown-abcmidi">
+    </div>
+  </div>
+`;
+
     if (typeof newValue === 'string' && newValue.length > 0) {
       window.smartdownJSModules.abc.loader(function () {
-        window.ABCJS.renderAbc([element], newValue);
-      });
-    }
-  }
-  else if (cellInfo.datatype === 'abcmidi') {
-    element.innerHTML = '<i>...rendering abcmidi...</i>';
-    if (typeof newValue === 'string' && newValue.length > 0) {
-      window.smartdownJSModules.abc.loader(function () {
-        window.ABCJS.renderMidi([element], newValue);
+        const params = {
+          responsive: 'resize',
+        };
+
+        if (cellInfo.datatype !== 'abcmidi') {
+          const sheetDiv = document.getElementById(`${abcBaseId}-sheet`);
+          window.ABCJS.renderAbc([sheetDiv], newValue, params);
+        }
+        if (cellInfo.datatype !== 'abcsheet') {
+          const midiDiv = document.getElementById(`${abcBaseId}-midi`);
+          window.ABCJS.renderMidi([midiDiv], newValue, params);
+        }
       });
     }
   }
@@ -4554,7 +4645,7 @@ module.exports = {
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
   showAugmentedCode: false,
-  version: '1.0.3',
+  version: '1.0.4',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,

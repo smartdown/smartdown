@@ -10,7 +10,7 @@ if (useABCJS) {
     }
     else if (window.smartdownJSModules.abc.loadedCallbacks.length > 0) {
       window.smartdownJSModules.abc.loadedCallbacks.unshift(loaded);
-      console.log('loadabcjs...abc is still loading', JSON.stringify(window.smartdownJSModules.abc.loadedCallbacks, null, 2));
+      // console.log('loadabcjs...abc is still loading', JSON.stringify(window.smartdownJSModules.abc.loadedCallbacks, null, 2));
     }
     else {
       window.smartdownJSModules.abc.loadedCallbacks.unshift(loaded);

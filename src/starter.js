@@ -222,15 +222,15 @@ function starter(basePrefix) {
     else if (cardKey.indexOf(':') >= 0) {
       const keyParts = cardKey.split(':');
       const loadableKey = keyParts.slice(0, -1).join(':');
-      var suffix = (loadableKey === '') ? '' : (loadableKey + '.md');
-      var cardURL = lastLoadedRawPrefix + suffix;
+      const suffix = (loadableKey === '') ? '' : (loadableKey + '.md');
+      const cardURL = lastLoadedRawPrefix + suffix;
       loadAsyncCard(cardKey, cardURL);
     }
     else {
       gistOrg = '';
       gistID = '';
-      var suffix = (cardKey === '') ? '' : (cardKey + '.md');
-      var cardURL = lastLoadedRawPrefix + suffix;
+      const suffix = (cardKey === '') ? '' : (cardKey + '.md');
+      const cardURL = lastLoadedRawPrefix + suffix;
       loadAsyncCard(cardKey, cardURL);
     }
   }
