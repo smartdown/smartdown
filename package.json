@@ -113,7 +113,7 @@
     "marked": "^0.6.2",
     "p5": "^0.8.0",
     "plotly.js": "^1.47.4",
-    "smartdown-gallery": "0.0.32",
+    "smartdown-gallery": "0.0.33",
     "stacktrace-js": "^2.0.0",
     "three": "^0.104.0",
     "topojson": "^3.0.2",

@@ -5,5 +5,4 @@
 - **1.0.2** - Add support to starter.js for loading multicards and jumping to a specific card in a multicard document. Create a single-file example in SimpleSiteExample/index_unpkg.html, which refers to unpkg.com to satisfy smartdown and gallery resources. Fix starter.js so that it can handle Gists properly even when the card hash is an external URL.
 - **1.0.3** - Updated deps. Add support for abcjs.net, which supports generation of sheet music and MIDI. Very preliminary, but cool.
 - **1.0.4** - Updated deps. Extend abcjs integration to support the loading and playing of URLs with a .abc suffix. Increase media breakpoint width to 800px to determine when the font size and line-height changes from small to larger. Use SD Gallery 0.0.32. Add a custom style to SimpleSiteExample so that the smartdown-container expands to fit the window, as opposed to 'auto'.
-
-
+- **1.0.5** - Fix XMLHttpRequest calls to use overrideMimeType() so that FireFox doesn't freak about non-XML content (such as .abc files). Deal with Chrome's new Autoplay policy by resuming the AudioContext that Chrome suspends until user interaction.

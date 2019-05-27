@@ -532,6 +532,22 @@ function convertVimeoFragmentToEmbed(href, title) {
   return result;
 }
 
+function renderABCIntoDivs(baseId, abcType, abcText) {
+  if (window.ABCJS.midi) {
+    window.ABCJS.midi.stopPlaying();
+  }
+  const params = {
+    responsive: 'resize',
+  };
+  if (abcType !== 'abcmidi') {
+    const sheetDiv = document.getElementById(`${baseId}-sheet`);
+    window.ABCJS.renderAbc([sheetDiv], abcText, params);
+  }
+  if (abcType !== 'abcsheet') {
+    const midiDiv = document.getElementById(`${baseId}-midi`);
+    window.ABCJS.renderMidi([midiDiv], abcText, params);
+  }
+}
 
 function queueContentLoad(contentType, baseId, href, title, text) {
   // console.log('queueContentLoad', contentType, baseId, href, title, text);
@@ -540,17 +556,7 @@ function queueContentLoad(contentType, baseId, href, title, text) {
     window.smartdownJSModules.abc.loader(function () {
       axios.get(href)
         .then(function(result) {
-          const params = {
-            responsive: 'resize',
-          };
-          if (text !== 'abcmidi') {
-            const sheetDiv = document.getElementById(`${baseId}-sheet`);
-            window.ABCJS.renderAbc([sheetDiv], result.data, params);
-          }
-          if (text !== 'abcsheet') {
-            const midiDiv = document.getElementById(`${baseId}-midi`);
-            window.ABCJS.renderMidi([midiDiv], result.data, params);
-          }
+          renderABCIntoDivs(baseId, text, result.data);
         })
         .catch(function(err) {
           console.log('queueContentLoad error', err);
@@ -2558,21 +2564,7 @@ ${e}
 `;
 
     window.smartdownJSModules.abc.loader(function () {
-      /* global ABCJS */
-      // https://github.com/paulrosen/abcjs/blob/master/src/api/abc_tunebook_svg.js#L143
-      // https://github.com/paulrosen/abcjs/blob/master/docs/api.md#abcjs-basic
-      const params = {
-        responsive: 'resize',
-      };
-
-      if (language !== 'abcmidi') {
-        const sheetDiv = document.getElementById(`${abcBaseId}-sheet`);
-        window.ABCJS.renderAbc([sheetDiv], script.text, params);
-      }
-      if (language !== 'abcsheet') {
-        const midiDiv = document.getElementById(`${abcBaseId}-midi`);
-        window.ABCJS.renderMidi([midiDiv], script.text, params);
-      }
+      renderABCIntoDivs(abcBaseId, language, script.text);
 
       if (progress) {
         progress.style.display = 'none';
@@ -3745,18 +3737,7 @@ function renderCell(cellID, variableId, newValue) {
 
     if (typeof newValue === 'string' && newValue.length > 0) {
       window.smartdownJSModules.abc.loader(function () {
-        const params = {
-          responsive: 'resize',
-        };
-
-        if (cellInfo.datatype !== 'abcmidi') {
-          const sheetDiv = document.getElementById(`${abcBaseId}-sheet`);
-          window.ABCJS.renderAbc([sheetDiv], newValue, params);
-        }
-        if (cellInfo.datatype !== 'abcsheet') {
-          const midiDiv = document.getElementById(`${abcBaseId}-midi`);
-          window.ABCJS.renderMidi([midiDiv], newValue, params);
-        }
+        renderABCIntoDivs(abcBaseId, cellInfo.datatype, newValue);
       });
     }
   }
@@ -4645,7 +4626,7 @@ module.exports = {
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
   showAugmentedCode: false,
-  version: '1.0.4',
+  version: '1.0.5',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,
