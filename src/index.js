@@ -1317,6 +1317,33 @@ function importCssCode(cssCode) {
 }
 
 
+function importCssUrl(href, fOnload, fOnerror) {
+  var oHead = document.head || document.getElementsByTagName('head')[0];
+  function loadError(oError) {
+    if (fOnerror) {
+      console.log('calling fOnerror');
+      fOnerror(oError);
+    }
+    else {
+      throw new URIError('The stylesheet ' + oError.target.src + ' is not accessible.');
+    }
+  }
+
+  var oLink = document.createElement('link');
+  oLink.rel  = 'stylesheet';
+  oLink.type = 'text/css';
+  oLink.onerror = loadError;
+  oLink.async = true;
+  oLink.href = href;
+  oHead.appendChild(oLink);
+  if (fOnload) {
+    oLink.onload = function (evt) {
+      console.log
+      fOnload(evt);
+    };
+  }
+}
+
 function renderLink(href, title, text) {
   const smartdownTag = ':';
 
@@ -4597,6 +4624,7 @@ module.exports = {
   cardLoader: cardLoader,
   calcHandlers: calcHandlers,
   importCssCode: importCssCode,
+  importCssUrl: importCssUrl,
   importScriptUrl: importScriptUrl,
   importTextUrl: importTextUrl,
   linkRules: linkRules,
@@ -4626,7 +4654,7 @@ module.exports = {
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
   showAugmentedCode: false,
-  version: '1.0.5',
+  version: '1.0.6',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,

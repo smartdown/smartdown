@@ -22,6 +22,8 @@ function cardLoaded(sourceText, cardKey, cardURL) {
   multiparts = smartdown.partitionMultipart(sourceText);
   var output = document.getElementById('smartdown-output');
   smartdown.setHome(multiparts._default_, output, function() {
+    document.body.scrollTop = 0; // For Chrome, Safari and Opera
+    document.documentElement.scrollTop = 0; // For IE and Firefox
     smartdown.startAutoplay(output);
     inhibitHash = '#' + cardKey;
     window.location.hash = inhibitHash;

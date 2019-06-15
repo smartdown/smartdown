@@ -311,6 +311,9 @@
   }
 }
 
+.smartdown-container .smartdown-json {
+  width: 100%;
+}
 
 .smartdown-container .abc-wrapper,
 .smartdown-container .infocell-output .abc-wrapper {
@@ -848,6 +851,7 @@ $disclosable-width: 400px;
   color: black;
   resize: both;
   overflow-y: scroll;
+  overflow-x: scroll;
   margin: 0;
   padding: 5px 10px;
   font-family: 'Ubuntu Mono', monospace;
