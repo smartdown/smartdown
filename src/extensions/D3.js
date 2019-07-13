@@ -9,11 +9,11 @@ if (useD3) {
       loaded();
     }
     else if (window.smartdownJSModules.d3.loadedCallbacks.length > 0) {
-      window.smartdownJSModules.d3.loadedCallbacks.unshift(loaded);
-      // console.log('loadD3...D3 is still loading', JSON.stringify(window.smartdownJSModules.d3.loadedCallbacks, null, 2));
+      window.smartdownJSModules.d3.loadedCallbacks.push(loaded);
+      // console.log('loadd3...d3 is still loading', JSON.stringify(window.smartdownJSModules.d3.loadedCallbacks, null, 2));
     }
     else {
-      window.smartdownJSModules.d3.loadedCallbacks.unshift(loaded);
+      window.smartdownJSModules.d3.loadedCallbacks.push(loaded);
 
       // console.log('loadD3...D3 initiate load');
       import(/* webpackChunkName: "d3" */ 'd3JS')

@@ -9,11 +9,11 @@ if (useThree) {
       loaded();
     }
     else if (window.smartdownJSModules.three.loadedCallbacks.length > 0) {
-      window.smartdownJSModules.three.loadedCallbacks.unshift(loaded);
+      window.smartdownJSModules.three.loadedCallbacks.push(loaded);
       // console.log('loadthree...three is still loading', JSON.stringify(window.smartdownJSModules.three.loadedCallbacks, null, 2));
     }
     else {
-      window.smartdownJSModules.three.loadedCallbacks.unshift(loaded);
+      window.smartdownJSModules.three.loadedCallbacks.push(loaded);
       // console.log('loadthree...three initiate load', window.smartdownJSModules.three.loadedCallbacks[0]);
       import(/* webpackChunkName: "three" */ 'three')
         .then(three => {

@@ -691,6 +691,8 @@ function renderCodeInternal(renderDivId, code, language, prelude) {
   var playable = languageOpts.indexOf('playable') >= 0;
   var autoplay = languageOpts.indexOf('autoplay') >= 0;
   var debug = languageOpts.indexOf('debug') >= 0;
+  var inline = languageOpts.indexOf('inline') >= 0;
+  var center = languageOpts.indexOf('center') >= 0;
 
   language = languageElements[0];
 
@@ -801,7 +803,7 @@ ${highlightedAugmentedCode}
     id="${playId}"
     onclick="smartdown.playPlayable('${language}', '${divId}')"
     class="playable-button playable-button-play">
-    <span>&#x25B6;&nbsp;&nbsp;&nbsp;Play&nbsp;&nbsp;&nbsp;&#x25B6;</span>
+    <span>&nbsp;&#x25B6;&nbsp;&nbsp;&nbsp;Play&nbsp;&nbsp;&nbsp;&#x25B6;&nbsp;</span>
   </button>
   <button type="button"
     id="${stopId}"
@@ -809,27 +811,28 @@ ${highlightedAugmentedCode}
     href="#"
     onclick="smartdown.resetPlayable('${language}', '${divId}', false)"
     class="playable-button playable-button-stop">
-    <span>&#x25A3;&nbsp;&nbsp;&nbsp;Stop&nbsp;&nbsp;&nbsp;&#x25A3;</span>
+    <span>&nbsp;&#x25A3;&nbsp;&nbsp;&nbsp;Stop&nbsp;&nbsp;&nbsp;&#x25A3;&nbsp;</span>
   </button>
 `;
 
 
+      var wrapperWrapperClass = 'playable-wrapper-wrapper';
+
+      if (inline) {
+        wrapperWrapperClass = 'playable-wrapper-wrapper-inline';
+      }
+      else if (center) {
+        wrapperWrapperClass = 'playable-wrapper-wrapper-center';
+      }
       var playableCodeDisplay =
 `
+<div class="${wrapperWrapperClass}">
 <div class="playable-wrapper">
-<div id="${preId}" class="playable-source">
-  <pre>${highlightedCode}</pre>
-</div>
+
+${playableButtons}
 
 <div class="smartdown-playable smartdown-${language}" id="${divId}"></div>
-</div>
-<div id="${progressId}" class="smartdown-progress">
-    <div
-      class="smartdown-progress-bar smartdown-progress-active"
-      data-percent="100" style="width: 100%;">
-      <span class="smartdown-progress-label"></span>
-    </div>
-</div>
+
 
 <button
   type="button"
@@ -841,16 +844,31 @@ ${highlightedAugmentedCode}
   Augmented Javascript
 </button>
 
+<div id="${progressId}" class="smartdown-progress">
+  <div
+    class="smartdown-progress-bar smartdown-progress-active"
+    data-percent="100" style="width: 100%;">
+    <span class="smartdown-progress-label"></span>
+  </div>
+</div>
+
+</div>
+</div>
+
+<div id="${preId}" class="playable-source">
+  <pre>${highlightedCode}</pre>
+</div>
+
 <pre
   id="${dbgId}"
   class="playable-debug-source">
 ${highlightedAugmentedCode}
 </pre>
 
-<div class="playable-bottom-spacer"></div>
+<!-- <div class="playable-bottom-spacer"></div> -->
 `;
 
-      return playableScript + playableButtons + playableCodeDisplay;
+      return playableScript + playableCodeDisplay;
     }
   }
   else {
@@ -862,7 +880,7 @@ ${highlightedAugmentedCode}
 
 
 function renderCode(code, language) {
-  language = language || '';
+  language = (language || '').replace(/ /g, '');
   var languageElements = language.split('/');
   var languageOpts = languageElements.slice(1);
   var playable = languageOpts.indexOf('playable') >= 0;
@@ -1136,6 +1154,7 @@ function isGifferable(href, title, tokens) {
 
 const imageStyles = {
   default: '',
+  icon: 'icon',
   thumbnail: 'thumbnail',
   halfwidth: 'halfwidth',
   fullwidth: 'fullwidth',
@@ -1684,9 +1703,10 @@ function renderLink(href, title, text) {
 
 function renderParagraph(text) {
   var result = '<p class="smartdown_p">' + text + '</p>\n';
-  // if (text[0] === '<') {
-  //   result = text;
-  // }
+
+  if (text.indexOf('<del>+') === 0 && text.endsWith('+</del>')) {
+    result = '<p class="smartdown_p_inline">' + text.slice(6, -7) + '</p>\n';
+  }
   return result.trim();
 }
 
@@ -2291,6 +2311,8 @@ jscadViewer.setJsCad(diagramSource);
 
 
 function playPlayableInternal(language, divId) {
+  // console.log('playPlayableInternal', divId);
+
   var playable = perPageState.playablesRegistered[divId];
   var div = document.getElementById(playable.divId);
   var divPre = document.getElementById(playable.preId);
@@ -2605,6 +2627,7 @@ ${e}
 
 
 function recursivelyLoadImports(language, divId, importsRemaining, done) {
+  // console.log('recursivelyLoadImports', divId, importsRemaining.length);
   if (importsRemaining.length > 0) {
     const nextImport = importsRemaining.shift();
     // console.log('nextImport', nextImport);
@@ -2679,6 +2702,7 @@ function recursivelyLoadImports(language, divId, importsRemaining, done) {
 }
 
 function playPlayable(language, divId) {
+  // console.log('playPlayable', divId);
   var playable = perPageState.playablesRegistered[divId];
   if (playable) {
     const importsRemaining = playable.imports.slice(0);  // Copy
@@ -3224,7 +3248,7 @@ function handleVisibilityChange() {
 
 
 function startAutoplay(outputDiv) {
-  // console.log('startAutoplay', outputDiv, mermaid, mermaidAPI);
+  // console.log('startAutoplay', outputDiv);
   if (outputDiv && outputDiv.id) {
     each(perPageState.playablesRegisteredOrder, function(playable) {
       // console.log('startAutoplay', outputDiv, outputDiv.id, playable);
@@ -4654,7 +4678,7 @@ module.exports = {
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
   showAugmentedCode: false,
-  version: '1.0.7',
+  version: '1.0.8',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,

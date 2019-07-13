@@ -8,3 +8,6 @@
 - **1.0.5** - Fix XMLHttpRequest calls to use overrideMimeType() so that FireFox doesn't freak about non-XML content (such as .abc files). Deal with Chrome's new Autoplay policy by resuming the AudioContext that Chrome suspends until user interaction.
 - **1.0.6** - Update dependencies. Add smartdown.importCssUrl() function. Adjust inline_helper.js so that it scrolls to top when a card is loaded.
 - **1.0.7** - Updates Gallery to 0.0.36 (clearer jsPsych documentation and examples).
+- **1.0.8** - Updates Gallery to 0.0.37 (improved jsPsych documentation and examples). Adds experimental center and inline playable mode, along with a non-breaking paragraph syntax to allow for playables to be inlined within text. Fixes a sequencing bug in some playable loaders, where playables would execute not in lexical page order. Update deps. Eliminate use of playable-bottom-spacer, until I remember why it is there.
+
+

@@ -9,11 +9,11 @@ if (useABCJS) {
       loaded();
     }
     else if (window.smartdownJSModules.abc.loadedCallbacks.length > 0) {
-      window.smartdownJSModules.abc.loadedCallbacks.unshift(loaded);
+      window.smartdownJSModules.abc.loadedCallbacks.push(loaded);
       // console.log('loadabcjs...abc is still loading', JSON.stringify(window.smartdownJSModules.abc.loadedCallbacks, null, 2));
     }
     else {
-      window.smartdownJSModules.abc.loadedCallbacks.unshift(loaded);
+      window.smartdownJSModules.abc.loadedCallbacks.push(loaded);
 
       window.smartdown.importScriptUrl(
         window.smartdown.baseURL + 'lib/abcjs_midi_5.6.11-min.js',

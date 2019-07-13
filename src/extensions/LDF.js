@@ -9,11 +9,11 @@ if (useLDF) {
       loaded();
     }
     else if (window.smartdownJSModules.ldf.loadedCallbacks.length > 0) {
-      window.smartdownJSModules.ldf.loadedCallbacks.unshift(loaded);
+      window.smartdownJSModules.ldf.loadedCallbacks.push(loaded);
       // console.log('loadldf...ldf is still loading', JSON.stringify(window.smartdownJSModules.ldf.loadedCallbacks, null, 2));
     }
     else {
-      window.smartdownJSModules.ldf.loadedCallbacks.unshift(loaded);
+      window.smartdownJSModules.ldf.loadedCallbacks.push(loaded);
       // console.log('loadldf...ldf initiate load', window.smartdownJSModules.ldf.loadedCallbacks[0]);
       import(/* webpackChunkName: "ldf" */ 'ldfJS')
         .then(ldf => {

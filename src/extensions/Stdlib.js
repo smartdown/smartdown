@@ -45,11 +45,11 @@ if (useStdlib) {
       loaded();
     }
     else if (window.smartdownJSModules.stdlib.loadedCallbacks.length > 0) {
-      window.smartdownJSModules.stdlib.loadedCallbacks.unshift(loaded);
+      window.smartdownJSModules.stdlib.loadedCallbacks.push(loaded);
       // console.log('loadStdlib...stdlib is still loading', JSON.stringify(jsModules.stdlib.loadedCallbacks, null, 2));
     }
     else {
-      window.smartdownJSModules.stdlib.loadedCallbacks.unshift(loaded);
+      window.smartdownJSModules.stdlib.loadedCallbacks.push(loaded);
       // console.log('loadStdlib...stdlib initiate load', window.smartdownJSModules.stdlib.loadedCallbacks[0]);
       import(/* webpackChunkName: "stdlib" */ '@stdlib/stdlib/dist/stdlib-tree.min.js')
       // import('@stdlib/stdlib/dist/stdlib-tree.min.js')

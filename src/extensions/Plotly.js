@@ -9,11 +9,11 @@ if (usePlotly) {
       loaded();
     }
     else if (window.smartdownJSModules.plotly.loadedCallbacks.length > 0) {
-      window.smartdownJSModules.plotly.loadedCallbacks.unshift(loaded);
+      window.smartdownJSModules.plotly.loadedCallbacks.push(loaded);
       // console.log('loadplotly...plotly is still loading', JSON.stringify(window.smartdownJSModules.plotly.loadedCallbacks, null, 2));
     }
     else {
-      window.smartdownJSModules.plotly.loadedCallbacks.unshift(loaded);
+      window.smartdownJSModules.plotly.loadedCallbacks.push(loaded);
 
       window.smartdown.importScriptUrl(
         'https://cdn.plot.ly/plotly-latest.min.js',

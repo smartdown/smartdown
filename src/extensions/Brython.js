@@ -9,11 +9,11 @@ if (useBrython) {
       loaded();
     }
     else if (window.smartdownJSModules.brython.loadedCallbacks.length > 0) {
-      window.smartdownJSModules.brython.loadedCallbacks.unshift(loaded);
+      window.smartdownJSModules.brython.loadedCallbacks.push(loaded);
       // console.log('loadbrython...brython is still loading', JSON.stringify(window.smartdownJSModules.brython.loadedCallbacks, null, 2));
     }
     else {
-      window.smartdownJSModules.brython.loadedCallbacks.unshift(loaded);
+      window.smartdownJSModules.brython.loadedCallbacks.push(loaded);
       const debugging = false;
       if (debugging) {
         const callThese = window.smartdownJSModules.brython.loadedCallbacks;

@@ -135,11 +135,11 @@ if (useMermaid) {
       loaded();
     }
     else if (window.smartdownJSModules.mermaid.loadedCallbacks.length > 0) {
-      window.smartdownJSModules.mermaid.loadedCallbacks.unshift(loaded);
+      window.smartdownJSModules.mermaid.loadedCallbacks.push(loaded);
       // console.log('loadmermaid...mermaid is still loading', JSON.stringify(window.smartdownJSModules.mermaid.loadedCallbacks, null, 2));
     }
     else {
-      window.smartdownJSModules.mermaid.loadedCallbacks.unshift(loaded);
+      window.smartdownJSModules.mermaid.loadedCallbacks.push(loaded);
 
       const url = 'https://unpkg.com/mermaid@7.1.2/dist/mermaid.min.js';
       window.smartdown.importScriptUrl(

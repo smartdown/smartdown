@@ -32,11 +32,11 @@ if (useP5JS) {
       loaded();
     }
     else if (window.smartdownJSModules.p5js.loadedCallbacks.length > 0) {
-      window.smartdownJSModules.p5js.loadedCallbacks.unshift(loaded);
+      window.smartdownJSModules.p5js.loadedCallbacks.push(loaded);
       // console.log('loadP5JS...p5js is still loading', JSON.stringify(window.smartdownJSModules.p5js.loadedCallbacks, null, 2));
     }
     else {
-      window.smartdownJSModules.p5js.loadedCallbacks.unshift(loaded);
+      window.smartdownJSModules.p5js.loadedCallbacks.push(loaded);
       // console.log('loadP5JS...p5js initiate load', window.smartdownJSModules.p5js.loadedCallbacks[0]);
 
       import(/* webpackChunkName: "p5js" */ 'p5JS')
