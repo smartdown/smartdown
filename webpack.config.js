@@ -38,7 +38,6 @@ var d3dcCSS = path.join(nm, '/dc/dc.min.css');
 var d3cloudJS = path.join(nm, '/d3-cloud/build/d3.layout.cloud.js');
 var leafletJSDir = path.join(nm, '/leaflet/dist');
 var leafletJS = path.join(leafletJSDir, 'leaflet.js');
-var ldfJS = path.join(app, 'external/ldf-client-browser.js');
 var openjscadJS = path.join(app, 'external/openjscad.reentrant.umd.js');
 var abcjsJS = path.join(app, 'external/abcjs_midi_5.6.11-min.js');
 var abcjsCSS = path.join(app, 'external/abcjs_midi.css');
@@ -67,7 +66,6 @@ var useBrython = true && !test;
 var useABCJS = true && !test;
 var useD3 = true && !test;
 var useGifffer = true && !test;
-var useLDF = true && !test;
 var usePlotly = true && !test;
 var useOpenJSCAD = true && !test;
 var useP5JS = true && !test;
@@ -181,7 +179,6 @@ var config = {
       d3cloudJS$: d3cloudJS,
       leafletJS$: leafletJS,
       // mermaidJS$: mermaidJS,
-      ldfJS$: ldfJS,
       p5JS$: p5JS,
       p5$: p5JS,
       'rx$': 'rx/dist/rx.all.js'
@@ -223,7 +220,6 @@ var config = {
       useABCJS: useABCJS,
       useD3: useD3,
       useGifffer: useGifffer,
-      useLDF: useLDF,
       usePlotly: usePlotly,
       useOpenJSCAD: useOpenJSCAD,
       useP5JS: useP5JS,
@@ -251,6 +247,9 @@ var config = {
         { from: path.join(webcomponentsJS, 'bundles/'), to: './bundles/' },
         { from: vizJS },
         { from: vizLiteJS },
+        { from: path.join(app, 'external/comunica-browser.js') },
+        { from: path.join(app, 'external/comunica-browser.js.map') },
+        { from: path.join(app, 'external/ldf-client-browser.js') },
         { from: openjscadJS },
         { from: abcjsJS },
         { from: abcjsCSS },
@@ -308,7 +307,6 @@ var config = {
           { source: outputPath + 'smartdown.js.map', destination: outputPath + '../gist/' },
           { source: outputPath + 'smartdown.css.map', destination: outputPath + '../gist/' },
 
-          { source: outputPath + 'smartdown_ldf.js', destination: outputPath + '../gist/' },
           { source: outputPath + 'smartdown_stdlib.js', destination: outputPath + '../gist/' },
           { source: outputPath + 'smartdown_vendors~stdlib.js', destination: outputPath + '../gist/' },
           { source: outputPath + 'smartdown_vendors~stdlib-sotu.js', destination: outputPath + '../gist/' },
@@ -317,7 +315,6 @@ var config = {
           { source: outputPath + 'smartdown_vendors~p5Sound.js', destination: outputPath + '../gist/' },
           { source: outputPath + 'smartdown_vendors~p5DOM~p5Sound~p5js.js', destination: outputPath + '../gist/' },
 
-          { source: outputPath + 'smartdown_ldf.js.map', destination: outputPath + '../gist/' },
           { source: outputPath + 'smartdown_stdlib.js.map', destination: outputPath + '../gist/' },
           { source: outputPath + 'smartdown_vendors~stdlib.js.map', destination: outputPath + '../gist/' },
           { source: outputPath + 'smartdown_vendors~stdlib-sotu.js.map', destination: outputPath + '../gist/' },
@@ -338,7 +335,6 @@ var config = {
       // new RegExp(d3fcJS),
       // new RegExp('d3fcJS'),
       // new RegExp(mermaidJS),
-      // new RegExp(ldfJS),
       new RegExp('mermaidJS'),
       new RegExp(leafletJS),
       new RegExp('leafletJS'),

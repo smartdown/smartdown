@@ -1,10 +1,8 @@
-/* eslint-disable */
-
-// see https://github.com/zaach/jison/issues/351
-
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.ldf = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 (function (global){
 'use strict';
+
+var objectAssign = require('object-assign');
 
 // compare and isBuffer taken from https://github.com/feross/buffer/blob/680e9e5e488f22aac27599a57dc844a6315928dd/index.js
 // original notice:
@@ -47,6 +45,8 @@ function isBuffer(b) {
 }
 
 // based on node assert, original notice:
+// NB: The URL to the CommonJS spec is kept just for tradition.
+//     node-assert has evolved a lot since then, both in API and behavior.
 
 // http://wiki.commonjs.org/wiki/Unit_Testing/1.0
 //
@@ -487,6 +487,18 @@ assert.doesNotThrow = function(block, /*optional*/error, /*optional*/message) {
 
 assert.ifError = function(err) { if (err) throw err; };
 
+// Expose a strict only variant of assert
+function strict(value, message) {
+  if (!value) fail(value, true, message, '==', strict);
+}
+assert.strict = objectAssign(strict, assert, {
+  equal: assert.strictEqual,
+  deepEqual: assert.deepStrictEqual,
+  notEqual: assert.notStrictEqual,
+  notDeepEqual: assert.notDeepStrictEqual
+});
+assert.strict.strict = assert.strict;
+
 var objectKeys = Object.keys || function (obj) {
   var keys = [];
   for (var key in obj) {
@@ -496,9 +508,631 @@ var objectKeys = Object.keys || function (obj) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"util/":13}],2:[function(require,module,exports){
+},{"object-assign":7,"util/":4}],2:[function(require,module,exports){
+if (typeof Object.create === 'function') {
+  // implementation from standard node.js 'util' module
+  module.exports = function inherits(ctor, superCtor) {
+    ctor.super_ = superCtor
+    ctor.prototype = Object.create(superCtor.prototype, {
+      constructor: {
+        value: ctor,
+        enumerable: false,
+        writable: true,
+        configurable: true
+      }
+    });
+  };
+} else {
+  // old school shim for old browsers
+  module.exports = function inherits(ctor, superCtor) {
+    ctor.super_ = superCtor
+    var TempCtor = function () {}
+    TempCtor.prototype = superCtor.prototype
+    ctor.prototype = new TempCtor()
+    ctor.prototype.constructor = ctor
+  }
+}
 
 },{}],3:[function(require,module,exports){
+module.exports = function isBuffer(arg) {
+  return arg && typeof arg === 'object'
+    && typeof arg.copy === 'function'
+    && typeof arg.fill === 'function'
+    && typeof arg.readUInt8 === 'function';
+}
+},{}],4:[function(require,module,exports){
+(function (process,global){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+var formatRegExp = /%[sdj%]/g;
+exports.format = function(f) {
+  if (!isString(f)) {
+    var objects = [];
+    for (var i = 0; i < arguments.length; i++) {
+      objects.push(inspect(arguments[i]));
+    }
+    return objects.join(' ');
+  }
+
+  var i = 1;
+  var args = arguments;
+  var len = args.length;
+  var str = String(f).replace(formatRegExp, function(x) {
+    if (x === '%%') return '%';
+    if (i >= len) return x;
+    switch (x) {
+      case '%s': return String(args[i++]);
+      case '%d': return Number(args[i++]);
+      case '%j':
+        try {
+          return JSON.stringify(args[i++]);
+        } catch (_) {
+          return '[Circular]';
+        }
+      default:
+        return x;
+    }
+  });
+  for (var x = args[i]; i < len; x = args[++i]) {
+    if (isNull(x) || !isObject(x)) {
+      str += ' ' + x;
+    } else {
+      str += ' ' + inspect(x);
+    }
+  }
+  return str;
+};
+
+
+// Mark that a method should not be used.
+// Returns a modified function which warns once by default.
+// If --no-deprecation is set, then it is a no-op.
+exports.deprecate = function(fn, msg) {
+  // Allow for deprecating things in the process of starting up.
+  if (isUndefined(global.process)) {
+    return function() {
+      return exports.deprecate(fn, msg).apply(this, arguments);
+    };
+  }
+
+  if (process.noDeprecation === true) {
+    return fn;
+  }
+
+  var warned = false;
+  function deprecated() {
+    if (!warned) {
+      if (process.throwDeprecation) {
+        throw new Error(msg);
+      } else if (process.traceDeprecation) {
+        console.trace(msg);
+      } else {
+        console.error(msg);
+      }
+      warned = true;
+    }
+    return fn.apply(this, arguments);
+  }
+
+  return deprecated;
+};
+
+
+var debugs = {};
+var debugEnviron;
+exports.debuglog = function(set) {
+  if (isUndefined(debugEnviron))
+    debugEnviron = process.env.NODE_DEBUG || '';
+  set = set.toUpperCase();
+  if (!debugs[set]) {
+    if (new RegExp('\\b' + set + '\\b', 'i').test(debugEnviron)) {
+      var pid = process.pid;
+      debugs[set] = function() {
+        var msg = exports.format.apply(exports, arguments);
+        console.error('%s %d: %s', set, pid, msg);
+      };
+    } else {
+      debugs[set] = function() {};
+    }
+  }
+  return debugs[set];
+};
+
+
+/**
+ * Echos the value of a value. Trys to print the value out
+ * in the best way possible given the different types.
+ *
+ * @param {Object} obj The object to print out.
+ * @param {Object} opts Optional options object that alters the output.
+ */
+/* legacy: obj, showHidden, depth, colors*/
+function inspect(obj, opts) {
+  // default options
+  var ctx = {
+    seen: [],
+    stylize: stylizeNoColor
+  };
+  // legacy...
+  if (arguments.length >= 3) ctx.depth = arguments[2];
+  if (arguments.length >= 4) ctx.colors = arguments[3];
+  if (isBoolean(opts)) {
+    // legacy...
+    ctx.showHidden = opts;
+  } else if (opts) {
+    // got an "options" object
+    exports._extend(ctx, opts);
+  }
+  // set default options
+  if (isUndefined(ctx.showHidden)) ctx.showHidden = false;
+  if (isUndefined(ctx.depth)) ctx.depth = 2;
+  if (isUndefined(ctx.colors)) ctx.colors = false;
+  if (isUndefined(ctx.customInspect)) ctx.customInspect = true;
+  if (ctx.colors) ctx.stylize = stylizeWithColor;
+  return formatValue(ctx, obj, ctx.depth);
+}
+exports.inspect = inspect;
+
+
+// http://en.wikipedia.org/wiki/ANSI_escape_code#graphics
+inspect.colors = {
+  'bold' : [1, 22],
+  'italic' : [3, 23],
+  'underline' : [4, 24],
+  'inverse' : [7, 27],
+  'white' : [37, 39],
+  'grey' : [90, 39],
+  'black' : [30, 39],
+  'blue' : [34, 39],
+  'cyan' : [36, 39],
+  'green' : [32, 39],
+  'magenta' : [35, 39],
+  'red' : [31, 39],
+  'yellow' : [33, 39]
+};
+
+// Don't use 'blue' not visible on cmd.exe
+inspect.styles = {
+  'special': 'cyan',
+  'number': 'yellow',
+  'boolean': 'yellow',
+  'undefined': 'grey',
+  'null': 'bold',
+  'string': 'green',
+  'date': 'magenta',
+  // "name": intentionally not styling
+  'regexp': 'red'
+};
+
+
+function stylizeWithColor(str, styleType) {
+  var style = inspect.styles[styleType];
+
+  if (style) {
+    return '\u001b[' + inspect.colors[style][0] + 'm' + str +
+           '\u001b[' + inspect.colors[style][1] + 'm';
+  } else {
+    return str;
+  }
+}
+
+
+function stylizeNoColor(str, styleType) {
+  return str;
+}
+
+
+function arrayToHash(array) {
+  var hash = {};
+
+  array.forEach(function(val, idx) {
+    hash[val] = true;
+  });
+
+  return hash;
+}
+
+
+function formatValue(ctx, value, recurseTimes) {
+  // Provide a hook for user-specified inspect functions.
+  // Check that value is an object with an inspect function on it
+  if (ctx.customInspect &&
+      value &&
+      isFunction(value.inspect) &&
+      // Filter out the util module, it's inspect function is special
+      value.inspect !== exports.inspect &&
+      // Also filter out any prototype objects using the circular check.
+      !(value.constructor && value.constructor.prototype === value)) {
+    var ret = value.inspect(recurseTimes, ctx);
+    if (!isString(ret)) {
+      ret = formatValue(ctx, ret, recurseTimes);
+    }
+    return ret;
+  }
+
+  // Primitive types cannot have properties
+  var primitive = formatPrimitive(ctx, value);
+  if (primitive) {
+    return primitive;
+  }
+
+  // Look up the keys of the object.
+  var keys = Object.keys(value);
+  var visibleKeys = arrayToHash(keys);
+
+  if (ctx.showHidden) {
+    keys = Object.getOwnPropertyNames(value);
+  }
+
+  // IE doesn't make error fields non-enumerable
+  // http://msdn.microsoft.com/en-us/library/ie/dww52sbt(v=vs.94).aspx
+  if (isError(value)
+      && (keys.indexOf('message') >= 0 || keys.indexOf('description') >= 0)) {
+    return formatError(value);
+  }
+
+  // Some type of object without properties can be shortcutted.
+  if (keys.length === 0) {
+    if (isFunction(value)) {
+      var name = value.name ? ': ' + value.name : '';
+      return ctx.stylize('[Function' + name + ']', 'special');
+    }
+    if (isRegExp(value)) {
+      return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
+    }
+    if (isDate(value)) {
+      return ctx.stylize(Date.prototype.toString.call(value), 'date');
+    }
+    if (isError(value)) {
+      return formatError(value);
+    }
+  }
+
+  var base = '', array = false, braces = ['{', '}'];
+
+  // Make Array say that they are Array
+  if (isArray(value)) {
+    array = true;
+    braces = ['[', ']'];
+  }
+
+  // Make functions say that they are functions
+  if (isFunction(value)) {
+    var n = value.name ? ': ' + value.name : '';
+    base = ' [Function' + n + ']';
+  }
+
+  // Make RegExps say that they are RegExps
+  if (isRegExp(value)) {
+    base = ' ' + RegExp.prototype.toString.call(value);
+  }
+
+  // Make dates with properties first say the date
+  if (isDate(value)) {
+    base = ' ' + Date.prototype.toUTCString.call(value);
+  }
+
+  // Make error with message first say the error
+  if (isError(value)) {
+    base = ' ' + formatError(value);
+  }
+
+  if (keys.length === 0 && (!array || value.length == 0)) {
+    return braces[0] + base + braces[1];
+  }
+
+  if (recurseTimes < 0) {
+    if (isRegExp(value)) {
+      return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
+    } else {
+      return ctx.stylize('[Object]', 'special');
+    }
+  }
+
+  ctx.seen.push(value);
+
+  var output;
+  if (array) {
+    output = formatArray(ctx, value, recurseTimes, visibleKeys, keys);
+  } else {
+    output = keys.map(function(key) {
+      return formatProperty(ctx, value, recurseTimes, visibleKeys, key, array);
+    });
+  }
+
+  ctx.seen.pop();
+
+  return reduceToSingleString(output, base, braces);
+}
+
+
+function formatPrimitive(ctx, value) {
+  if (isUndefined(value))
+    return ctx.stylize('undefined', 'undefined');
+  if (isString(value)) {
+    var simple = '\'' + JSON.stringify(value).replace(/^"|"$/g, '')
+                                             .replace(/'/g, "\\'")
+                                             .replace(/\\"/g, '"') + '\'';
+    return ctx.stylize(simple, 'string');
+  }
+  if (isNumber(value))
+    return ctx.stylize('' + value, 'number');
+  if (isBoolean(value))
+    return ctx.stylize('' + value, 'boolean');
+  // For some reason typeof null is "object", so special case here.
+  if (isNull(value))
+    return ctx.stylize('null', 'null');
+}
+
+
+function formatError(value) {
+  return '[' + Error.prototype.toString.call(value) + ']';
+}
+
+
+function formatArray(ctx, value, recurseTimes, visibleKeys, keys) {
+  var output = [];
+  for (var i = 0, l = value.length; i < l; ++i) {
+    if (hasOwnProperty(value, String(i))) {
+      output.push(formatProperty(ctx, value, recurseTimes, visibleKeys,
+          String(i), true));
+    } else {
+      output.push('');
+    }
+  }
+  keys.forEach(function(key) {
+    if (!key.match(/^\d+$/)) {
+      output.push(formatProperty(ctx, value, recurseTimes, visibleKeys,
+          key, true));
+    }
+  });
+  return output;
+}
+
+
+function formatProperty(ctx, value, recurseTimes, visibleKeys, key, array) {
+  var name, str, desc;
+  desc = Object.getOwnPropertyDescriptor(value, key) || { value: value[key] };
+  if (desc.get) {
+    if (desc.set) {
+      str = ctx.stylize('[Getter/Setter]', 'special');
+    } else {
+      str = ctx.stylize('[Getter]', 'special');
+    }
+  } else {
+    if (desc.set) {
+      str = ctx.stylize('[Setter]', 'special');
+    }
+  }
+  if (!hasOwnProperty(visibleKeys, key)) {
+    name = '[' + key + ']';
+  }
+  if (!str) {
+    if (ctx.seen.indexOf(desc.value) < 0) {
+      if (isNull(recurseTimes)) {
+        str = formatValue(ctx, desc.value, null);
+      } else {
+        str = formatValue(ctx, desc.value, recurseTimes - 1);
+      }
+      if (str.indexOf('\n') > -1) {
+        if (array) {
+          str = str.split('\n').map(function(line) {
+            return '  ' + line;
+          }).join('\n').substr(2);
+        } else {
+          str = '\n' + str.split('\n').map(function(line) {
+            return '   ' + line;
+          }).join('\n');
+        }
+      }
+    } else {
+      str = ctx.stylize('[Circular]', 'special');
+    }
+  }
+  if (isUndefined(name)) {
+    if (array && key.match(/^\d+$/)) {
+      return str;
+    }
+    name = JSON.stringify('' + key);
+    if (name.match(/^"([a-zA-Z_][a-zA-Z_0-9]*)"$/)) {
+      name = name.substr(1, name.length - 2);
+      name = ctx.stylize(name, 'name');
+    } else {
+      name = name.replace(/'/g, "\\'")
+                 .replace(/\\"/g, '"')
+                 .replace(/(^"|"$)/g, "'");
+      name = ctx.stylize(name, 'string');
+    }
+  }
+
+  return name + ': ' + str;
+}
+
+
+function reduceToSingleString(output, base, braces) {
+  var numLinesEst = 0;
+  var length = output.reduce(function(prev, cur) {
+    numLinesEst++;
+    if (cur.indexOf('\n') >= 0) numLinesEst++;
+    return prev + cur.replace(/\u001b\[\d\d?m/g, '').length + 1;
+  }, 0);
+
+  if (length > 60) {
+    return braces[0] +
+           (base === '' ? '' : base + '\n ') +
+           ' ' +
+           output.join(',\n  ') +
+           ' ' +
+           braces[1];
+  }
+
+  return braces[0] + base + ' ' + output.join(', ') + ' ' + braces[1];
+}
+
+
+// NOTE: These type checking functions intentionally don't use `instanceof`
+// because it is fragile and can be easily faked with `Object.create()`.
+function isArray(ar) {
+  return Array.isArray(ar);
+}
+exports.isArray = isArray;
+
+function isBoolean(arg) {
+  return typeof arg === 'boolean';
+}
+exports.isBoolean = isBoolean;
+
+function isNull(arg) {
+  return arg === null;
+}
+exports.isNull = isNull;
+
+function isNullOrUndefined(arg) {
+  return arg == null;
+}
+exports.isNullOrUndefined = isNullOrUndefined;
+
+function isNumber(arg) {
+  return typeof arg === 'number';
+}
+exports.isNumber = isNumber;
+
+function isString(arg) {
+  return typeof arg === 'string';
+}
+exports.isString = isString;
+
+function isSymbol(arg) {
+  return typeof arg === 'symbol';
+}
+exports.isSymbol = isSymbol;
+
+function isUndefined(arg) {
+  return arg === void 0;
+}
+exports.isUndefined = isUndefined;
+
+function isRegExp(re) {
+  return isObject(re) && objectToString(re) === '[object RegExp]';
+}
+exports.isRegExp = isRegExp;
+
+function isObject(arg) {
+  return typeof arg === 'object' && arg !== null;
+}
+exports.isObject = isObject;
+
+function isDate(d) {
+  return isObject(d) && objectToString(d) === '[object Date]';
+}
+exports.isDate = isDate;
+
+function isError(e) {
+  return isObject(e) &&
+      (objectToString(e) === '[object Error]' || e instanceof Error);
+}
+exports.isError = isError;
+
+function isFunction(arg) {
+  return typeof arg === 'function';
+}
+exports.isFunction = isFunction;
+
+function isPrimitive(arg) {
+  return arg === null ||
+         typeof arg === 'boolean' ||
+         typeof arg === 'number' ||
+         typeof arg === 'string' ||
+         typeof arg === 'symbol' ||  // ES6 symbol
+         typeof arg === 'undefined';
+}
+exports.isPrimitive = isPrimitive;
+
+exports.isBuffer = require('./support/isBuffer');
+
+function objectToString(o) {
+  return Object.prototype.toString.call(o);
+}
+
+
+function pad(n) {
+  return n < 10 ? '0' + n.toString(10) : n.toString(10);
+}
+
+
+var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep',
+              'Oct', 'Nov', 'Dec'];
+
+// 26 Feb 16:19:34
+function timestamp() {
+  var d = new Date();
+  var time = [pad(d.getHours()),
+              pad(d.getMinutes()),
+              pad(d.getSeconds())].join(':');
+  return [d.getDate(), months[d.getMonth()], time].join(' ');
+}
+
+
+// log is just a thin wrapper to console.log that prepends a timestamp
+exports.log = function() {
+  console.log('%s - %s', timestamp(), exports.format.apply(exports, arguments));
+};
+
+
+/**
+ * Inherit the prototype methods from one constructor into another.
+ *
+ * The Function.prototype.inherits from lang.js rewritten as a standalone
+ * function (not on Function.prototype). NOTE: If this file is to be loaded
+ * during bootstrapping this function needs to be rewritten using some native
+ * functions as prototype setup using normal JavaScript does not work as
+ * expected during bootstrapping (see mirror.js in r114903).
+ *
+ * @param {function} ctor Constructor function which needs to inherit the
+ *     prototype.
+ * @param {function} superCtor Constructor function to inherit prototype from.
+ */
+exports.inherits = require('inherits');
+
+exports._extend = function(origin, add) {
+  // Don't do anything if add isn't an object
+  if (!add || !isObject(add)) return origin;
+
+  var keys = Object.keys(add);
+  var i = keys.length;
+  while (i--) {
+    origin[keys[i]] = add[keys[i]];
+  }
+  return origin;
+};
+
+function hasOwnProperty(obj, prop) {
+  return Object.prototype.hasOwnProperty.call(obj, prop);
+}
+
+}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"./support/isBuffer":3,"_process":8,"inherits":2}],5:[function(require,module,exports){
+
+},{}],6:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -929,24 +1563,28 @@ EventEmitter.prototype.removeAllListeners =
       return this;
     };
 
-EventEmitter.prototype.listeners = function listeners(type) {
-  var evlistener;
-  var ret;
-  var events = this._events;
+function _listeners(target, type, unwrap) {
+  var events = target._events;
 
   if (!events)
-    ret = [];
-  else {
-    evlistener = events[type];
-    if (!evlistener)
-      ret = [];
-    else if (typeof evlistener === 'function')
-      ret = [evlistener.listener || evlistener];
-    else
-      ret = unwrapListeners(evlistener);
-  }
+    return [];
 
-  return ret;
+  var evlistener = events[type];
+  if (!evlistener)
+    return [];
+
+  if (typeof evlistener === 'function')
+    return unwrap ? [evlistener.listener || evlistener] : [evlistener];
+
+  return unwrap ? unwrapListeners(evlistener) : arrayClone(evlistener, evlistener.length);
+}
+
+EventEmitter.prototype.listeners = function listeners(type) {
+  return _listeners(this, type, true);
+};
+
+EventEmitter.prototype.rawListeners = function rawListeners(type) {
+  return _listeners(this, type, false);
 };
 
 EventEmitter.listenerCount = function(emitter, type) {
@@ -1019,7 +1657,99 @@ function functionBindPolyfill(context) {
   };
 }
 
-},{}],4:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
+/*
+object-assign
+(c) Sindre Sorhus
+@license MIT
+*/
+
+'use strict';
+/* eslint-disable no-unused-vars */
+var getOwnPropertySymbols = Object.getOwnPropertySymbols;
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+var propIsEnumerable = Object.prototype.propertyIsEnumerable;
+
+function toObject(val) {
+	if (val === null || val === undefined) {
+		throw new TypeError('Object.assign cannot be called with null or undefined');
+	}
+
+	return Object(val);
+}
+
+function shouldUseNative() {
+	try {
+		if (!Object.assign) {
+			return false;
+		}
+
+		// Detect buggy property enumeration order in older V8 versions.
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=4118
+		var test1 = new String('abc');  // eslint-disable-line no-new-wrappers
+		test1[5] = 'de';
+		if (Object.getOwnPropertyNames(test1)[0] === '5') {
+			return false;
+		}
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+		var test2 = {};
+		for (var i = 0; i < 10; i++) {
+			test2['_' + String.fromCharCode(i)] = i;
+		}
+		var order2 = Object.getOwnPropertyNames(test2).map(function (n) {
+			return test2[n];
+		});
+		if (order2.join('') !== '0123456789') {
+			return false;
+		}
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+		var test3 = {};
+		'abcdefghijklmnopqrst'.split('').forEach(function (letter) {
+			test3[letter] = letter;
+		});
+		if (Object.keys(Object.assign({}, test3)).join('') !==
+				'abcdefghijklmnopqrst') {
+			return false;
+		}
+
+		return true;
+	} catch (err) {
+		// We don't expect any of the above to throw, but better to be safe.
+		return false;
+	}
+}
+
+module.exports = shouldUseNative() ? Object.assign : function (target, source) {
+	var from;
+	var to = toObject(target);
+	var symbols;
+
+	for (var s = 1; s < arguments.length; s++) {
+		from = Object(arguments[s]);
+
+		for (var key in from) {
+			if (hasOwnProperty.call(from, key)) {
+				to[key] = from[key];
+			}
+		}
+
+		if (getOwnPropertySymbols) {
+			symbols = getOwnPropertySymbols(from);
+			for (var i = 0; i < symbols.length; i++) {
+				if (propIsEnumerable.call(from, symbols[i])) {
+					to[symbols[i]] = from[symbols[i]];
+				}
+			}
+		}
+	}
+
+	return to;
+};
+
+},{}],8:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -1205,7 +1935,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],5:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 (function (global){
 /*! https://mths.be/punycode v1.4.1 by @mathias */
 ;(function(root) {
@@ -1742,7 +2472,7 @@ process.umask = function() { return 0; };
 }(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],6:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -1828,7 +2558,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],7:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -1915,13 +2645,92 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],8:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":6,"./encode":7}],9:[function(require,module,exports){
+},{"./decode":10,"./encode":11}],13:[function(require,module,exports){
+(function (setImmediate,clearImmediate){
+var nextTick = require('process/browser.js').nextTick;
+var apply = Function.prototype.apply;
+var slice = Array.prototype.slice;
+var immediateIds = {};
+var nextImmediateId = 0;
+
+// DOM APIs, for completeness
+
+exports.setTimeout = function() {
+  return new Timeout(apply.call(setTimeout, window, arguments), clearTimeout);
+};
+exports.setInterval = function() {
+  return new Timeout(apply.call(setInterval, window, arguments), clearInterval);
+};
+exports.clearTimeout =
+exports.clearInterval = function(timeout) { timeout.close(); };
+
+function Timeout(id, clearFn) {
+  this._id = id;
+  this._clearFn = clearFn;
+}
+Timeout.prototype.unref = Timeout.prototype.ref = function() {};
+Timeout.prototype.close = function() {
+  this._clearFn.call(window, this._id);
+};
+
+// Does not start the time, just sets up the members needed.
+exports.enroll = function(item, msecs) {
+  clearTimeout(item._idleTimeoutId);
+  item._idleTimeout = msecs;
+};
+
+exports.unenroll = function(item) {
+  clearTimeout(item._idleTimeoutId);
+  item._idleTimeout = -1;
+};
+
+exports._unrefActive = exports.active = function(item) {
+  clearTimeout(item._idleTimeoutId);
+
+  var msecs = item._idleTimeout;
+  if (msecs >= 0) {
+    item._idleTimeoutId = setTimeout(function onTimeout() {
+      if (item._onTimeout)
+        item._onTimeout();
+    }, msecs);
+  }
+};
+
+// That's not how node.js implements it but the exposed api is the same.
+exports.setImmediate = typeof setImmediate === "function" ? setImmediate : function(fn) {
+  var id = nextImmediateId++;
+  var args = arguments.length < 2 ? false : slice.call(arguments, 1);
+
+  immediateIds[id] = true;
+
+  nextTick(function onNextTick() {
+    if (immediateIds[id]) {
+      // fn.call() is faster so we optimize for the common use-case
+      // @see http://jsperf.com/call-apply-segu
+      if (args) {
+        fn.apply(null, args);
+      } else {
+        fn.call(null);
+      }
+      // Prevent ids from leaking
+      exports.clearImmediate(id);
+    }
+  });
+
+  return id;
+};
+
+exports.clearImmediate = typeof clearImmediate === "function" ? clearImmediate : function(id) {
+  delete immediateIds[id];
+};
+}).call(this,require("timers").setImmediate,require("timers").clearImmediate)
+},{"process/browser.js":8,"timers":13}],14:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -2655,7 +3464,7 @@ Url.prototype.parseHost = function() {
   if (host) this.hostname = host;
 };
 
-},{"./util":10,"punycode":5,"querystring":8}],10:[function(require,module,exports){
+},{"./util":15,"punycode":9,"querystring":12}],15:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -2673,629 +3482,13 @@ module.exports = {
   }
 };
 
-},{}],11:[function(require,module,exports){
-if (typeof Object.create === 'function') {
-  // implementation from standard node.js 'util' module
-  module.exports = function inherits(ctor, superCtor) {
-    ctor.super_ = superCtor
-    ctor.prototype = Object.create(superCtor.prototype, {
-      constructor: {
-        value: ctor,
-        enumerable: false,
-        writable: true,
-        configurable: true
-      }
-    });
-  };
-} else {
-  // old school shim for old browsers
-  module.exports = function inherits(ctor, superCtor) {
-    ctor.super_ = superCtor
-    var TempCtor = function () {}
-    TempCtor.prototype = superCtor.prototype
-    ctor.prototype = new TempCtor()
-    ctor.prototype.constructor = ctor
-  }
-}
-
-},{}],12:[function(require,module,exports){
-module.exports = function isBuffer(arg) {
-  return arg && typeof arg === 'object'
-    && typeof arg.copy === 'function'
-    && typeof arg.fill === 'function'
-    && typeof arg.readUInt8 === 'function';
-}
-},{}],13:[function(require,module,exports){
-(function (process,global){
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-var formatRegExp = /%[sdj%]/g;
-exports.format = function(f) {
-  if (!isString(f)) {
-    var objects = [];
-    for (var i = 0; i < arguments.length; i++) {
-      objects.push(inspect(arguments[i]));
-    }
-    return objects.join(' ');
-  }
-
-  var i = 1;
-  var args = arguments;
-  var len = args.length;
-  var str = String(f).replace(formatRegExp, function(x) {
-    if (x === '%%') return '%';
-    if (i >= len) return x;
-    switch (x) {
-      case '%s': return String(args[i++]);
-      case '%d': return Number(args[i++]);
-      case '%j':
-        try {
-          return JSON.stringify(args[i++]);
-        } catch (_) {
-          return '[Circular]';
-        }
-      default:
-        return x;
-    }
-  });
-  for (var x = args[i]; i < len; x = args[++i]) {
-    if (isNull(x) || !isObject(x)) {
-      str += ' ' + x;
-    } else {
-      str += ' ' + inspect(x);
-    }
-  }
-  return str;
-};
-
-
-// Mark that a method should not be used.
-// Returns a modified function which warns once by default.
-// If --no-deprecation is set, then it is a no-op.
-exports.deprecate = function(fn, msg) {
-  // Allow for deprecating things in the process of starting up.
-  if (isUndefined(global.process)) {
-    return function() {
-      return exports.deprecate(fn, msg).apply(this, arguments);
-    };
-  }
-
-  if (process.noDeprecation === true) {
-    return fn;
-  }
-
-  var warned = false;
-  function deprecated() {
-    if (!warned) {
-      if (process.throwDeprecation) {
-        throw new Error(msg);
-      } else if (process.traceDeprecation) {
-        console.trace(msg);
-      } else {
-        console.error(msg);
-      }
-      warned = true;
-    }
-    return fn.apply(this, arguments);
-  }
-
-  return deprecated;
-};
-
-
-var debugs = {};
-var debugEnviron;
-exports.debuglog = function(set) {
-  if (isUndefined(debugEnviron))
-    debugEnviron = process.env.NODE_DEBUG || '';
-  set = set.toUpperCase();
-  if (!debugs[set]) {
-    if (new RegExp('\\b' + set + '\\b', 'i').test(debugEnviron)) {
-      var pid = process.pid;
-      debugs[set] = function() {
-        var msg = exports.format.apply(exports, arguments);
-        console.error('%s %d: %s', set, pid, msg);
-      };
-    } else {
-      debugs[set] = function() {};
-    }
-  }
-  return debugs[set];
-};
-
-
-/**
- * Echos the value of a value. Trys to print the value out
- * in the best way possible given the different types.
- *
- * @param {Object} obj The object to print out.
- * @param {Object} opts Optional options object that alters the output.
- */
-/* legacy: obj, showHidden, depth, colors*/
-function inspect(obj, opts) {
-  // default options
-  var ctx = {
-    seen: [],
-    stylize: stylizeNoColor
-  };
-  // legacy...
-  if (arguments.length >= 3) ctx.depth = arguments[2];
-  if (arguments.length >= 4) ctx.colors = arguments[3];
-  if (isBoolean(opts)) {
-    // legacy...
-    ctx.showHidden = opts;
-  } else if (opts) {
-    // got an "options" object
-    exports._extend(ctx, opts);
-  }
-  // set default options
-  if (isUndefined(ctx.showHidden)) ctx.showHidden = false;
-  if (isUndefined(ctx.depth)) ctx.depth = 2;
-  if (isUndefined(ctx.colors)) ctx.colors = false;
-  if (isUndefined(ctx.customInspect)) ctx.customInspect = true;
-  if (ctx.colors) ctx.stylize = stylizeWithColor;
-  return formatValue(ctx, obj, ctx.depth);
-}
-exports.inspect = inspect;
-
-
-// http://en.wikipedia.org/wiki/ANSI_escape_code#graphics
-inspect.colors = {
-  'bold' : [1, 22],
-  'italic' : [3, 23],
-  'underline' : [4, 24],
-  'inverse' : [7, 27],
-  'white' : [37, 39],
-  'grey' : [90, 39],
-  'black' : [30, 39],
-  'blue' : [34, 39],
-  'cyan' : [36, 39],
-  'green' : [32, 39],
-  'magenta' : [35, 39],
-  'red' : [31, 39],
-  'yellow' : [33, 39]
-};
-
-// Don't use 'blue' not visible on cmd.exe
-inspect.styles = {
-  'special': 'cyan',
-  'number': 'yellow',
-  'boolean': 'yellow',
-  'undefined': 'grey',
-  'null': 'bold',
-  'string': 'green',
-  'date': 'magenta',
-  // "name": intentionally not styling
-  'regexp': 'red'
-};
-
-
-function stylizeWithColor(str, styleType) {
-  var style = inspect.styles[styleType];
-
-  if (style) {
-    return '\u001b[' + inspect.colors[style][0] + 'm' + str +
-           '\u001b[' + inspect.colors[style][1] + 'm';
-  } else {
-    return str;
-  }
-}
-
-
-function stylizeNoColor(str, styleType) {
-  return str;
-}
-
-
-function arrayToHash(array) {
-  var hash = {};
-
-  array.forEach(function(val, idx) {
-    hash[val] = true;
-  });
-
-  return hash;
-}
-
-
-function formatValue(ctx, value, recurseTimes) {
-  // Provide a hook for user-specified inspect functions.
-  // Check that value is an object with an inspect function on it
-  if (ctx.customInspect &&
-      value &&
-      isFunction(value.inspect) &&
-      // Filter out the util module, it's inspect function is special
-      value.inspect !== exports.inspect &&
-      // Also filter out any prototype objects using the circular check.
-      !(value.constructor && value.constructor.prototype === value)) {
-    var ret = value.inspect(recurseTimes, ctx);
-    if (!isString(ret)) {
-      ret = formatValue(ctx, ret, recurseTimes);
-    }
-    return ret;
-  }
-
-  // Primitive types cannot have properties
-  var primitive = formatPrimitive(ctx, value);
-  if (primitive) {
-    return primitive;
-  }
-
-  // Look up the keys of the object.
-  var keys = Object.keys(value);
-  var visibleKeys = arrayToHash(keys);
-
-  if (ctx.showHidden) {
-    keys = Object.getOwnPropertyNames(value);
-  }
-
-  // IE doesn't make error fields non-enumerable
-  // http://msdn.microsoft.com/en-us/library/ie/dww52sbt(v=vs.94).aspx
-  if (isError(value)
-      && (keys.indexOf('message') >= 0 || keys.indexOf('description') >= 0)) {
-    return formatError(value);
-  }
-
-  // Some type of object without properties can be shortcutted.
-  if (keys.length === 0) {
-    if (isFunction(value)) {
-      var name = value.name ? ': ' + value.name : '';
-      return ctx.stylize('[Function' + name + ']', 'special');
-    }
-    if (isRegExp(value)) {
-      return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
-    }
-    if (isDate(value)) {
-      return ctx.stylize(Date.prototype.toString.call(value), 'date');
-    }
-    if (isError(value)) {
-      return formatError(value);
-    }
-  }
-
-  var base = '', array = false, braces = ['{', '}'];
-
-  // Make Array say that they are Array
-  if (isArray(value)) {
-    array = true;
-    braces = ['[', ']'];
-  }
-
-  // Make functions say that they are functions
-  if (isFunction(value)) {
-    var n = value.name ? ': ' + value.name : '';
-    base = ' [Function' + n + ']';
-  }
-
-  // Make RegExps say that they are RegExps
-  if (isRegExp(value)) {
-    base = ' ' + RegExp.prototype.toString.call(value);
-  }
-
-  // Make dates with properties first say the date
-  if (isDate(value)) {
-    base = ' ' + Date.prototype.toUTCString.call(value);
-  }
-
-  // Make error with message first say the error
-  if (isError(value)) {
-    base = ' ' + formatError(value);
-  }
-
-  if (keys.length === 0 && (!array || value.length == 0)) {
-    return braces[0] + base + braces[1];
-  }
-
-  if (recurseTimes < 0) {
-    if (isRegExp(value)) {
-      return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
-    } else {
-      return ctx.stylize('[Object]', 'special');
-    }
-  }
-
-  ctx.seen.push(value);
-
-  var output;
-  if (array) {
-    output = formatArray(ctx, value, recurseTimes, visibleKeys, keys);
-  } else {
-    output = keys.map(function(key) {
-      return formatProperty(ctx, value, recurseTimes, visibleKeys, key, array);
-    });
-  }
-
-  ctx.seen.pop();
-
-  return reduceToSingleString(output, base, braces);
-}
-
-
-function formatPrimitive(ctx, value) {
-  if (isUndefined(value))
-    return ctx.stylize('undefined', 'undefined');
-  if (isString(value)) {
-    var simple = '\'' + JSON.stringify(value).replace(/^"|"$/g, '')
-                                             .replace(/'/g, "\\'")
-                                             .replace(/\\"/g, '"') + '\'';
-    return ctx.stylize(simple, 'string');
-  }
-  if (isNumber(value))
-    return ctx.stylize('' + value, 'number');
-  if (isBoolean(value))
-    return ctx.stylize('' + value, 'boolean');
-  // For some reason typeof null is "object", so special case here.
-  if (isNull(value))
-    return ctx.stylize('null', 'null');
-}
-
-
-function formatError(value) {
-  return '[' + Error.prototype.toString.call(value) + ']';
-}
-
-
-function formatArray(ctx, value, recurseTimes, visibleKeys, keys) {
-  var output = [];
-  for (var i = 0, l = value.length; i < l; ++i) {
-    if (hasOwnProperty(value, String(i))) {
-      output.push(formatProperty(ctx, value, recurseTimes, visibleKeys,
-          String(i), true));
-    } else {
-      output.push('');
-    }
-  }
-  keys.forEach(function(key) {
-    if (!key.match(/^\d+$/)) {
-      output.push(formatProperty(ctx, value, recurseTimes, visibleKeys,
-          key, true));
-    }
-  });
-  return output;
-}
-
-
-function formatProperty(ctx, value, recurseTimes, visibleKeys, key, array) {
-  var name, str, desc;
-  desc = Object.getOwnPropertyDescriptor(value, key) || { value: value[key] };
-  if (desc.get) {
-    if (desc.set) {
-      str = ctx.stylize('[Getter/Setter]', 'special');
-    } else {
-      str = ctx.stylize('[Getter]', 'special');
-    }
-  } else {
-    if (desc.set) {
-      str = ctx.stylize('[Setter]', 'special');
-    }
-  }
-  if (!hasOwnProperty(visibleKeys, key)) {
-    name = '[' + key + ']';
-  }
-  if (!str) {
-    if (ctx.seen.indexOf(desc.value) < 0) {
-      if (isNull(recurseTimes)) {
-        str = formatValue(ctx, desc.value, null);
-      } else {
-        str = formatValue(ctx, desc.value, recurseTimes - 1);
-      }
-      if (str.indexOf('\n') > -1) {
-        if (array) {
-          str = str.split('\n').map(function(line) {
-            return '  ' + line;
-          }).join('\n').substr(2);
-        } else {
-          str = '\n' + str.split('\n').map(function(line) {
-            return '   ' + line;
-          }).join('\n');
-        }
-      }
-    } else {
-      str = ctx.stylize('[Circular]', 'special');
-    }
-  }
-  if (isUndefined(name)) {
-    if (array && key.match(/^\d+$/)) {
-      return str;
-    }
-    name = JSON.stringify('' + key);
-    if (name.match(/^"([a-zA-Z_][a-zA-Z_0-9]*)"$/)) {
-      name = name.substr(1, name.length - 2);
-      name = ctx.stylize(name, 'name');
-    } else {
-      name = name.replace(/'/g, "\\'")
-                 .replace(/\\"/g, '"')
-                 .replace(/(^"|"$)/g, "'");
-      name = ctx.stylize(name, 'string');
-    }
-  }
-
-  return name + ': ' + str;
-}
-
-
-function reduceToSingleString(output, base, braces) {
-  var numLinesEst = 0;
-  var length = output.reduce(function(prev, cur) {
-    numLinesEst++;
-    if (cur.indexOf('\n') >= 0) numLinesEst++;
-    return prev + cur.replace(/\u001b\[\d\d?m/g, '').length + 1;
-  }, 0);
-
-  if (length > 60) {
-    return braces[0] +
-           (base === '' ? '' : base + '\n ') +
-           ' ' +
-           output.join(',\n  ') +
-           ' ' +
-           braces[1];
-  }
-
-  return braces[0] + base + ' ' + output.join(', ') + ' ' + braces[1];
-}
-
-
-// NOTE: These type checking functions intentionally don't use `instanceof`
-// because it is fragile and can be easily faked with `Object.create()`.
-function isArray(ar) {
-  return Array.isArray(ar);
-}
-exports.isArray = isArray;
-
-function isBoolean(arg) {
-  return typeof arg === 'boolean';
-}
-exports.isBoolean = isBoolean;
-
-function isNull(arg) {
-  return arg === null;
-}
-exports.isNull = isNull;
-
-function isNullOrUndefined(arg) {
-  return arg == null;
-}
-exports.isNullOrUndefined = isNullOrUndefined;
-
-function isNumber(arg) {
-  return typeof arg === 'number';
-}
-exports.isNumber = isNumber;
-
-function isString(arg) {
-  return typeof arg === 'string';
-}
-exports.isString = isString;
-
-function isSymbol(arg) {
-  return typeof arg === 'symbol';
-}
-exports.isSymbol = isSymbol;
-
-function isUndefined(arg) {
-  return arg === void 0;
-}
-exports.isUndefined = isUndefined;
-
-function isRegExp(re) {
-  return isObject(re) && objectToString(re) === '[object RegExp]';
-}
-exports.isRegExp = isRegExp;
-
-function isObject(arg) {
-  return typeof arg === 'object' && arg !== null;
-}
-exports.isObject = isObject;
-
-function isDate(d) {
-  return isObject(d) && objectToString(d) === '[object Date]';
-}
-exports.isDate = isDate;
-
-function isError(e) {
-  return isObject(e) &&
-      (objectToString(e) === '[object Error]' || e instanceof Error);
-}
-exports.isError = isError;
-
-function isFunction(arg) {
-  return typeof arg === 'function';
-}
-exports.isFunction = isFunction;
-
-function isPrimitive(arg) {
-  return arg === null ||
-         typeof arg === 'boolean' ||
-         typeof arg === 'number' ||
-         typeof arg === 'string' ||
-         typeof arg === 'symbol' ||  // ES6 symbol
-         typeof arg === 'undefined';
-}
-exports.isPrimitive = isPrimitive;
-
-exports.isBuffer = require('./support/isBuffer');
-
-function objectToString(o) {
-  return Object.prototype.toString.call(o);
-}
-
-
-function pad(n) {
-  return n < 10 ? '0' + n.toString(10) : n.toString(10);
-}
-
-
-var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep',
-              'Oct', 'Nov', 'Dec'];
-
-// 26 Feb 16:19:34
-function timestamp() {
-  var d = new Date();
-  var time = [pad(d.getHours()),
-              pad(d.getMinutes()),
-              pad(d.getSeconds())].join(':');
-  return [d.getDate(), months[d.getMonth()], time].join(' ');
-}
-
-
-// log is just a thin wrapper to console.log that prepends a timestamp
-exports.log = function() {
-  console.log('%s - %s', timestamp(), exports.format.apply(exports, arguments));
-};
-
-
-/**
- * Inherit the prototype methods from one constructor into another.
- *
- * The Function.prototype.inherits from lang.js rewritten as a standalone
- * function (not on Function.prototype). NOTE: If this file is to be loaded
- * during bootstrapping this function needs to be rewritten using some native
- * functions as prototype setup using normal JavaScript does not work as
- * expected during bootstrapping (see mirror.js in r114903).
- *
- * @param {function} ctor Constructor function which needs to inherit the
- *     prototype.
- * @param {function} superCtor Constructor function to inherit prototype from.
- */
-exports.inherits = require('inherits');
-
-exports._extend = function(origin, add) {
-  // Don't do anything if add isn't an object
-  if (!add || !isObject(add)) return origin;
-
-  var keys = Object.keys(add);
-  var i = keys.length;
-  while (i--) {
-    origin[keys[i]] = add[keys[i]];
-  }
-  return origin;
-};
-
-function hasOwnProperty(obj, prop) {
-  return Object.prototype.hasOwnProperty.call(obj, prop);
-}
-
-}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":12,"_process":4,"inherits":11}],14:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
+arguments[4][2][0].apply(exports,arguments)
+},{"dup":2}],17:[function(require,module,exports){
+arguments[4][3][0].apply(exports,arguments)
+},{"dup":3}],18:[function(require,module,exports){
+arguments[4][4][0].apply(exports,arguments)
+},{"./support/isBuffer":17,"_process":8,"dup":4,"inherits":16}],19:[function(require,module,exports){
 /*! @license MIT ©2013-2016 Ruben Verborgh, Ghent University - imec */
 /* Single-function HTTP(S) request module for browsers */
 
@@ -3382,7 +3575,7 @@ function removeQuery(url) {
 
 module.exports = createRequest;
 
-},{"asynciterator":37,"events":3,"lodash":44,"parse-link-header":54,"setimmediate":57}],15:[function(require,module,exports){
+},{"asynciterator":42,"events":6,"lodash":49,"parse-link-header":59,"setimmediate":62}],20:[function(require,module,exports){
 /*! @license MIT ©2015-2016 Ruben Verborgh, Ghent University - imec */
 /* Browser replacement for a subset of crypto. */
 
@@ -3502,7 +3695,7 @@ function toHexStr(n) {
   return s;
 }
 
-},{}],16:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 /*! @license MIT ©2014-2016 Ruben Verborgh, Ghent University - imec */
 /* A CompositeExtractor combines metadata from different extractors. */
 
@@ -3557,7 +3750,7 @@ CompositeExtractor.prototype._extract = function (metadata, tripleStream, callba
 
 module.exports = CompositeExtractor;
 
-},{"./MetadataExtractor":19,"lodash":44}],17:[function(require,module,exports){
+},{"./MetadataExtractor":24,"lodash":49}],22:[function(require,module,exports){
 /*! @license MIT ©2014-2016 Ruben Verborgh, Ghent University - imec */
 /* A ControlsExtractor extracts hypermedia controls from a triple stream. */
 
@@ -3664,7 +3857,7 @@ ControlsExtractor.prototype._extract = function (metadata, tripleStream, callbac
 
 module.exports = ControlsExtractor;
 
-},{"../util/RdfUtil":34,"./MetadataExtractor":19,"assert":1,"uritemplate":61}],18:[function(require,module,exports){
+},{"../util/RdfUtil":39,"./MetadataExtractor":24,"assert":1,"uritemplate":66}],23:[function(require,module,exports){
 /*! @license MIT ©2014-2016 Ruben Verborgh, Ghent University - imec */
 /* A CountExtractor extracts count metadata from a triple stream. */
 
@@ -3723,7 +3916,7 @@ function toHash(array) {
 
 module.exports = CountExtractor;
 
-},{"../util/RdfUtil":34,"./MetadataExtractor":19}],19:[function(require,module,exports){
+},{"../util/RdfUtil":39,"./MetadataExtractor":24}],24:[function(require,module,exports){
 /*! @license MIT ©2014-2016 Ruben Verborgh, Ghent University - imec */
 /* MetadataExtractor is a base class for objects that extract metadata from a triple stream. */
 
@@ -3782,7 +3975,7 @@ MetadataExtractor.prototype._extract = function (metadata, tripleStream, callbac
 
 module.exports = MetadataExtractor;
 
-},{"util":13}],20:[function(require,module,exports){
+},{"util":18}],25:[function(require,module,exports){
 /*! @license MIT ©2014-2016 Ruben Verborgh, Ghent University - imec */
 /* A DistinctIterator emits the unique items from a source. */
 
@@ -3817,7 +4010,7 @@ DistinctIterator.prototype._hash = function (item) {
 
 module.exports = DistinctIterator;
 
-},{"asynciterator":37,"crypto":15}],21:[function(require,module,exports){
+},{"asynciterator":42,"crypto":20}],26:[function(require,module,exports){
 /*! @license MIT ©2014-2016 Ruben Verborgh, Ghent University - imec */
 /* A SortIterator emits the items of a source in a sorted way. */
 
@@ -3879,7 +4072,7 @@ function defaultSort(a, b) {
 
 module.exports = SortIterator;
 
-},{"asynciterator":37}],22:[function(require,module,exports){
+},{"asynciterator":42}],27:[function(require,module,exports){
 /*! @license MIT ©2014-2016 Ruben Verborgh, Ghent University - imec */
 /* A SparqlIterator returns the results of a SPARQL query. */
 
@@ -4032,7 +4225,7 @@ function SparqlDescribeIterator(source, query, options) {
   var variables = query.variables, template = query.template = [];
   for (var i = 0, l = variables.length; i < l; i++)
     template.push(rdf.triple(variables[i], '?__predicate' + i, '?__object' + i));
-  query.where = query.where.concat({ type: 'bgp', triples: template });
+  query.where = (query.where || []).concat({ type: 'bgp', triples: template });
   SparqlConstructIterator.call(this, source, query, options);
 }
 SparqlConstructIterator.subclass(SparqlDescribeIterator);
@@ -4114,7 +4307,7 @@ module.exports = SparqlIterator;
 SparqlIterator.InvalidQueryError = InvalidQueryError;
 SparqlIterator.UnsupportedQueryError = UnsupportedQueryError;
 
-},{"../triple-pattern-fragments/ReorderingGraphPatternIterator":25,"../util/CustomError":30,"../util/RdfUtil":34,"../util/SparqlExpressionEvaluator":35,"./DistinctIterator":20,"./SortIterator":21,"./UnionIterator":23,"asynciterator":37,"lodash":44,"sparqljs":60}],23:[function(require,module,exports){
+},{"../triple-pattern-fragments/ReorderingGraphPatternIterator":30,"../util/CustomError":35,"../util/RdfUtil":39,"../util/SparqlExpressionEvaluator":40,"./DistinctIterator":25,"./SortIterator":26,"./UnionIterator":28,"asynciterator":42,"lodash":49,"sparqljs":65}],28:[function(require,module,exports){
 /*! @license MIT ©2014-2016 Ruben Verborgh, Ghent University - imec */
 /* A UnionIterator returns the results from a set of source iterators. */
 
@@ -4176,7 +4369,8 @@ UnionIterator.prototype._read = function (count, done) {
 
 module.exports = UnionIterator;
 
-},{"asynciterator":37}],24:[function(require,module,exports){
+},{"asynciterator":42}],29:[function(require,module,exports){
+(function (setImmediate){
 /*! @license MIT ©2014-2016 Ruben Verborgh, Ghent University - imec */
 /* A FragmentsClient fetches Triple Pattern Fragments through HTTP. */
 /* eslint max-nested-callbacks: [2, 3] */
@@ -4278,6 +4472,11 @@ FragmentsClient.prototype.abortAll = function () {
   this._httpClient.abortAll();
 };
 
+/** Returns the current number of requests sent **/
+FragmentsClient.prototype.getRequestCount = function () {
+  return this._httpClient ? this._httpClient._requestId : 0;
+};
+
 // Creates a new Triple Pattern Fragment
 function Fragment(fragmentsClient, pattern) {
   if (!(this instanceof Fragment))
@@ -4366,7 +4565,8 @@ Fragment.prototype.toString = function () {
 
 module.exports = FragmentsClient;
 
-},{"../extractors/CompositeExtractor":16,"../extractors/ControlsExtractor":17,"../extractors/CountExtractor":18,"../util/HttpClient":32,"../util/RdfUtil":34,"./TrigFragmentIterator":26,"./TurtleFragmentIterator":28,"asynciterator":37,"lodash":44,"lru-cache":45}],25:[function(require,module,exports){
+}).call(this,require("timers").setImmediate)
+},{"../extractors/CompositeExtractor":21,"../extractors/ControlsExtractor":22,"../extractors/CountExtractor":23,"../util/HttpClient":37,"../util/RdfUtil":39,"./TrigFragmentIterator":31,"./TurtleFragmentIterator":33,"asynciterator":42,"lodash":49,"lru-cache":50,"timers":13}],30:[function(require,module,exports){
 /*! @license MIT ©2014-2016 Ruben Verborgh, Ghent University - imec */
 /* A ReorderingGraphPatternIterator builds bindings by reading matches for a basic graph pattern. */
 
@@ -4469,7 +4669,7 @@ ReorderingGraphPatternIterator.prototype.toString = function () {
 
 module.exports = ReorderingGraphPatternIterator;
 
-},{"../util/ExecutionLogger":31,"../util/RdfUtil":34,"./TriplePatternIterator":27,"asynciterator":37,"lodash":44}],26:[function(require,module,exports){
+},{"../util/ExecutionLogger":36,"../util/RdfUtil":39,"./TriplePatternIterator":32,"asynciterator":42,"lodash":49}],31:[function(require,module,exports){
 /*! @license MIT ©2013-2016 Ruben Verborgh, Ghent University - imec */
 /* A TrigFragmentIterator reads data and metadata from Linked Data Fragments in TriG. */
 
@@ -4499,7 +4699,7 @@ TrigFragmentIterator.supportsContentType = function (contentType) {
 
 module.exports = TrigFragmentIterator;
 
-},{"./TurtleFragmentIterator":28}],27:[function(require,module,exports){
+},{"./TurtleFragmentIterator":33}],32:[function(require,module,exports){
 /*! @license MIT ©2014-2016 Ruben Verborgh, Ghent University - imec */
 /* A TriplePatternIterator builds bindings by reading matches for a triple pattern. */
 
@@ -4554,7 +4754,7 @@ TriplePatternIterator.prototype.toString = function () {
 
 module.exports = TriplePatternIterator;
 
-},{"../util/ExecutionLogger":31,"../util/RdfUtil":34,"asynciterator":37}],28:[function(require,module,exports){
+},{"../util/ExecutionLogger":36,"../util/RdfUtil":39,"asynciterator":42}],33:[function(require,module,exports){
 /*! @license MIT ©2013-2016 Ruben Verborgh, Ghent University - imec */
 /* A TurtleFragmentIterator reads data and metadata from Linked Data Fragments in Turtle. */
 
@@ -4630,7 +4830,7 @@ TurtleFragmentIterator.supportsContentType = function (contentType) {
 
 module.exports = TurtleFragmentIterator;
 
-},{"../util/RdfUtil":34,"asynciterator":37,"n3":46}],29:[function(require,module,exports){
+},{"../util/RdfUtil":39,"asynciterator":42,"n3":51}],34:[function(require,module,exports){
 /*! @license MIT ©2015-2016 Miel Vander Sande, Ghent University - imec */
 
 var FragmentsClient = require('../FragmentsClient'),
@@ -4682,6 +4882,13 @@ FederatedFragmentsClient.prototype.getFragmentByPattern = function (pattern) {
 /** Aborts all requests. */
 FederatedFragmentsClient.prototype.abortAll = function () {
   this._clients.forEach(function (client) { client.abortAll(); });
+};
+
+/** Returns the current number of requests sent **/
+FederatedFragmentsClient.prototype.getRequestCount = function () {
+  var sum = 0;
+  this._clients.forEach(function (client) { sum += client.getRequestCount(); });
+  return sum;
 };
 
 // Creates a new compound Triple Pattern Fragment
@@ -4775,7 +4982,7 @@ function getIndex(element, index) { return index; }
 
 module.exports = FederatedFragmentsClient;
 
-},{"../../util/RdfUtil":34,"../FragmentsClient":24,"asynciterator":37,"lodash":44}],30:[function(require,module,exports){
+},{"../../util/RdfUtil":39,"../FragmentsClient":29,"asynciterator":42,"lodash":49}],35:[function(require,module,exports){
 /*! @license MIT ©2014-2016 Ruben Verborgh, Ghent University - imec */
 
 // Creates a constructor for an Error with the given name
@@ -4797,7 +5004,7 @@ function createErrorType(name, init) {
 
 module.exports = createErrorType;
 
-},{}],31:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 /*! @license MIT ©2013-2016 Miel Vander Sande, Ghent University - imec */
 
 var Logger = require('./Logger'),
@@ -4835,7 +5042,8 @@ ExecutionLogger.prototype.logFragment = function (iterator, fragment, bindings) 
 
 module.exports = ExecutionLogger;
 
-},{"./Logger":33,"asynciterator":37,"util":13}],32:[function(require,module,exports){
+},{"./Logger":38,"asynciterator":42,"util":18}],37:[function(require,module,exports){
+(function (setImmediate){
 /*! @license MIT ©2014-2016 Ruben Verborgh, Ghent University - imec */
 
 var TransformIterator = require('asynciterator').TransformIterator,
@@ -4985,16 +5193,20 @@ HttpClient.prototype._startRequest = function (request) {
   };
 };
 
-/** Aborts all active and pending requests. */
+/** Aborts all active and pending requests and prevents the HttpClient from accepting new requests. */
 HttpClient.prototype.abortAll = function () {
   this._queued = [];
   for (var id in this._active)
     this._active[id].abort();
+  this.request = function () {
+    throw new Error('Client no longer accepts requests after aborting.');
+  };
 };
 
 module.exports = HttpClient;
 
-},{"../util/Logger.js":33,"./Request":14,"asynciterator":37,"lodash":44,"parse-link-header":54}],33:[function(require,module,exports){
+}).call(this,require("timers").setImmediate)
+},{"../util/Logger.js":38,"./Request":19,"asynciterator":42,"lodash":49,"parse-link-header":59,"timers":13}],38:[function(require,module,exports){
 /*! @license MIT ©2014-2016 Ruben Verborgh and Miel Vander Sande, Ghent University - imec */
 /* loosely based on https://github.com/visionmedia/log.js/blob/master/lib/log.js */
 /* eslint no-console: 0 */
@@ -5103,7 +5315,7 @@ Logger.setMode = function (modeName) {
 
 module.exports = Logger;
 
-},{"./RdfUtil":34,"lodash":44}],34:[function(require,module,exports){
+},{"./RdfUtil":39,"lodash":49}],39:[function(require,module,exports){
 /*! @license MIT ©2014-2016 Ruben Verborgh, Ghent University - imec */
 
 var N3 = require('n3'),
@@ -5344,7 +5556,7 @@ function namespace(prefix, base, names) {
 
 Object.freeze(util);
 
-},{"lodash":44,"n3":46}],35:[function(require,module,exports){
+},{"lodash":49,"n3":51}],40:[function(require,module,exports){
 /*! @license MIT ©2014-2016 Ruben Verborgh, Ghent University - imec */
 
 var N3Util = require('n3').Util,
@@ -5407,8 +5619,9 @@ evaluators = {
         operator = operators[operatorName];
     if (!operator)
       throw new UnsupportedOperatorError(operatorName);
-    if (operator.length !== expression.args.length)
-      throw new InvalidArgumentsNumberError(operatorName, expression.args.length, operator.length);
+    var minimumArgumentsLength = operator.minimumArgumentsLength || operator.length;
+    if (expression.args.length < minimumArgumentsLength || expression.args.length > operator.length)
+      throw new InvalidArgumentsNumberError(operatorName, expression.args.length, minimumArgumentsLength, operator.length);
 
     // Special case: some operators accept expressions instead of evaluated expressions
     if (operator.acceptsExpressions) {
@@ -5495,10 +5708,10 @@ operators = {
     string = literalValue(string);
     return string.indexOf(substring) >= 0;
   },
-  'regex': function (subject, pattern) {
+  'regex': function (subject, pattern, flags) {
     if (isLiteral(subject))
       subject = literalValue(subject);
-    return new RegExp(literalValue(pattern)).test(subject);
+    return new RegExp(literalValue(pattern), flags).test(subject);
   },
   'str': function (a) {
     return isLiteral(a) ? a : '"' + a + '"';
@@ -5549,6 +5762,9 @@ operators = {
   operators[operatorName].resultType = 'boolean';
 });
 
+// Tag for all operators with optional arguments the minimum number of arguments required
+operators.regex.minimumArgumentsLength = 2;
+
 // Tag all operators that take expressions instead of evaluated expressions
 operators.bound.acceptsExpressions = true;
 
@@ -5563,9 +5779,15 @@ UnsupportedOperatorError = createErrorType('UnsupportedExpressionError', functio
 });
 
 InvalidArgumentsNumberError = createErrorType('InvalidArgumentsNumberError',
-function (operatorName, actualNumber, expectedNumber) {
-  this.message = 'Invalid number of arguments for ' + operatorName + ': ' +
-                 actualNumber + ' (expected: ' + expectedNumber + ').';
+function (operatorName, actualNumber, minArgs, maxArgs) {
+  if (minArgs === maxArgs) {
+    this.message = 'Invalid number of arguments for ' + operatorName + ': ' +
+        actualNumber + ' (expected: ' + minArgs + ').';
+  }
+  else {
+    this.message = 'Invalid number of arguments for ' + operatorName + ': ' +
+        actualNumber + ' (expected between ' + minArgs + ' and ' + maxArgs + ').';
+  }
 });
 
 
@@ -5575,7 +5797,7 @@ module.exports.UnsupportedExpressionError = UnsupportedExpressionError;
 module.exports.UnsupportedOperatorError = UnsupportedOperatorError;
 module.exports.InvalidArgumentsNumberError = InvalidArgumentsNumberError;
 
-},{"./CustomError":30,"n3":46}],36:[function(require,module,exports){
+},{"./CustomError":35,"n3":51}],41:[function(require,module,exports){
 /*! @license MIT ©2014-2016 Miel Vander Sande, Ghent University - imec */
 /* Serializing the output of a SparqlIterator */
 
@@ -5621,7 +5843,7 @@ SparqlResultWriter.register = function (mediaType, ResultWriter) {
 };
 
 // Instantiate a writer of a given media type
-SparqlResultWriter.instantiate = function (mediaType, source) {
+SparqlResultWriter.instantiate = function (mediaType, source, options) {
   // Look up the class or class name
   var ResultWriter = SparqlResultWriter.writers[mediaType];
   if (!ResultWriter)
@@ -5630,13 +5852,13 @@ SparqlResultWriter.instantiate = function (mediaType, source) {
   if (typeof ResultWriter === 'string')
     ResultWriter = SparqlResultWriter.writers[mediaType] = require(ResultWriter);
   // Create an instance of the subclass
-  return new ResultWriter(source);
+  return new ResultWriter(source, options);
 };
 
 module.exports = SparqlResultWriter;
 
-},{"asynciterator":37}],37:[function(require,module,exports){
-(function (process){
+},{"asynciterator":42}],42:[function(require,module,exports){
+(function (process,setImmediate){
 var EventEmitter = require('events').EventEmitter;
 
 // Executes the given function with arguments as soon as possible
@@ -7230,8 +7452,8 @@ AsyncIterator.SimpleTransformIterator = SimpleTransformIterator;
 AsyncIterator.MultiTransformIterator = MultiTransformIterator;
 AsyncIterator.ClonedIterator = ClonedIterator;
 
-}).call(this,require('_process'))
-},{"_process":4,"events":3,"immediate":38}],38:[function(require,module,exports){
+}).call(this,require('_process'),require("timers").setImmediate)
+},{"_process":8,"events":6,"immediate":43,"timers":13}],43:[function(require,module,exports){
 'use strict';
 var types = [
   require('./nextTick'),
@@ -7329,7 +7551,7 @@ function immediate(task) {
   }
 }
 
-},{"./messageChannel":39,"./mutation.js":40,"./nextTick":41,"./stateChange":42,"./timeout":43}],39:[function(require,module,exports){
+},{"./messageChannel":44,"./mutation.js":45,"./nextTick":46,"./stateChange":47,"./timeout":48}],44:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -7350,7 +7572,7 @@ exports.install = function (func) {
   };
 };
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],40:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 (function (global){
 'use strict';
 //based off rsvp https://github.com/tildeio/rsvp.js
@@ -7375,7 +7597,7 @@ exports.install = function (handle) {
   };
 };
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],41:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 (function (process){
 'use strict';
 exports.test = function () {
@@ -7390,7 +7612,7 @@ exports.install = function (func) {
 };
 
 }).call(this,require('_process'))
-},{"_process":4}],42:[function(require,module,exports){
+},{"_process":8}],47:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -7417,7 +7639,7 @@ exports.install = function (handle) {
   };
 };
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],43:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 'use strict';
 exports.test = function () {
   return true;
@@ -7428,7 +7650,7 @@ exports.install = function (t) {
     setTimeout(t, 0);
   };
 };
-},{}],44:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -14218,7 +14440,7 @@ exports.install = function (t) {
 }.call(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],45:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 'use strict'
 
 module.exports = LRUCache
@@ -14687,7 +14909,7 @@ function Entry (key, value, length, now, maxAge) {
   this.maxAge = maxAge || 0
 }
 
-},{"pseudomap":55,"util":13,"yallist":63}],46:[function(require,module,exports){
+},{"pseudomap":60,"util":18,"yallist":68}],51:[function(require,module,exports){
 // Replace local require by a lazy loader
 var globalRequire = require;
 require = function () {};
@@ -14715,7 +14937,8 @@ Object.keys(exports).forEach(function (submodule) {
   });
 });
 
-},{"./lib/N3Lexer":47,"./lib/N3Parser":48,"./lib/N3Store":49,"./lib/N3StreamParser":50,"./lib/N3StreamWriter":51,"./lib/N3Util":52,"./lib/N3Writer":53}],47:[function(require,module,exports){
+},{"./lib/N3Lexer":52,"./lib/N3Parser":53,"./lib/N3Store":54,"./lib/N3StreamParser":55,"./lib/N3StreamWriter":56,"./lib/N3Util":57,"./lib/N3Writer":58}],52:[function(require,module,exports){
+(function (setImmediate){
 // **N3Lexer** tokenizes N3 documents.
 var fromCharCode = String.fromCharCode;
 var immediately = typeof setImmediate === 'function' ? setImmediate :
@@ -15127,7 +15350,8 @@ N3Lexer.prototype = {
 // Export the `N3Lexer` class as a whole.
 module.exports = N3Lexer;
 
-},{}],48:[function(require,module,exports){
+}).call(this,require("timers").setImmediate)
+},{"timers":13}],53:[function(require,module,exports){
 // **N3Parser** parses N3 documents.
 var N3Lexer = require('./N3Lexer');
 
@@ -16015,7 +16239,7 @@ function noop() {}
 // Export the `N3Parser` class as a whole.
 module.exports = N3Parser;
 
-},{"./N3Lexer":47}],49:[function(require,module,exports){
+},{"./N3Lexer":52}],54:[function(require,module,exports){
 // **N3Store** objects store N3 triples by graph in memory.
 
 var expandPrefixedName = require('./N3Util').expandPrefixedName;
@@ -16406,7 +16630,7 @@ N3Store.prototype = {
 // Export the `N3Store` class as a whole.
 module.exports = N3Store;
 
-},{"./N3Util":52}],50:[function(require,module,exports){
+},{"./N3Util":57}],55:[function(require,module,exports){
 // **N3StreamParser** parses an N3 stream into a triple stream
 var Transform = require('stream').Transform,
     util = require('util'),
@@ -16441,7 +16665,7 @@ util.inherits(N3StreamParser, Transform);
 // Export the `N3StreamParser` class as a whole.
 module.exports = N3StreamParser;
 
-},{"./N3Parser.js":48,"stream":undefined,"util":13}],51:[function(require,module,exports){
+},{"./N3Parser.js":53,"stream":undefined,"util":18}],56:[function(require,module,exports){
 // **N3StreamWriter** serializes a triple stream into an N3 stream
 var Transform = require('stream').Transform,
     util = require('util'),
@@ -16473,7 +16697,7 @@ util.inherits(N3StreamWriter, Transform);
 // Export the `N3StreamWriter` class as a whole.
 module.exports = N3StreamWriter;
 
-},{"./N3Writer.js":53,"stream":undefined,"util":13}],52:[function(require,module,exports){
+},{"./N3Writer.js":58,"stream":undefined,"util":18}],57:[function(require,module,exports){
 // **N3Util** provides N3 utility functions
 
 var Xsd = 'http://www.w3.org/2001/XMLSchema#';
@@ -16620,7 +16844,7 @@ function applyToThis(f) {
 // Expose N3Util, attaching all functions to it
 module.exports = addN3Util(addN3Util);
 
-},{}],53:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 // **N3Writer** writes N3 documents.
 
 // Matches a literal as represented in memory by the N3 library
@@ -16952,7 +17176,7 @@ function characterReplacer(character) {
 // Export the `N3Writer` class as a whole.
 module.exports = N3Writer;
 
-},{}],54:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 'use strict';
 
 var qs = require('querystring')
@@ -17007,7 +17231,7 @@ module.exports = function (linkHeader) {
    .reduce(intoRels, {});
 };
 
-},{"querystring":8,"url":9,"xtend":62}],55:[function(require,module,exports){
+},{"querystring":12,"url":14,"xtend":67}],60:[function(require,module,exports){
 (function (process){
 if (process.env.npm_package_name === 'pseudomap' &&
     process.env.npm_lifecycle_script === 'test')
@@ -17020,7 +17244,7 @@ if (typeof Map === 'function' && !process.env.TEST_PSEUDOMAP) {
 }
 
 }).call(this,require('_process'))
-},{"./pseudomap":56,"_process":4}],56:[function(require,module,exports){
+},{"./pseudomap":61,"_process":8}],61:[function(require,module,exports){
 var hasOwnProperty = Object.prototype.hasOwnProperty
 
 module.exports = PseudoMap
@@ -17135,7 +17359,7 @@ function set (data, k, v) {
   data[key] = new Entry(k, v, key)
 }
 
-},{}],57:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 (function (process,global){
 (function (global, undefined) {
     "use strict";
@@ -17325,7 +17549,7 @@ function set (data, k, v) {
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":4}],58:[function(require,module,exports){
+},{"_process":8}],63:[function(require,module,exports){
 var XSD_INTEGER = 'http://www.w3.org/2001/XMLSchema#integer';
 
 function Generator(options, prefixes) {
@@ -17650,7 +17874,7 @@ module.exports = function SparqlGenerator(options) {
   };
 };
 
-},{}],59:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 (function (process){
 /* parser generated by jison 0.4.18 */
 /*
@@ -18211,6 +18435,7 @@ parse: function parse(input) {
         vstack.length = vstack.length - n;
         lstack.length = lstack.length - n;
     }
+    _token_stack:
         var lex = function () {
             var token;
             token = lexer.lex() || EOF;
@@ -19175,7 +19400,7 @@ if (typeof module !== 'undefined' && require.main === module) {
 }
 }
 }).call(this,require('_process'))
-},{"_process":2,"fs":2,"path":2}],60:[function(require,module,exports){
+},{"_process":5,"fs":5,"path":5}],65:[function(require,module,exports){
 var Parser = require('./lib/SparqlParser').Parser;
 var Generator = require('./lib/SparqlGenerator');
 
@@ -19209,7 +19434,7 @@ module.exports = {
   Generator: Generator,
 };
 
-},{"./lib/SparqlGenerator":58,"./lib/SparqlParser":59}],61:[function(require,module,exports){
+},{"./lib/SparqlGenerator":63,"./lib/SparqlParser":64}],66:[function(require,module,exports){
 (function (global){
 /*global unescape, module, define, window, global*/
 
@@ -20098,7 +20323,7 @@ var UriTemplate = (function () {
 ));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],62:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 module.exports = extend
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -20119,7 +20344,7 @@ function extend() {
     return target
 }
 
-},{}],63:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 module.exports = Yallist
 
 Yallist.Node = Node
@@ -20491,7 +20716,7 @@ function Node (value, prev, next, list) {
   }
 }
 
-},{}],64:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 /*! @license MIT ©2013-2016 Ruben Verborgh, Ghent University - imec */
 /* Main ldf-client module exports. */
 
@@ -20535,7 +20760,5 @@ Object.keys(exports).forEach(function (submodule) {
 // Restore original require
 require = globalRequire;
 
-},{"./lib/sparql/SparqlIterator.js":22,"./lib/triple-pattern-fragments/federated/FederatedFragmentsClient":29,"./lib/util/HttpClient":32,"./lib/util/Logger":33,"./lib/writers/SparqlResultWriter":36}]},{},[64])(64)
+},{"./lib/sparql/SparqlIterator.js":27,"./lib/triple-pattern-fragments/federated/FederatedFragmentsClient":34,"./lib/util/HttpClient":37,"./lib/util/Logger":38,"./lib/writers/SparqlResultWriter":41}]},{},[69])(69)
 });
-
-// see https://github.com/zaach/jison/issues/351

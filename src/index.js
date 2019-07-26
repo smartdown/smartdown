@@ -17,7 +17,6 @@
 /* global useABCJS */
 /* global useD3 */
 /* global useGifffer */
-/* global useLDF */
 /* global usePlotly */
 /* global useOpenJSCAD */
 /* global useP5JS */
@@ -27,6 +26,7 @@
 /* global ABCJS */
 
 import './polyfills';
+import createDOMPurify from 'dompurify';
 
 import emoji from 'emoji-js';
 const emojiInstance = new emoji();
@@ -268,7 +268,6 @@ const mathjaxConfigure = require('./extensions/MathJax');
 
 const Stdlib = require('./extensions/Stdlib.js');
 const Three = require('./extensions/Three');
-const LDF = require('./extensions/LDF');
 const Brython = require('./extensions/Brython');
 const D3 = require('./extensions/D3');
 const Plotly = require('./extensions/Plotly');
@@ -311,7 +310,7 @@ var markedOpts = {
   breaks: true,
   gfmBreaks: true,
   pedantic: false,
-  sanitize: true,
+  sanitize: false,
   smartLists: true,
   smartypants: false,
   highlight: function (code, lang) {    // , callback)
@@ -646,7 +645,6 @@ function getPrelude(language, code) {
     'p5js',
     'P5JS',
     'three',
-    'ldf',
     'plotly',
     'openjscad',
     'graphviz',
@@ -2660,11 +2658,6 @@ function recursivelyLoadImports(language, divId, importsRemaining, done) {
         recursivelyLoadImports(language, divId, importsRemaining, done);
       });
     }
-    else if (nextImport === 'ldf') {
-      window.smartdownJSModules.ldf.loader(function () {
-        recursivelyLoadImports(language, divId, importsRemaining, done);
-      });
-    }
     else if (nextImport === 'plotly') {
       window.smartdownJSModules.plotly.loader(function () {
         recursivelyLoadImports(language, divId, importsRemaining, done);
@@ -4230,6 +4223,36 @@ function setSmartdown(md, outputDiv, setSmartdownCompleted) {
   }
 
   var result = markedModule(md, markedOpts);
+
+  // https://github.com/cure53/DOMPurify/tree/master/demos#advanced-config-demo-link
+  var config = {
+    ADD_TAGS: ['script'],
+    ADD_ATTR: ['onclick', 'onmousedown', 'onmouseup', 'onmouseenter', 'onmouseleave', 'onkeydown', 'onkeyup'],
+  };
+
+  const kludgeDOMPurifyPrefix = '&nbsp;';
+  result = kludgeDOMPurifyPrefix + result;
+  var sanitized = createDOMPurify.sanitize(result, config);
+  if (result !== sanitized) {
+    // console.log('result !== sanitized', result.length, sanitized.length);
+    // console.log('-------------------');
+    // console.log(md.slice(0, 100));
+    // console.log('-------------------');
+    // console.log(result.slice(0, 100));
+    // console.log('-------------------');
+    // console.log('sanitized');
+    // console.log('-------------------');
+    // console.log(sanitized.slice(0, 100));
+    result = sanitized;
+  }
+
+  const shouldBePrefix = result.slice(0, kludgeDOMPurifyPrefix.length);
+  if (shouldBePrefix === kludgeDOMPurifyPrefix) {
+    result = result.slice(kludgeDOMPurifyPrefix.length);
+  }
+  else {
+    console.log('kludgeDOMPurifyPrefix missing after sanitize', shouldBePrefix);
+  }
   currentRenderDiv = null;
 
   function applyBackpatches(done) {
@@ -4661,7 +4684,6 @@ module.exports = {
   marked: markedModule,
   markedOpts: markedOpts,
   Stdlib: Stdlib,
-  ldf: LDF,
   P5Loader: P5.Loader,
   d3: null,
   d3v5: null,
@@ -4678,7 +4700,7 @@ module.exports = {
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
   showAugmentedCode: false,
-  version: '1.0.8',
+  version: '1.0.9',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,

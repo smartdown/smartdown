@@ -4,13 +4,23 @@
 //
 
 .smartdown-outer-container {
-  margin:0;
-  padding:0 20px 0 0;
+  margin: 0;
+  padding: 0 20px 0 0;
   background: rgb(250, 250, 255);
 
   > .container-fluid {
     margin: 0;
     padding: 0 5px 10px 5px;
+  }
+
+  @media (min-width: 800px) {
+    margin: auto;
+    width: 90%;
+  }
+
+  @media (min-width: 1200px) {
+    margin: auto;
+    width: 80%;
   }
 }
 
