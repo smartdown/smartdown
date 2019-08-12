@@ -1394,7 +1394,7 @@ function renderLink(href, title, text) {
                  ' class="smartdown-link" href="' +
                  href;
   if (useNewWindow) {
-    linkHead += '" target="_blank" rel="noopener">';
+    linkHead += '" target="_blank" rel="noreferrer noopener">';
   }
   else {
     linkHead += '">';
@@ -3636,7 +3636,7 @@ function renderCell(cellID, variableId, newValue) {
   }
   else if (cellInfo.datatype === 'url') {
     // console.log('cellInfo', cellInfo);
-    element.innerHTML = `<a target="_blank" rel="noopener" href="${newValue}" style="word-break:break-all;font-size:0.9em;line-height:1.15em;">${newValue}</a>`;
+    element.innerHTML = `<a target="_blank" rel="noreferrer noopener" href="${newValue}" style="word-break:break-all;font-size:0.9em;line-height:1.15em;">${newValue}</a>`;
   }
   else if (cellInfo.datatype === 'markdown') {
     if (typeof newValue === 'string') {
@@ -3820,7 +3820,7 @@ function renderCell(cellID, variableId, newValue) {
         elementList += '<li><img src="' + newElement + '"></li>';
       }
       else if (isURLTitle) {
-        elementList += '<li><a target="_blank" rel="noopener" href="' + newElement.url + '">' + newElement.title + '</a></li>';
+        elementList += '<li><a target="_blank" rel="noreferrer noopener" href="' + newElement.url + '">' + newElement.title + '</a></li>';
       }
       else if (typeof newElement === 'string') {
         elementList += '<li>' + newElement + '</li>';
@@ -4228,7 +4228,7 @@ function setSmartdown(md, outputDiv, setSmartdownCompleted) {
   var config = {
     FORCE_BODY: true,
     ADD_TAGS: ['script'],
-    ADD_ATTR: ['onblur', 'oninput', 'onchange', 'onclick', 'onmousedown', 'onmouseup', 'onmouseenter', 'onmouseleave', 'onkeydown', 'onkeyup'],
+    ADD_ATTR: ['onblur', 'oninput', 'onchange', 'onclick', 'onmousedown', 'onmouseup', 'onmouseenter', 'onmouseleave', 'onkeydown', 'onkeyup', 'target'],
   };
 
   var sanitized = createDOMPurify.sanitize(result, config);
@@ -4693,7 +4693,7 @@ module.exports = {
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
   showAugmentedCode: false,
-  version: '1.0.10',
+  version: '1.0.11',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,

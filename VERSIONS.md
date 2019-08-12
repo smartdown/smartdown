@@ -11,6 +11,7 @@
 - **1.0.8** - Updates Gallery to 0.0.37 (improved jsPsych documentation and examples). Adds experimental center and inline playable mode, along with a non-breaking paragraph syntax to allow for playables to be inlined within text. Fixes a sequencing bug in some playable loaders, where playables would execute not in lexical page order. Update deps. Eliminate use of playable-bottom-spacer, until I remember why it is there.
 - **1.0.9** - Remove LDF as a builtin extension. Adjust smartdown-outer-container to add horizontal margins in a responsive way.
 - **1.0.10** Fix issue where setVariable() and calculations don't cause reactivity in output cells. Fix issue where setHome() fails to resetAllPlayables, leaving sounds playing and other resources unreleased. Eliminate DOMPurify prefix kludge in favor of FORCE_BODY=true; this eliminates the problem where a script was improperly clean from a text. Gallery 0.0.41.
+- **1.0.11** - Fix DOMPurify config issue that disappears target=.
 
 
 
