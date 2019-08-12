@@ -4222,37 +4222,29 @@ function setSmartdown(md, outputDiv, setSmartdownCompleted) {
     }
   }
 
-  var result = markedModule(md, markedOpts);
+  let result = markedModule(md, markedOpts);
 
   // https://github.com/cure53/DOMPurify/tree/master/demos#advanced-config-demo-link
   var config = {
+    FORCE_BODY: true,
     ADD_TAGS: ['script'],
-    ADD_ATTR: ['onclick', 'onmousedown', 'onmouseup', 'onmouseenter', 'onmouseleave', 'onkeydown', 'onkeyup'],
+    ADD_ATTR: ['onblur', 'oninput', 'onchange', 'onclick', 'onmousedown', 'onmouseup', 'onmouseenter', 'onmouseleave', 'onkeydown', 'onkeyup'],
   };
 
-  const kludgeDOMPurifyPrefix = '&nbsp;';
-  result = kludgeDOMPurifyPrefix + result;
   var sanitized = createDOMPurify.sanitize(result, config);
   if (result !== sanitized) {
     // console.log('result !== sanitized', result.length, sanitized.length);
     // console.log('-------------------');
-    // console.log(md.slice(0, 100));
+    // console.log(md);
     // console.log('-------------------');
-    // console.log(result.slice(0, 100));
+    // console.log(result);
     // console.log('-------------------');
     // console.log('sanitized');
     // console.log('-------------------');
-    // console.log(sanitized.slice(0, 100));
+    // console.log(sanitized);
     result = sanitized;
   }
 
-  const shouldBePrefix = result.slice(0, kludgeDOMPurifyPrefix.length);
-  if (shouldBePrefix === kludgeDOMPurifyPrefix) {
-    result = result.slice(kludgeDOMPurifyPrefix.length);
-  }
-  else {
-    console.log('kludgeDOMPurifyPrefix missing after sanitize', shouldBePrefix);
-  }
   currentRenderDiv = null;
 
   function applyBackpatches(done) {
@@ -4352,6 +4344,7 @@ function setHome(md, outputDiv, done) {
   currentMD = md;
   currentHomeDiv = outputDiv;
   window.getSelection().removeAllRanges();
+  resetAllPlayables(outputDiv, true);
   resetPerPageState();
   setSmartdown(md, outputDiv, function() {
     updateProcesses();
@@ -4700,7 +4693,7 @@ module.exports = {
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
   showAugmentedCode: false,
-  version: '1.0.9',
+  version: '1.0.10',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,
