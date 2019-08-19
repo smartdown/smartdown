@@ -4227,7 +4227,7 @@ function setSmartdown(md, outputDiv, setSmartdownCompleted) {
   // https://github.com/cure53/DOMPurify/tree/master/demos#advanced-config-demo-link
   var config = {
     FORCE_BODY: true,
-    ADD_TAGS: ['script'],
+    ADD_TAGS: ['script', 'iframe'],
     ADD_ATTR: ['onblur', 'oninput', 'onchange', 'onclick', 'onmousedown', 'onmouseup', 'onmouseenter', 'onmouseleave', 'onkeydown', 'onkeyup', 'target'],
   };
 
@@ -4693,7 +4693,7 @@ module.exports = {
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
   showAugmentedCode: false,
-  version: '1.0.11',
+  version: '1.0.12',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,

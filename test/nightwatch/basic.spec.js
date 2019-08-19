@@ -33,3 +33,14 @@ this.testSmartdownClickREADME = function (browser) {
     .end();
   browser.end();
 };
+
+
+this.testSmartdownVideos = function (browser) {
+  browser
+    .url('https://localhost:4000/#Video')
+    .waitForElementVisible('body', 1000)
+    .waitForElementVisible('#smartdown-output', 1000)
+    .waitForElementVisible('#youtube-iframe-1', 1000)
+    .end();
+  browser.end();
+};

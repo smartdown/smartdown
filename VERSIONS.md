@@ -12,6 +12,4 @@
 - **1.0.9** - Remove LDF as a builtin extension. Adjust smartdown-outer-container to add horizontal margins in a responsive way.
 - **1.0.10** Fix issue where setVariable() and calculations don't cause reactivity in output cells. Fix issue where setHome() fails to resetAllPlayables, leaving sounds playing and other resources unreleased. Eliminate DOMPurify prefix kludge in favor of FORCE_BODY=true; this eliminates the problem where a script was improperly clean from a text. Gallery 0.0.41.
 - **1.0.11** - Fix DOMPurify config issue that disappears target=.
-
-
-
+- **1.0.12** - Fix DOMPurify config issue that disappears videos. Basically, enable iframe. Get mocha unit tests working again. Added nightwatch test (very minimal) for existence of a youtube iframe on the Videos card.
