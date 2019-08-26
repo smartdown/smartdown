@@ -5,7 +5,8 @@
 
 .smartdown-outer-container {
   margin: 0;
-  padding: 0 20px 0 0;
+  padding: 0 20px 0 10px;
+
   background: rgb(250, 250, 255);
 
   > .container-fluid {
@@ -69,20 +70,20 @@
 
 .smartdown-container p.smartdown_p {
   margin: 4px 0 15px 0;
-  padding: 0 0 0 8px;
+  padding: 0 0 0 0;
 }
 
 .smartdown-container p.smartdown_p_inline {
   margin: 4px 0 15px 0;
-  padding: 0 0 0 8px;
-  display: inline-block;
+  padding: 0 0 0 0;
+  display: inline;
   vertical-align: top;
 }
 
 
 .smartdown-container blockquote {
-  margin: 0 0 0 8px;
-  padding: 2px 5px;
+  margin: 0 0 0 5px;
+  padding: 2px 5px 2px 12px;
   border: 2px solid #ddd;
   font-size: 1em;
   border-radius: 10px;
@@ -111,6 +112,7 @@
     font-family: 'Asap', san-serif;
     line-height: unset;
 
+    text-indent: -8px;
     user-select: text;
   }
 
@@ -256,14 +258,19 @@
   overflow-y: scroll;
 }
 
-
 .smartdown-container input[type="radio"],
 .smartdown-container input[type="checkbox"] {
   margin: 5px !important;
-  vertical-align: bottom !important;
-  border:1px solid red !important;
+  vertical-align: middle !important;
 }
 
+.smartdown-container input[type="checkbox"].smartdown-checkbox {
+  margin: 5px 10px !important;
+  transform: scale(2);
+}
+
+
+smartdown-checkbox
 .smartdown-container input[type="range"] {
   display: inline-block;
 }
@@ -455,10 +462,17 @@
 }
 
 
+.smartdown-container .inline-target-div {
+  border: none;
+  display: inline;
+  margin: 0;
+  padding: 0;
+}
+
 .smartdown-container .playable-wrapper-wrapper-inline {
   /*margin: auto !important;*/
   padding: 0;
-  display: inline;
+  display: inline-block;
   vertical-align: top;
   .playable-wrapper {
     padding: 0;
@@ -467,7 +481,6 @@
     display: inline-block;
   }
 }
-
 
 .smartdown-container h1,
 .smartdown-container h2,
@@ -845,7 +858,6 @@ $disclosable-width: 400px;
 .smartdown-container .infocell-group-addon,
 .smartdown-container .infocell-group-btn {
   display: table-cell;
-
   width: 1%;
   white-space: nowrap;
   vertical-align: middle;
@@ -863,6 +875,11 @@ $disclosable-width: 400px;
   border:1px solid darkslateblue;
   border-top-right-radius:3px;
   border-bottom-right-radius:3px;
+}
+
+.smartdown-container .infocell-group-addon.infocell-group-inline {
+  display: inline;
+  margin: 0 10px 0 0;
 }
 
 .smartdown-container .infocell-label {
@@ -1458,6 +1475,10 @@ img.media-image path {
   100% {
     background-position: 35px 35px;
   }
+}
+
+.smartdown-container .smartdown-progress.smartdown-progress-inline .smartdown-progress-active {
+  animation: smartdown-progressActive 2s linear infinite;
 }
 
 /*https://www.thecssninja.com/css/pointer-events-60fps*/

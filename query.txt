@@ -1,0 +1,8 @@
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdp: <http://www.wikidata.org/prop/direct/>
+PREFIX wde: <http://www.wikidata.org/entity/>
+PREFIX schema: <https://schema.org/>
+
+SELECT * WHERE {
+  <https://www.wikidata.org/entity/Q1299> ?pred ?beatle .
+}

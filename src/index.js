@@ -65,6 +65,7 @@ if (useGifffer) {
 }
 
 const localForageSmartdownPrefix = 'smartdownVariable/';
+const inlinePrefix = '^^InLiNe^^';
 
 let twitterLoading = false;
 var cardLoader = null;
@@ -299,8 +300,6 @@ function entityEscape(html, encode) {
     .replace(/'/g, '&#39;');
 }
 
-/* global escape */
-
 const escape = entityEscape;
 
 var markedOpts = {
@@ -308,7 +307,6 @@ var markedOpts = {
   gfm: true,
   tables: true,
   breaks: true,
-  gfmBreaks: true,
   pedantic: false,
   sanitize: false,
   smartLists: true,
@@ -691,6 +689,7 @@ function renderCodeInternal(renderDivId, code, language, prelude) {
   var debug = languageOpts.indexOf('debug') >= 0;
   var inline = languageOpts.indexOf('inline') >= 0;
   var center = languageOpts.indexOf('center') >= 0;
+  var targetDivId = null;
 
   language = languageElements[0];
 
@@ -708,6 +707,14 @@ function renderCodeInternal(renderDivId, code, language, prelude) {
     var playId = `play_playable_${uniquePlayableIndex}`;
     var stopId = `stop_playable_${uniquePlayableIndex}`;
     var progressId = `progress_playable_${uniquePlayableIndex}`;
+
+    languageOpts.forEach(o => {
+      if (o.indexOf('&') === 0) {
+        targetDivId = 'inline-target-' + o.slice(1);
+        divId = targetDivId;
+      }
+    });
+
     var registeredPlayable = smartdown.registerPlayable(
       prelude,
       language,
@@ -723,7 +730,8 @@ function renderCodeInternal(renderDivId, code, language, prelude) {
       progressId,
       autoplay,
       code,
-      playableType.transform
+      playableType.transform,
+      targetDivId
     );
 
     var playableScript = '';
@@ -759,36 +767,42 @@ ${transformedCode}
     var showAugmentedCode = smartdown.showAugmentedCode || debug;
     var debugIsHidden = showAugmentedCode ? '' : 'hidden';
 
+    var wrapperWrapperElement = 'div';
+    var wrapperWrapperClass = 'playable-wrapper-wrapper';
+    var progressClass = 'smartdown-progress';
+
+    if (inline) {
+      wrapperWrapperElement = 'span';
+      wrapperWrapperClass = 'playable-wrapper-wrapper-inline';
+      progressClass += ' smartdown-progress-inline';
+    }
+    else if (center) {
+      wrapperWrapperClass = 'playable-wrapper-wrapper-center';
+    }
+
     if (autoplay && !playable) {
-      var playableWrapper =
+      var playableDiv =
 `
-<div class="playable-wrapper">
 <div class="smartdown-playable smartdown-${language}" id="${divId}"></div>
 </div>
-<div id="${progressId}" class="smartdown-progress">
+`;
+      if (targetDivId) {
+        playableDiv = '';
+      }
+
+      var playableWrapper =
+`
+<${wrapperWrapperElement} class="${wrapperWrapperClass}">
+<div class="playable-wrapper">
+${playableDiv}
+<div id="${progressId}" class="${progressClass}">
     <div
       class="smartdown-progress-bar smartdown-progress-active"
       data-percent="100" style="width: 100%;">
       <span class="smartdown-progress-label"></span>
     </div>
 </div>
-<button
-  type="button"
-  id="${dbgId}-toggle"
-  href="#"
-  onclick="smartdown.toggleDebug('${dbgId}')"
-  ${debugIsHidden}
-  class="debug-button">
-  Augmented Javascript
-</button>
-
-<pre
-  id="${dbgId}"
-  class="playable-debug-source">
-${highlightedAugmentedCode}
-</pre>
-
-<div class="playable-bottom-spacer"></div>
+</${wrapperWrapperElement}>
 `;
 
       return playableScript + playableWrapper;
@@ -813,18 +827,9 @@ ${highlightedAugmentedCode}
   </button>
 `;
 
-
-      var wrapperWrapperClass = 'playable-wrapper-wrapper';
-
-      if (inline) {
-        wrapperWrapperClass = 'playable-wrapper-wrapper-inline';
-      }
-      else if (center) {
-        wrapperWrapperClass = 'playable-wrapper-wrapper-center';
-      }
       var playableCodeDisplay =
 `
-<div class="${wrapperWrapperClass}">
+<${wrapperWrapperElement} class="${wrapperWrapperClass}">
 <div class="playable-wrapper">
 
 ${playableButtons}
@@ -842,7 +847,7 @@ ${playableButtons}
   Augmented Javascript
 </button>
 
-<div id="${progressId}" class="smartdown-progress">
+<div id="${progressId}" class="${progressClass}">
   <div
     class="smartdown-progress-bar smartdown-progress-active"
     data-percent="100" style="width: 100%;">
@@ -851,7 +856,7 @@ ${playableButtons}
 </div>
 
 </div>
-</div>
+</${wrapperWrapperElement}>
 
 <div id="${preId}" class="playable-source">
   <pre>${highlightedCode}</pre>
@@ -862,8 +867,6 @@ ${playableButtons}
   class="playable-debug-source">
 ${highlightedAugmentedCode}
 </pre>
-
-<!-- <div class="playable-bottom-spacer"></div> -->
 `;
 
       return playableScript + playableCodeDisplay;
@@ -1432,6 +1435,10 @@ function renderLink(href, title, text) {
       op = 'GO';
       lhs = cellscript.slice(1);
     }
+    else if (cellscript.indexOf('&') === 0) {
+      op = 'DIV';
+      lhs = cellscript.slice(1);
+    }
     else if (cellscript.indexOf('=') === 0) {
       op = 'CALC';
       cellscript = cellscript.slice(1);
@@ -1589,7 +1596,7 @@ function renderLink(href, title, text) {
         newHTML += '<span class="infocell-group-addon" id="' + lhs + '"><span class="infocell-label">' + decodeURIComponent(text) + '</span></span>';
       }
 
-      newHTML += '<input type="checkbox"';
+      newHTML += '<input class="smartdown-checkbox" type="checkbox"';
       newHTML += ' id="' + inputCheckboxCellId + '"';
       newHTML += ' onchange="smartdown.setVariable(\'' + lhs + '\', this.checked, \'boolean\')"';
       newHTML += '</input>';
@@ -1615,6 +1622,21 @@ function renderLink(href, title, text) {
     }
     else if (op === 'GO') {
       newHTML += '<button class="btn-infocell btn-infocell-go" onclick="smartdown.goToCard(\'' + lhs + '\', event)">' + decodeURIComponent(text) + '</button>';
+    }
+    else if (op === 'DIV') {
+      if (hasLabel) {
+        newHTML += '<span class="infocell-group">\n';
+        if (text && text.length > 0) {
+          newHTML += '<span class="infocell-group-addon infocell-group-inline"><span class="infocell-label">' + decodeURIComponent(text) + '</span></span>';
+        }
+      }
+
+      newHTML +=
+`<span
+  class="smartdown-playable inline-target-div"
+  id="inline-target-${lhs}">
+</span>
+`;
     }
     else if (op === 'GET') {
       uniqueCellIndex++;
@@ -1700,11 +1722,17 @@ function renderLink(href, title, text) {
 }
 
 function renderParagraph(text) {
-  var result = '<p class="smartdown_p">' + text + '</p>\n';
+  const isInline = (text.indexOf(inlinePrefix) === 0);
 
-  if (text.indexOf('<del>+') === 0 && text.endsWith('+</del>')) {
-    result = '<p class="smartdown_p_inline">' + text.slice(6, -7) + '</p>\n';
+  if (isInline) {
+    text = text.slice(inlinePrefix.length);
   }
+
+  const pClass = isInline ? 'smartdown_p_inline' : 'smartdown_p';
+  var result =
+`<p class="${pClass}">${text}</p>
+`;
+
   return result.trim();
 }
 
@@ -1984,7 +2012,7 @@ function computeExpressions() {
   /* eslint-enable guard-for-in */
 }
 
-function registerPlayable(prelude, language, renderDivId, divId, preId, dbgId, scriptId, functionId, playId, stopId, dbgToggleId, progressId, autoplay, code, transform) {
+function registerPlayable(prelude, language, renderDivId, divId, preId, dbgId, scriptId, functionId, playId, stopId, dbgToggleId, progressId, autoplay, code, transform, targetDivId) {
   var augmentedCode = code;
   var playableType = playableTypes[language];
 
@@ -2301,7 +2329,9 @@ jscadViewer.setJsCad(diagramSource);
     augmentedCode: augmentedCode,
     imports: imports,
     includes: includes,
+    targetDivId: targetDivId,
   };
+
   perPageState.playablesRegisteredOrder.push(perPageState.playablesRegistered[divId]);
 
   return perPageState.playablesRegistered[divId];
@@ -2327,13 +2357,12 @@ function playPlayableInternal(language, divId) {
   if (divPre) {
     divPre.style.display = 'none';
   }
-  div.style.display = 'block';
   if (progress) {
-    progress.style.display = 'block';
+    progress.style.display = playable.targetDivId ? 'inline-block' : 'block';
   }
   playable.playing = true;
   if (div) {
-    div.style.display = 'block';
+    div.style.display = playable.targetDivId ? 'inline' : 'block';
   }
   var playableType = playableTypes[language];
   if (playableType.javascript) {
@@ -4222,7 +4251,45 @@ function setSmartdown(md, outputDiv, setSmartdownCompleted) {
     }
   }
 
-  let result = markedModule(md, markedOpts);
+  const tokens = markedModule.lexer(md, markedOpts);
+  let precedingParagraph = null;
+  let precedingInlinedCodeblock = null; // This is a code block with /inline
+  tokens.forEach((t) => {
+    if (t.type === 'paragraph') {
+      if (precedingInlinedCodeblock) {
+        t.text = inlinePrefix + t.text;
+      }
+      precedingParagraph = t;
+      precedingInlinedCodeblock = null;
+    }
+    else if (t.type === 'code') {
+      const inlineCode = t.lang.indexOf('/inline') >= 0;
+      if (precedingParagraph &&
+          inlineCode &&
+          precedingParagraph.text.indexOf(inlinePrefix) !== 0) {
+        precedingParagraph.text = inlinePrefix + precedingParagraph.text;
+      }
+      if (inlineCode) {
+        precedingInlinedCodeblock = t;
+      }
+      else {
+        precedingInlinedCodeblock = null;
+      }
+      precedingParagraph = null;
+    }
+    else if (t.type === 'space' || t.type === 'script') {
+      // These elements may appear between a paragraph and an inline code
+      // block.
+    }
+    else {
+      precedingParagraph = null;
+      precedingInlinedCodeblock = null;
+    }
+  });
+
+  let result = markedModule.parser(tokens, markedOpts);
+
+  // let result = markedModule(md, markedOpts);
 
   // https://github.com/cure53/DOMPurify/tree/master/demos#advanced-config-demo-link
   var config = {
@@ -4693,7 +4760,7 @@ module.exports = {
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
   showAugmentedCode: false,
-  version: '1.0.12',
+  version: '1.0.13',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,
