@@ -247,8 +247,6 @@ var config = {
         { from: path.join(webcomponentsJS, 'bundles/'), to: './bundles/' },
         { from: vizJS },
         { from: vizLiteJS },
-        { from: path.join(app, 'external/comunica-browser.js') },
-        { from: path.join(app, 'external/comunica-browser.js.map') },
         { from: path.join(app, 'external/ldf-client-browser.js') },
         { from: openjscadJS },
         { from: abcjsJS },

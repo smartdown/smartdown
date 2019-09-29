@@ -454,7 +454,7 @@ function convertYoutubeFragmentToEmbed(href, title) {
             ${sizing}
             src="https://www.youtube.com/embed/${suffix}?html5=1&ecver=2&modestbranding=1${enablejsapi}"
             frameborder="0"
-
+            allow="autoplay; encrypted-media; picture-in-picture"
             allowfullscreen>
           </iframe>
         </div>
@@ -479,6 +479,7 @@ function convertYoutubeFragmentToEmbed(href, title) {
     ${sizing}
     src="https://www.youtube.com/embed/${suffix}"
     frameborder="0"
+    allow="autoplay; encrypted-media; picture-in-picture"
     allowfullscreen>
   </iframe>
 </div>
@@ -656,7 +657,7 @@ function getPrelude(language, code) {
     imports.push(language);
   }
 
-  if (playableType && playableType.javascript) {
+  if (playableType && (playableType.javascript || language === 'graphviz')) {
     const lines = code.split('\n');
     const usePrefix = '//smartdown.import=';
     const includePrefix = '//smartdown.include=';
@@ -672,7 +673,7 @@ function getPrelude(language, code) {
     });
   }
 
-  // console.log('getPrelude', language, imports);
+  // console.log('getPrelude', language, imports, includes);
 
   return {
     imports: imports,
@@ -910,10 +911,8 @@ function renderCode(code, language) {
     const prefixCode = '';
     recursivelyLoadIncludes(prefixCode, language, includesRemaining, function(includedCode) {
       const saveRenderDiv = currentRenderDiv;
-      // console.log('renderCode1', (currentRenderDiv ? currentRenderDiv.id : 'NOID'), includedCode.slice(0, 100));
       currentRenderDiv = backpatch.currentRenderDiv;
       const renderedExpandedCode = renderCodeInternal(currentRenderDiv.id, includedCode, language, prelude);
-      // console.log('renderCode2', (currentRenderDiv ? currentRenderDiv.id : 'NOID'), renderedExpandedCode.slice(0, 100));
       currentRenderDiv = saveRenderDiv;
       const patch = bp[backpatchIndex];
 
@@ -2915,7 +2914,7 @@ function deactivateOnMouseLeave(divId, overrideLocked) {
 }
 
 
-function setDisclosureLocation(div, triggerId, settings) {
+function setDisclosureLocation(div, contentDiv, triggerId, settings) {
 
   // this code is dependent on the css for diclosable-position
   // I can't seem to get reliable offsetHeight and offsetWidth
@@ -2934,11 +2933,7 @@ function setDisclosureLocation(div, triggerId, settings) {
     const viewportWidth = window.innerWidth;
     const visibleHeight = Math.min(bound.height, viewportHeight);
     const visibleWidth = Math.min(bound.width, viewportWidth);
-
-    // console.log('settings.location', settings.location);
-    // console.log(baseContainer.scrollTop, baseContainer.scrollLeft);
-    // console.log(height, width);
-    // console.log(visibleHeight, visibleWidth);
+    const padding = 25;
 
     switch (settings.location) {
       case 'center':
@@ -2959,20 +2954,20 @@ function setDisclosureLocation(div, triggerId, settings) {
         // console.log('scrollLeft', baseContainer.scrollLeft, div.scrollLeft, window.scrollLeft);
         break;
       case 'topleft':
-        top = 0;
-        left = 0;
+        top = 0 + padding;
+        left = 0 + padding;
         break;
       case 'topright':
-        top = 0;
-        left = (visibleWidth - width);
+        top = 0 + padding;
+        left = (visibleWidth - width - padding);
         break;
       case 'bottomleft':
-        top = (visibleHeight - height);
-        left = 0;
+        top = (visibleHeight - height - padding);
+        left = 0 + padding;
         break;
       case 'bottomright':
-        top = (visibleHeight - height);
-        left = (visibleWidth - width);
+        top = (visibleHeight - height - padding);
+        left = (visibleWidth - width - padding);
         break;
       default:
         break;
@@ -2985,7 +2980,6 @@ function setDisclosureLocation(div, triggerId, settings) {
     div.classList.add('disclosable-attach');
     div.style.top = `${trigger.offsetTop + trigger.offsetHeight}px`;
 
-
     //
     // Hack for InfoClay because the dnd-list there
     // has relative positioning. InfoClay will override
@@ -2997,44 +2991,50 @@ function setDisclosureLocation(div, triggerId, settings) {
       div.style.top = 0;
     }
 
-    if (window.innerWidth <= 770) {
-      div.style.left = 0;
+    const divWidth = div.clientWidth; // Math.floor(2 * window.innerWidth / 3); // width: 66%;
+    const paddingHack = 30;
+    if ((trigger.offsetLeft + divWidth + paddingHack) < window.innerWidth) {
+      // console.log('noadjust', trigger.offsetLeft, divWidth, (trigger.offsetLeft + divWidth), window.innerWidth, trigger.offsetWidth);
+      div.style.left = `${trigger.offsetLeft}px`;
     }
     else {
-      const divWidth = Math.floor(2 * window.innerWidth / 3); // width: 66%;
-      const paddingHack = 30;
-      if ((trigger.offsetLeft + divWidth + paddingHack) < window.innerWidth) {
-        // console.log('noadjust', trigger.offsetLeft, divWidth, (trigger.offsetLeft + divWidth), window.innerWidth, trigger.offsetWidth);
-        div.style.left = `${trigger.offsetLeft}px`;
-      }
-      else {
-        const left = Math.max(0, trigger.offsetLeft + trigger.offsetWidth - divWidth);
-        // console.log('adjust', left, trigger.offsetLeft, divWidth, (trigger.offsetLeft + divWidth), window.innerWidth, trigger.offsetWidth);
-        div.style.left = `${left}px`;
-      }
+      const left = Math.max(0, trigger.offsetLeft + trigger.offsetWidth - divWidth);
+      // console.log('adjust', left, trigger.offsetLeft, divWidth, (trigger.offsetLeft + divWidth), window.innerWidth, trigger.offsetWidth);
+      div.style.left = `${left}px`;
     }
   }
 }
 
 
-class DisclosableSetings {
+class DisclosableSettings {
   constructor() {
     this.showTrigger = 'button';
     this.display = 'inline';
     this.location = null;
     this.hideTrigger = null;
     this.decorations = [];
+    this.decorationsInner = [];
     this.draggable = false;
   }
 
 }
 
 function parseDisclosureSettings(settingsStr) {
-  const settings = new DisclosableSetings();
+  const settings = new DisclosableSettings();
   let options = settingsStr.split(',');
 
+  if (options.includes('transparent')) {
+
+  }
+  else {
+    options.push('shadow');
+    options.push('outline');
+  }
+
   if (options.includes('tooltip')) {
-    options = ['link', 'attach', 'onmouseleave', 'outline', 'shadow'];
+    options.push('link');
+    options.push('attach');
+    options.push('onmouseleave');
   }
 
   if (options.includes('link')) {
@@ -3091,17 +3091,32 @@ function parseDisclosureSettings(settingsStr) {
   // because decorations just get added in with all the
   // other options
 
+  if (options.includes('outline')) {
+    if (settings.draggable) {
+      settings.decorations.push('outline-draggable');
+      settings.decorationsInner.push('outline-draggable-content');
+    }
+    else {
+      settings.decorations.push('outline');
+      settings.decorationsInner.push('outline-content');
+    }
+  }
+
   if (options.includes('shadow')) {
     settings.decorations.push('shadow');
+    settings.decorationsInner.push('shadow-content');
+  }
+
+  if (options.includes('transparent')) {
+    settings.decorations.push('transparent');
+    settings.decorationsInner.push('transparent-content');
   }
 
   if (options.includes('lightbox')) {
     settings.decorations.push('lightbox');
+    settings.decorationsInner.push('lightbox-content');
   }
 
-  if (options.includes('outline')) {
-    settings.decorations.push('outline');
-  }
 
   return settings;
 }
@@ -3111,17 +3126,28 @@ function showDisclosure(divId, triggerId, settingsStr) {
   const settings = parseDisclosureSettings(settingsStr);
 
   var div = document.getElementById(divId);
+  div.classList.remove('disclosable-draggable', 'disclosable-scrollable', 'disclosable-shadow', 'disclosable-lightbox', 'disclosable-outline', 'disclosable-transparent');
+
+  var contentDiv = div.querySelector('.disclosable-content');
+  contentDiv.classList.remove('disclosable-scrollable-content', 'disclosable-shadow-content', 'disclosable-lightbox-content', 'disclosable-outline-content', 'disclosable-transparent-content');
   div.classList.add('disclosable-open');
   if (settings.scrollable) {
     div.classList.add('disclosable-scrollable');
+    contentDiv.classList.add('disclosable-scrollable-content');
   }
 
   for (var i = 0; i < settings.decorations.length; i++) {
-    div.classList.add(`decoration-${settings.decorations[i]}`);
+    div.classList.add(`disclosable-${settings.decorations[i]}`);
   }
 
+  for (var i = 0; i < settings.decorationsInner.length; i++) {
+    contentDiv.classList.add(`disclosable-${settings.decorationsInner[i]}`);
+  }
+
+  var headerDiv = document.getElementById(`${divId}_header`);
+  headerDiv.classList.remove('disclosable-header-position');
+
   if (settings.draggable) {
-    var headerDiv = document.getElementById(`${divId}_header`);
     headerDiv.classList.add('disclosable-header-position');
     if (settings.hideTrigger === 'closeable') {
       headerDiv.innerHTML = `<button class="disclosable-button-close" onclick="smartdown.hideDisclosure('${divId}','${settingsStr}')">&times;</button>`;
@@ -3133,8 +3159,7 @@ function showDisclosure(divId, triggerId, settingsStr) {
     activateDraggableDisclosure(divId);
   }
 
-
-  setDisclosureLocation(div, triggerId, settings);
+  setDisclosureLocation(div, contentDiv, triggerId, settings);
 
   if (settings.hideTrigger === 'onmouseleave') {
     /* eslint-disable no-use-before-define */
@@ -3147,6 +3172,7 @@ function showDisclosure(divId, triggerId, settingsStr) {
 function hideDisclosure(divId, settingsStr) {
   const settings = parseDisclosureSettings(settingsStr);
   var div = document.getElementById(divId);
+  var contentDiv = div.querySelector('.disclosable-content');
 
   div.classList.remove('disclosable-open');
 
@@ -3159,8 +3185,14 @@ function hideDisclosure(divId, settingsStr) {
   }
 
   for (var i = 0; i < settings.decorations.length; i++) {
-    if (div.classList.contains(`decoration-${settings.decorations[i]}`)) {
-      div.classList.remove(`decoration-${settings.decorations[i]}`);
+    if (div.classList.contains(`disclosable-${settings.decorations[i]}`)) {
+      div.classList.remove(`disclosable-${settings.decorations[i]}`);
+    }
+  }
+
+  for (var i = 0; i < settings.decorationsInner.length; i++) {
+    if (contentDiv.classList.contains(`disclosable-${settings.decorationsInner[i]}`)) {
+      contentDiv.classList.remove(`disclosable-${settings.decorationsInner[i]}`);
     }
   }
 
@@ -4760,7 +4792,7 @@ module.exports = {
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
   showAugmentedCode: false,
-  version: '1.0.13',
+  version: '1.0.14',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,

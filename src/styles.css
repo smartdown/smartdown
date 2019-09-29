@@ -26,7 +26,7 @@
 }
 
 .smartdown-container {
-  border: 1px solid white;
+  border: 1px solid transparent;
   background: rgb(250, 250, 255);
   margin: 0;
   padding: 4px 8px;
@@ -214,8 +214,9 @@
   font-size: inherit;
   line-height: 1.2;
   color: inherit;
-  word-break: break-all;
-  xword-wrap: break-word;
+  // word-break: break-all;
+  word-wrap: break-word;
+  white-space: pre-wrap;
   background-color: #f5f5f5;
 
   border-left: 1px solid #CCC;
@@ -227,10 +228,10 @@
 }
 
 .smartdown-container code {
-  word-break: break-all;
-  xword-wrap: break-word;
-  font-size: inherit;
+  // word-break: break-all;
+  word-wrap: break-word;
   white-space: pre-wrap;
+  font-size: inherit;
   border: none;
   border-radius: 0;
   border-left: 1px solid #CCCCBB;
@@ -643,53 +644,127 @@ fieldset[disabled] .smartdown-container .btn-infocell.focus {
   margin: -15px;
 }
 
-.smartdown-container .disclosable-trigger-tooltip {
+.smartdown-container .disclosable-trigger-tooltip-wrapper .disclosable-trigger-tooltip {
   display: inline-block;
   color: #639ad7;
 }
 
-.smartdown-container .disclosable-trigger-tooltip:hover {
+.smartdown-container .disclosable-trigger-tooltip-wrapper .disclosable-trigger-tooltip:hover {
   text-decoration: none;
   color: #337ab7;
   font-weight: bold;
 }
 
-$disclosable-height: 300px;
-$disclosable-width: 400px;
-
 .smartdown-container .disclosable-wrapper {
   display: none;
   margin: 0;
   padding: 0;
-  border: none;
-  background: white;
+  background: none;
+  /*border: 2px solid magenta !important;*/
 
   &.disclosable-open {
-    display: block;
+    display: inline-block;
     animation: fadeIn 2s;
   }
 
-  .disclosable-header {
+  &.disclosable-tooltip {
+    div.resp-iframe-container {
+      background: white;
+      height: 60vh;
+      min-height: 400px;
+      margin: 0;
+      padding: 0;
+    }
   }
 
+  &.disclosable-outline {
+  }
+
+  &.disclosable-outline-draggable {
+  }
+
+  &.disclosable-shadow {
+    /*border-radius: 10px;*/
+  }
+
+  &.disclosable-transparent {
+  }
+
+  &.disclosable-lightbox {
+    outline: 9999px solid rgba(0,0,0,0.5);
+    background: white;
+  }
+
+
   .disclosable-content {
-    padding: 0;
     margin: 0;
+    padding: 10px 10px 10px 15px;
+    background: aliceblue; /* floralwhite */
+    border: none;
+    /*width: 100%;*/
+
+    &.disclosable-outline-content {
+      border: 2px solid lightgray;
+      border-radius: 11.5px;
+      xbox-sizing: border-box;
+    }
+
+    &.disclosable-outline-draggable-content {
+/*      background: white;
+      padding: 0;
+      margin: 0;
+      border: 2px solid gray;
+      border-radius: 10px;
+*/    }
+
+    &.disclosable-shadow-content {
+      border-radius: 10px;
+      box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    &.disclosable-transparent-content {
+      background: none;
+      padding: 0;
+    }
+
+    &.disclosable-lightbox-content {
+      border-radius: 0;
+    }
+
+    &.disclosable-scrollable-content {
+      height: 50%;
+      resize: both;
+      overflow: auto;
+    }
+  }
+
+  &.disclosable-attach {
+    position: absolute;
+    z-index: 100;
+    background: none;
+    overflow: visible;
+    font-size: 0.95em;
+    max-width: 60%;
   }
 
   &.disclosable-position {
-    width: ($disclosable-width);
     position: fixed;
     padding: 0;
     z-index: 1050;
-    border: none;
+    /*border: none;*/
 
     .disclosable-header {
       background: lightgray;
       margin: 0;
-      padding: 0;
+      padding: 0 0 1px 0;
       line-height: 0;
+      border-radius: 2px;
+      display: none;
 
+      &.disclosable-header-position {
+        display: block;
+        min-width: 200px;
+      }
       button.disclosable-button-close {
         height: 16px;
         line-height: 0;
@@ -706,25 +781,9 @@ $disclosable-width: 400px;
       resize: both;
       overflow: auto;
     }
-
-    .disclosable-content {
-      padding: 0;
-      margin: 0;
-    }
   }
 }
 
-
-.smartdown-container .disclosable-attach {
-  background: white;
-  display: block;
-  overflow: auto;
-  position: absolute;
-  padding: 5px;
-  z-index: 100;
-  font-size: 0.95em;
-  max-width: 90%;
-}
 
 @media (min-width: 800px) {
   .smartdown-container .disclosable-attach {
@@ -772,21 +831,12 @@ $disclosable-width: 400px;
   display: block;
   animation: fadeIn 2s;
   background: aliceblue;
-  padding: 5px;
+  padding: 5px 8px 5px 16px;
   margin: 0;
   border: 1px solid lightgray;
   border-radius: 8px;
 }
 
-
-.smartdown-container .decoration-shadow {
-  box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.5);
-}
-
-
-.smartdown-container .decoration-lightbox {
-  outline: 9999px solid rgba(0,0,0,0.5);
-}
 
 
 /* Add animation (fade in the tooltip) */
@@ -1540,13 +1590,6 @@ img.media-image path {
   height:0;
 }
 
-.smartdown-container .disclosable-wrapper.disclosable-tooltip div.resp-iframe-container {
-  background: white;
-  height: 60vh;
-  min-height: 400px;
-  margin: 0;
-  padding: 0;
-}
 
 .smartdown-container div.resp-iframe-container > iframe {
   position: absolute;
