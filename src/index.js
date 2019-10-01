@@ -454,7 +454,7 @@ function convertYoutubeFragmentToEmbed(href, title) {
             ${sizing}
             src="https://www.youtube.com/embed/${suffix}?html5=1&ecver=2&modestbranding=1${enablejsapi}"
             frameborder="0"
-            allow="autoplay; encrypted-media; picture-in-picture"
+            allow="camera;microphone;autoplay;encrypted-media;picture-in-picture"
             allowfullscreen>
           </iframe>
         </div>
@@ -474,12 +474,13 @@ function convertYoutubeFragmentToEmbed(href, title) {
         var suffix = href.substr(prefix.length);
         result =
 `<div
-  class="video-container youtube ${classList}">
+  class="video-container youtube c2 ${classList}">
   <iframe
     ${sizing}
+    class="cc2"
     src="https://www.youtube.com/embed/${suffix}"
     frameborder="0"
-    allow="autoplay; encrypted-media; picture-in-picture"
+    allow="camera;microphone;autoplay;encrypted-media;picture-in-picture"
     allowfullscreen>
   </iframe>
 </div>
@@ -513,6 +514,7 @@ function convertVimeoFragmentToEmbed(href, title) {
     width="640"
     height="360"
     frameborder="0"
+    allow="camera;microphone;autoplay;encrypted-media;picture-in-picture"
     webkitallowfullscreen
     mozallowfullscreen
     allowfullscreen>
@@ -4792,7 +4794,7 @@ module.exports = {
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
   showAugmentedCode: false,
-  version: '1.0.14',
+  version: '1.0.15',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,
