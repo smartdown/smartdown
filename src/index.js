@@ -4329,7 +4329,7 @@ function setSmartdown(md, outputDiv, setSmartdownCompleted) {
   var config = {
     FORCE_BODY: true,
     ADD_TAGS: ['script', 'iframe'],
-    ADD_ATTR: ['onblur', 'oninput', 'onchange', 'onclick', 'onmousedown', 'onmouseup', 'onmouseenter', 'onmouseleave', 'onkeydown', 'onkeyup', 'target'],
+    ADD_ATTR: ['onblur', 'oninput', 'onchange', 'onclick', 'onmousedown', 'onmouseup', 'onmouseenter', 'onmouseleave', 'onkeydown', 'onkeyup', 'target', 'allow'],
   };
 
   var sanitized = createDOMPurify.sanitize(result, config);
@@ -4794,7 +4794,7 @@ module.exports = {
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
   showAugmentedCode: false,
-  version: '1.0.15',
+  version: '1.0.16',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,
