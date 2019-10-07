@@ -437,6 +437,48 @@ smartdown-checkbox
     margin: 0;
     width: 100%;
     display: inline-block;
+
+    button.kiosk-button {
+      display: inline;
+      background: none;
+      background: white;
+      margin: 0;
+      padding: 0 5px 5px 5px;
+      line-height: 0;
+      >span {
+        color: lightblue;
+        vertical-align: text-bottom;
+        line-height: 0.8em;
+        font-size: 2em;
+        font-weight: 600;
+      }
+      z-index: 500;
+      position: relative;
+      top: -25px;
+      left: -50%;
+    }
+
+
+    &.smartdown-playable-kiosk.playable-playing {
+      top: 0;
+      left: 0;
+      right: 10px !important;
+      bottom: 0 !important;
+      xwidth: unset;
+      xheight: unset;
+      background: none;
+      padding: 0;
+      margin: 0;
+      position: fixed;
+      display: block;
+
+      button.kiosk-button {
+        color: red;
+        position: fixed;
+        top: 0;
+        left: 0;
+      }
+    }
   }
 }
 
@@ -1299,11 +1341,8 @@ img.media-image path {
   -webkit-touch-callout: none;
 }
 
-
-.smartdown-container div.playable-wrapper div.playable-source {
-  height: 300px;
-  overflow-y: scroll;
-  resize: vertical;
+.smartdown-container div.playable-source.playable-autoplay {
+  display: none;
 }
 
 .smartdown-container pre.playable-debug-source {

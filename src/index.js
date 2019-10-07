@@ -690,6 +690,7 @@ function renderCodeInternal(renderDivId, code, language, prelude) {
   var playable = languageOpts.indexOf('playable') >= 0;
   var autoplay = languageOpts.indexOf('autoplay') >= 0;
   var debug = languageOpts.indexOf('debug') >= 0;
+  var kiosk = languageOpts.indexOf('kiosk') >= 0;
   var inline = languageOpts.indexOf('inline') >= 0;
   var center = languageOpts.indexOf('center') >= 0;
   var targetDivId = null;
@@ -707,6 +708,7 @@ function renderCodeInternal(renderDivId, code, language, prelude) {
     var dbgId = `dbg_playable_${uniquePlayableIndex}`;
     var dbgToggleId = `${dbgId}-toggle`;
     var functionId = `function_playable_${uniquePlayableIndex}`;
+    var kioskId = `kiosk_playable_${uniquePlayableIndex}`;
     var playId = `play_playable_${uniquePlayableIndex}`;
     var stopId = `stop_playable_${uniquePlayableIndex}`;
     var progressId = `progress_playable_${uniquePlayableIndex}`;
@@ -770,6 +772,17 @@ ${transformedCode}
     var showAugmentedCode = smartdown.showAugmentedCode || debug;
     var debugIsHidden = showAugmentedCode ? '' : 'hidden';
 
+    var kioskClass = kiosk ? 'smartdown-playable-kiosk' : '';
+    var kioskToggle = !kiosk ? '' :
+`
+  <button type="button"
+    href="#"
+    id="${kioskId}"
+    onclick="smartdown.toggleKiosk('${divId}', event)"
+    class="kiosk-button">
+    <span>&#9713;</span>
+  </button>
+`;
     var wrapperWrapperElement = 'div';
     var wrapperWrapperClass = 'playable-wrapper-wrapper';
     var progressClass = 'smartdown-progress';
@@ -783,6 +796,7 @@ ${transformedCode}
       wrapperWrapperClass = 'playable-wrapper-wrapper-center';
     }
 
+    var playableAutoplayClass = autoplay ? 'playable-autoplay' : '';
     if (autoplay && !playable) {
       var playableDiv =
 `
@@ -796,8 +810,11 @@ ${transformedCode}
       var playableWrapper =
 `
 <${wrapperWrapperElement} class="${wrapperWrapperClass}">
-<div class="playable-wrapper">
+<div class="playable-wrapper ${kioskClass}">
+
+${kioskToggle}
 ${playableDiv}
+
 <div id="${progressId}" class="${progressClass}">
     <div
       class="smartdown-progress-bar smartdown-progress-active"
@@ -833,9 +850,10 @@ ${playableDiv}
       var playableCodeDisplay =
 `
 <${wrapperWrapperElement} class="${wrapperWrapperClass}">
-<div class="playable-wrapper">
+<div class="playable-wrapper ${kioskClass}">
 
 ${playableButtons}
+${kioskToggle}
 
 <div class="smartdown-playable smartdown-${language}" id="${divId}"></div>
 
@@ -861,7 +879,7 @@ ${playableButtons}
 </div>
 </${wrapperWrapperElement}>
 
-<div id="${preId}" class="playable-source">
+<div id="${preId}" class="playable-source ${playableAutoplayClass}">
   <pre>${highlightedCode}</pre>
 </div>
 
@@ -2362,6 +2380,7 @@ function playPlayableInternal(language, divId) {
     progress.style.display = playable.targetDivId ? 'inline-block' : 'block';
   }
   playable.playing = true;
+  div.parentElement.classList.add('playable-playing');
   if (div) {
     div.style.display = playable.targetDivId ? 'inline' : 'block';
   }
@@ -2531,8 +2550,9 @@ ${e}
 
       try {
         var myP5 = new P5.Loader(func, div);
-        // console.log('myP5', myP5);
-        myP5.frameRate(25);
+        if (myP5._targetFrameRate === 60) {
+          myP5.frameRate(16);
+        }
         myP5._onresize();
         function keydownHandler(e) {
           // console.log('keydownHandler', e.target.tagName, e);
@@ -2768,6 +2788,7 @@ function resetPlayable(language, divId, throwAway) {
     var playableType = playableTypes[language];
 
     playable.playing = false;
+    div.parentElement.classList.remove('playable-playing');
 
     div.style.display = 'none';
     if (playableType.javascript) {
@@ -3203,8 +3224,54 @@ function hideDisclosure(divId, settingsStr) {
       deactivateOnMouseLeave(divId);
     }, 500);
   }
-
 }
+
+function isFullscreen() {
+  return  document.fullscreenElement ||
+          document.webkitFullscreenElement ||
+          document.mozFullscreenElement ||
+          document.msFullscreenElement;
+}
+
+// https://www.w3schools.com/howto/howto_js_fullscreen.asp
+/* View in fullscreen */
+function openFullscreen() {
+  var elem = document.documentElement;
+  if (elem.requestFullscreen) {
+    elem.requestFullscreen();
+  } else if (elem.mozRequestFullScreen) { /* Firefox */
+    elem.mozRequestFullScreen();
+  } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+    elem.webkitRequestFullscreen();
+  } else if (elem.msRequestFullscreen) { /* IE/Edge */
+    elem.msRequestFullscreen();
+  }
+}
+
+/* Close fullscreen */
+function closeFullscreen() {
+  var elem = document.documentElement;
+  if (document.exitFullscreen) {
+    document.exitFullscreen();
+  } else if (document.mozCancelFullScreen) { /* Firefox */
+    document.mozCancelFullScreen();
+  } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+    document.webkitExitFullscreen();
+  } else if (document.msExitFullscreen) { /* IE/Edge */
+    document.msExitFullscreen();
+  }
+}
+
+function toggleKiosk(divId, event) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  var div = document.getElementById(divId);
+  div.parentElement.classList.toggle('smartdown-playable-kiosk');
+}
+
 
 function toggleDisclosure(divId, triggerId, settingsStr) {
   var div = document.getElementById(divId);
@@ -4297,7 +4364,7 @@ function setSmartdown(md, outputDiv, setSmartdownCompleted) {
       precedingInlinedCodeblock = null;
     }
     else if (t.type === 'code') {
-      const inlineCode = t.lang.indexOf('/inline') >= 0;
+      const inlineCode = t.lang && t.lang.indexOf('/inline') >= 0;
       if (precedingParagraph &&
           inlineCode &&
           precedingParagraph.text.indexOf(inlinePrefix) !== 0) {
@@ -4741,6 +4808,10 @@ module.exports = {
   toggleDebug: toggleDebug,
   showDisclosure: showDisclosure,
   hideDisclosure: hideDisclosure,
+  isFullscreen: isFullscreen,
+  openFullscreen: openFullscreen,
+  closeFullscreen: closeFullscreen,
+  toggleKiosk: toggleKiosk,
   toggleDisclosure: toggleDisclosure,
   activateOnMouseLeave: activateOnMouseLeave,
   deactivateOnMouseLeave: deactivateOnMouseLeave,
@@ -4794,7 +4865,7 @@ module.exports = {
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
   showAugmentedCode: false,
-  version: '1.0.16',
+  version: '1.0.17',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,
