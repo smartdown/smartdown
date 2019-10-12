@@ -2012,7 +2012,7 @@ function computeExpressions() {
         var rootDiv = document.getElementById(entry.rootDivId);
         var labelElement = document.getElementById(entry.labelId);
         if (!labelElement) {
-          console.log('computeExpressions NO LABEL', entry, entry.labelId, entry.rootDivId, rootDiv);
+          // console.log('computeExpressions NO LABEL', entry, entry.labelId, entry.rootDivId, rootDiv);
           // debugger;
         }
         else {
@@ -3270,6 +3270,7 @@ function toggleKiosk(divId, event) {
 
   var div = document.getElementById(divId);
   div.parentElement.classList.toggle('smartdown-playable-kiosk');
+  div.scrollIntoView();
 }
 
 
@@ -4865,7 +4866,7 @@ module.exports = {
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
   showAugmentedCode: false,
-  version: '1.0.17',
+  version: '1.0.18',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,

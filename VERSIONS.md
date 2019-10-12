@@ -18,3 +18,6 @@
 - **1.0.15** - Fix (again) the allow= option for iframes and Safari.
 - **1.0.16** - Fix (again again) the allow= option for iframes and Safari.
 - **1.0.17** - For autoplay playables, don't show source prior to autoplay. Fix bug where a code block with no language specified would cause a JS crash due to 't.lang' being undefined in 't.lang.indexOf()'. Add 'smartdown-playable-kiosk' CSS class to support Kiosk Mode. Gallery 0.0.45. Fix P5JS instantiation so that the 'p5.frameRate' is adjusted to a slow 16FPS if the author hasn't overridden the default 60FPS. This is to save energy, and is still a WIP spec. Add open/close/is-Fullscreen() functions.
+- **1.0.18** - Gallery 0.0.46. Eliminated extraneous debug message about unlabelled compute cells. Adjusted CSS for disclosable-attach so that overflow:visible is replace with :auto. Eliminate need or support for container-fluid, which is really a BS4 class and shouldn't be in Smartdown. Fix horizontal centering problem with smartdown-outer-container. Improve dark theme's behavior for disclosables, MathJax, and xypic. toggleKiosk() now ensures kiosk div is scrolled into view.
+
+

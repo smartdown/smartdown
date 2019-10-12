@@ -5,14 +5,8 @@
 
 .smartdown-outer-container {
   margin: 0;
-  padding: 0 20px 0 10px;
-
+  padding: 0 10px;
   background: rgb(250, 250, 255);
-
-  > .container-fluid {
-    margin: 0;
-    padding: 0 5px 10px 5px;
-  }
 
   @media (min-width: 800px) {
     margin: auto;
@@ -27,6 +21,7 @@
 
 .smartdown-container {
   border: 1px solid transparent;
+  box-sizing: border-box;
   background: rgb(250, 250, 255);
   margin: 0;
   padding: 4px 8px;
@@ -699,6 +694,7 @@ fieldset[disabled] .smartdown-container .btn-infocell.focus {
 
 .smartdown-container .disclosable-wrapper {
   display: none;
+  overflow: visible;
   margin: 0;
   padding: 0;
   background: none;
@@ -742,7 +738,7 @@ fieldset[disabled] .smartdown-container .btn-infocell.focus {
     margin: 0;
     padding: 10px 10px 10px 15px;
     background: aliceblue; /* floralwhite */
-    border: none;
+    border: 2px solid transparent;
     /*width: 100%;*/
 
     &.disclosable-outline-content {
@@ -1677,15 +1673,20 @@ img.media-image path {
 
 /* smartdown-theme-dark theme */
 
-.smartdown-theme-dark .smartdown-container .MathJax_Display {
-  background:ghostwhite !important;
-  color: black;
+.smartdown-theme-dark .smartdown-container .MathJax_Display svg {
+  background: lightblue;
 }
 
 .smartdown-outer-container.smartdown-theme-dark {
-  margin: 0;
-  padding: 0;
   background: #2E2E2E;
+}
+
+.smartdown-outer-container.smartdown-theme-dark div.playable-source pre {
+  background: #555555;
+}
+
+.smartdown-outer-container.smartdown-theme-dark .smartdown-container .disclosable-wrapper .disclosable-content {
+  background: black !important;
 }
 
 .smartdown-outer-container.smartdown-theme-dark .smartdown-container .infocell-group {
@@ -1693,17 +1694,10 @@ img.media-image path {
   color: black;
 }
 
-.smartdown-outer-container.smartdown-theme-dark > .container-fluid {
-  margin:0;
-  padding:0;
-}
-
 .smartdown-theme-dark .smartdown-container {
-  border:1px solid black;
   background: #2E2E2E;
   color: #EBEBEB;
 }
-
 
 .smartdown-theme-dark .smartdown-container .json-formatter-row {
   background:lightgray;
@@ -1752,8 +1746,7 @@ img.media-image path {
 /* Chat theme (aka Scape) */
 
 .smartdown-outer-container.smartdown-theme-chat {
-  margin:0;
-  padding:0;
+  margin: 0;
 }
 
 .smartdown-theme-chat .smartdown-container {
@@ -1804,8 +1797,6 @@ img.media-image path {
 /* Blog theme (for Celestial Toys) */
 
 .smartdown-outer-container.smartdown-theme-blog {
-  margin:0;
-  padding:0;
 }
 
 .smartdown-theme-blog .smartdown-container {
