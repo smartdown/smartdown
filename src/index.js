@@ -4866,7 +4866,7 @@ module.exports = {
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
   showAugmentedCode: false,
-  version: '1.0.18',
+  version: '1.0.19',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,
