@@ -433,26 +433,39 @@ smartdown-checkbox
     width: 100%;
     display: inline-block;
 
-    button.kiosk-button {
-      display: inline;
-      background: none;
-      background: white;
-      margin: 0;
-      padding: 0 5px 5px 5px;
-      line-height: 0;
-      >span {
-        color: lightblue;
-        vertical-align: text-bottom;
-        line-height: 0.8em;
-        font-size: 2em;
-        font-weight: 600;
-      }
-      z-index: 500;
+    .playable-buttons {
       position: relative;
-      top: -25px;
-      left: -50%;
+      padding: 0;
+      margin: 0;
+      line-height: 1em;
     }
 
+    button.kiosk-button {
+      display: none;
+      background: white;
+      margin: 0;
+      padding: 0 2px 4px 2px;
+      line-height: 0;
+      z-index: 500;
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 20px;
+
+      > span {
+        color: lightblue;
+        vertical-align: middle;
+        line-height: 12px;
+        font-size: 14px;
+        font-weight: 600;
+      }
+    }
+
+    &.playable-playing {
+      button.kiosk-button {
+        display: block;
+      }
+    }
 
     &.smartdown-playable-kiosk.playable-playing {
       top: 0;
@@ -466,13 +479,6 @@ smartdown-checkbox
       margin: 0;
       position: fixed;
       display: block;
-
-      button.kiosk-button {
-        color: red;
-        position: fixed;
-        top: 0;
-        left: 0;
-      }
     }
   }
 }
@@ -1362,8 +1368,7 @@ img.media-image path {
   margin: auto;
   font-size: 12px;
   font-weight: 600;
-  xtext-align: text-top;
-  vertical-align: middle;
+  vertical-align: top;
   white-space: nowrap;
   touch-action: manipulation;
   cursor: pointer;
@@ -1740,6 +1745,22 @@ img.media-image path {
   background-image: linear-gradient(rgb(124, 124, 124) 0px, rgb(104, 104, 104) 100%);
   border: 1px solid transparent;
   color: #EBEBEB;
+}
+
+
+
+.smartdown-theme-dark .smartdown-container .decoration-aliceblue {
+  display: block;
+  animation: fadeIn 2s;
+  background: aliceblue;
+  padding: 5px 8px 5px 16px;
+  margin: 0;
+  border: 1px solid lightgray;
+  border-radius: 8px;
+
+  .smartdown_p {
+    color: black;
+  }
 }
 
 

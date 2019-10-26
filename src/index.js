@@ -28,7 +28,7 @@
 import './polyfills';
 import createDOMPurify from 'dompurify';
 
-import emoji from 'emoji-js';
+import emoji from 'emojiJS';
 const emojiInstance = new emoji();
 const emojiReplacer = match => emojiInstance.replace_colons(match);
 import axios from 'axios';
@@ -812,7 +812,10 @@ ${transformedCode}
 <${wrapperWrapperElement} class="${wrapperWrapperClass}">
 <div class="playable-wrapper ${kioskClass}">
 
+<div class="playable-buttons">
 ${kioskToggle}
+</div>
+
 ${playableDiv}
 
 <div id="${progressId}" class="${progressClass}">
@@ -852,8 +855,10 @@ ${playableDiv}
 <${wrapperWrapperElement} class="${wrapperWrapperClass}">
 <div class="playable-wrapper ${kioskClass}">
 
+<div class="playable-buttons">
 ${playableButtons}
 ${kioskToggle}
+</div>
 
 <div class="smartdown-playable smartdown-${language}" id="${divId}"></div>
 
@@ -2750,7 +2755,11 @@ function playPlayable(language, divId) {
   if (playable) {
     const importsRemaining = playable.imports.slice(0);  // Copy
 
+    var progress = document.getElementById(playable.progressId);
+    progress.style.display = playable.targetDivId ? 'inline-block' : 'block';
+
     recursivelyLoadImports(language, divId, importsRemaining, function() {
+      progress.style.display = 'none';
       playPlayableInternal(language, divId);
     });
   }
@@ -3271,6 +3280,11 @@ function toggleKiosk(divId, event) {
   var div = document.getElementById(divId);
   div.parentElement.classList.toggle('smartdown-playable-kiosk');
   div.scrollIntoView();
+
+  var playable = perPageState.playablesRegistered[divId];
+  if (playable && playable.p5) {
+    playable.p5._onresize();
+  }
 }
 
 

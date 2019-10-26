@@ -36,6 +36,7 @@ var d3fcJS = path.join(nm, '/d3fc/build/d3fc.js');
 var d3dcJS = path.join(nm, '/dc/dc.min.js');
 var d3dcCSS = path.join(nm, '/dc/dc.min.css');
 var d3cloudJS = path.join(nm, '/d3-cloud/build/d3.layout.cloud.js');
+var emojiJS = path.join(nm, '/emoji-js/lib/emoji.min.js');
 var leafletJSDir = path.join(nm, '/leaflet/dist');
 var leafletJS = path.join(leafletJSDir, 'leaflet.js');
 var openjscadJS = path.join(app, 'external/openjscad.reentrant.umd.js');
@@ -177,6 +178,7 @@ var config = {
       d3dcJS$: d3dcJS,
       d3dcCSS$: d3dcCSS,
       d3cloudJS$: d3cloudJS,
+      emojiJS$: emojiJS,
       leafletJS$: leafletJS,
       // mermaidJS$: mermaidJS,
       p5JS$: p5JS,
@@ -309,17 +311,17 @@ var config = {
           { source: outputPath + 'smartdown_vendors~stdlib.js', destination: outputPath + '../gist/' },
           { source: outputPath + 'smartdown_vendors~stdlib-sotu.js', destination: outputPath + '../gist/' },
           { source: outputPath + 'smartdown_vendors~three.js', destination: outputPath + '../gist/' },
-          { source: outputPath + 'smartdown_p5DOM.js', destination: outputPath + '../gist/' },
+          // { source: outputPath + 'smartdown_p5DOM.js', destination: outputPath + '../gist/' },
           { source: outputPath + 'smartdown_vendors~p5Sound.js', destination: outputPath + '../gist/' },
-          { source: outputPath + 'smartdown_vendors~p5DOM~p5Sound~p5js.js', destination: outputPath + '../gist/' },
+          // { source: outputPath + 'smartdown_vendors~p5DOM~p5Sound~p5js.js', destination: outputPath + '../gist/' },
 
           { source: outputPath + 'smartdown_stdlib.js.map', destination: outputPath + '../gist/' },
           { source: outputPath + 'smartdown_vendors~stdlib.js.map', destination: outputPath + '../gist/' },
           { source: outputPath + 'smartdown_vendors~stdlib-sotu.js.map', destination: outputPath + '../gist/' },
           { source: outputPath + 'smartdown_vendors~three.js.map', destination: outputPath + '../gist/' },
-          { source: outputPath + 'smartdown_p5DOM.js.map', destination: outputPath + '../gist/' },
+          // { source: outputPath + 'smartdown_p5DOM.js.map', destination: outputPath + '../gist/' },
           { source: outputPath + 'smartdown_vendors~p5Sound.js.map', destination: outputPath + '../gist/' },
-          { source: outputPath + 'smartdown_vendors~p5DOM~p5Sound~p5js.js.map', destination: outputPath + '../gist/' },
+          // { source: outputPath + 'smartdown_vendors~p5DOM~p5Sound~p5js.js.map', destination: outputPath + '../gist/' },
         ]
       }
     })
@@ -330,6 +332,7 @@ var config = {
       /node_modules\/localforage\/dist\/localforage.js/,
       new RegExp(d3JS),
       new RegExp('d3JS'),
+      new RegExp('emojiJS'),
       // new RegExp(d3fcJS),
       // new RegExp('d3fcJS'),
       // new RegExp(mermaidJS),
@@ -464,6 +467,7 @@ switch (nodeEnvironment) {
     break;
 
   case 'analyze':
+    config.devtool = 'nosources-source-map';
     config.plugins.push(
       new BundleAnalyzerPlugin({
         analyzerMode: 'static'
