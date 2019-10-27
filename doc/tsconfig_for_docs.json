@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "outDir": "../distdocts/src/",
+    "sourceMap": true,
+    "noImplicitAny": true,
+    "module": "es6",
+    "target": "es5",
+    "jsx": "react",
+    "allowJs": false,
+    "noEmitOnError": true,
+    "lib": ["dom", "es6"],
+    "strictFunctionTypes": false,
+  },
+  "include": [
+    "../src/**/*.ts",
+    "../node_modules/eventemitter3/*.ts"
+  ]
+}

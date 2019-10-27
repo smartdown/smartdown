@@ -190,7 +190,8 @@ var config = {
       app,
       nm
     ],
-    extensions: ['.json', '.js']
+    extensions: ['.json', '.js', '.tsx', '.ts' ],
+
   },
 
   plugins: [
@@ -232,8 +233,8 @@ var config = {
     }),
 
     new CopyWebpackPlugin([
-        { from: 'SimpleSiteExample/index_unpkg.html', to: '../index_unpkg.html' },
         { from: '../distdoc/', to: '../doc/' },
+        { from: 'SimpleSiteExample/index_unpkg.html', to: '../index_unpkg.html' },
         { from: 'favicons', to: '../' },
         { from: '../CODE_OF_CONDUCT.md', to: '../' },
         { from: '../CONTRIBUTING.md', to: '../' },
@@ -356,6 +357,12 @@ var config = {
           'postcss-loader',
           'sass-loader',
         ],
+      },
+
+      {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
       },
 
       {

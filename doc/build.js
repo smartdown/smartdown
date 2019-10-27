@@ -2,7 +2,6 @@ const Docma = require('docma');
 
 var nodeEnvironment = process.env.BUILD;
 var production = nodeEnvironment === 'production';
-console.log('production', production);
 
 const buildConfig = {
   debug: Docma.Debug.ALL,
@@ -16,6 +15,8 @@ const buildConfig = {
 
     // ungrouped js files will be merged under default route
     './src/index.js',                   // ?api or ?api=_def_
+    './distdocts/src/extensions.js',                   // ?api or ?api=_def_
+    './distdocts/src/importers.js',                   // ?api or ?api=_def_
 
     // including markdown ('content') files
     './README.md',

@@ -24,6 +24,7 @@
 /* global useStdlib */
 /* global useMermaid */
 /* global ABCJS */
+/* global XMLHttpRequest */
 
 import './polyfills';
 import createDOMPurify from 'dompurify';
@@ -32,6 +33,8 @@ import emoji from 'emojiJS';
 const emojiInstance = new emoji();
 const emojiReplacer = match => emojiInstance.replace_colons(match);
 import axios from 'axios';
+
+import {importScriptUrl, importTextUrl, importCssCode, importCssUrl} from 'importers';
 
 require('./styles.css');
 
@@ -46,8 +49,6 @@ const hljs = require('hljs');
 window.jsyaml = require('js-yaml');
 
 const StackTrace = require('stacktraceJS');
-
-window.smartdownJSModules = {};
 
 let fileSaver = {};
 if (useFileSaver) {
@@ -181,89 +182,8 @@ var smartdownScriptsMap = {};
 var mediaRegistry = {};
 var uniquePlayableIndex = 0;
 
+import {loadExternal} from 'extensions';
 
-function importScriptUrl(sSrc, fOnload, fOnerror) {
-  var oHead = document.head || document.getElementsByTagName('head')[0];
-  function loadError(oError) {
-    if (fOnerror) {
-      console.log('calling fOnerror');
-      fOnerror(oError);
-    }
-    else {
-      throw new URIError('The script ' + oError.target.src + ' is not accessible.');
-    }
-  }
-
-  var oScript = document.createElement('script');
-  oScript.type = 'text\/javascript';
-  oScript.onerror = loadError;
-  oScript.async = true;
-  oScript.src = sSrc;
-  oHead.appendChild(oScript);
-  if (fOnload) {
-    oScript.onload = function (evt) {
-      fOnload(evt);
-    };
-  }
-}
-
-
-function importTextUrl(url, fOnload, fOnerror) {
-  // console.log('importTextUrl', url);
-  /* global XMLHttpRequest */
-  var xhr = new XMLHttpRequest();
-  xhr.onreadystatechange = function () {
-    if (this.readyState === 4) {
-      if (this.status === 200) {
-        fOnload(this.responseText);
-      }
-      else {
-        // console.log('failed', this);
-        fOnerror(this.status);
-      }
-    }
-  };
-  xhr.open('GET', url);
-  xhr.send();
-}
-
-
-function loadExternal(external, loaded) {
-  // console.log('loadExternal...', external);
-  if (!window.smartdownJSModules[external]) {
-    window.smartdownJSModules[external] = {
-      loader: function() {
-        console.log('why you callin loadExternal', external);
-      },
-      loaded: null,
-      loadedCallbacks: []
-    };
-  }
-
-  if (window.smartdownJSModules[external].loaded) {
-    loaded();
-  }
-  else if (window.smartdownJSModules[external].loadedCallbacks.length > 0) {
-    window.smartdownJSModules[external].loadedCallbacks.unshift(loaded);
-    // console.log('loadExternal...External is still loading', external);
-  }
-  else {
-    window.smartdownJSModules[external].loadedCallbacks.unshift(loaded);
-    // console.log('loadExternal...External initiate load', external);
-
-    importScriptUrl(
-      external,
-      function(script1) {
-        // console.log('loadExternal...load complete', external);
-        const callThese = window.smartdownJSModules[external].loadedCallbacks;
-        window.smartdownJSModules[external].loaded = true;
-        window.smartdownJSModules[external].loadedCallbacks = [];
-        callThese.forEach(loadedCb => {
-          loadedCb();
-        });
-      });
-  }
-}
 
 const mathjaxConfigure = require('./extensions/MathJax');
 
@@ -280,16 +200,6 @@ const ABCJS = require('./extensions/ABCJS.js');
 
 
 var P5 = require('./extensions/P5.js');
-
-function escapeQuotes(s) {
-  return s
-    .replace(/'/g, '\\\'')
-    .replace(/"/g, '\\\"');
-}
-
-function escapeSingle(s) {
-  return s.replace(/'/g, '\\\'');
-}
 
 function entityEscape(html, encode) {
   return html
@@ -1347,46 +1257,6 @@ function renderImage(href, title, text) {
   return out;
 }
 
-
-function importCssCode(cssCode) {
-  var styleElement = document.createElement('style');
-  styleElement.type = 'text/css';
-  if (styleElement.styleSheet) {
-    styleElement.styleSheet.cssText = cssCode;
-  }
-  else {
-    styleElement.appendChild(document.createTextNode(cssCode));
-  }
-  document.getElementsByTagName('head')[0].appendChild(styleElement);
-}
-
-
-function importCssUrl(href, fOnload, fOnerror) {
-  var oHead = document.head || document.getElementsByTagName('head')[0];
-  function loadError(oError) {
-    if (fOnerror) {
-      console.log('calling fOnerror');
-      fOnerror(oError);
-    }
-    else {
-      throw new URIError('The stylesheet ' + oError.target.src + ' is not accessible.');
-    }
-  }
-
-  var oLink = document.createElement('link');
-  oLink.rel  = 'stylesheet';
-  oLink.type = 'text/css';
-  oLink.onerror = loadError;
-  oLink.async = true;
-  oLink.href = href;
-  oHead.appendChild(oLink);
-  if (fOnload) {
-    oLink.onload = function (evt) {
-      console.log
-      fOnload(evt);
-    };
-  }
-}
 
 function renderLink(href, title, text) {
   const smartdownTag = ':';
@@ -4880,7 +4750,7 @@ module.exports = {
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
   showAugmentedCode: false,
-  version: '1.0.19',
+  version: '1.0.20',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,
