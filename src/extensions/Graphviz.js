@@ -36,11 +36,11 @@ if (useGraphviz) {
       loaded();
     }
     else if (window.smartdownJSModules.graphviz.loadedCallbacks.length > 0) {
-      window.smartdownJSModules.graphviz.loadedCallbacks.unshift(loaded);
+      window.smartdownJSModules.graphviz.loadedCallbacks.push(loaded);
       // console.log('loadgraphviz...graphviz is still loading', JSON.stringify(window.smartdownJSModules.graphviz.loadedCallbacks, null, 2));
     }
     else {
-      window.smartdownJSModules.graphviz.loadedCallbacks.unshift(loaded);
+      window.smartdownJSModules.graphviz.loadedCallbacks.push(loaded);
       window.smartdown.importScriptUrl(
         window.smartdown.baseURL + 'lib/viz.js',
         function(script1) {

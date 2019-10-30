@@ -69,6 +69,7 @@ var useD3 = true && !test;
 var useGifffer = true && !test;
 var usePlotly = true && !test;
 var useOpenJSCAD = true && !test;
+var useTypeScript = true && !test;
 var useP5JS = true && !test;
 var useMermaid = true && !test;
 var useMathJax = true;
@@ -225,6 +226,7 @@ var config = {
       useGifffer: useGifffer,
       usePlotly: usePlotly,
       useOpenJSCAD: useOpenJSCAD,
+      useTypeScript: useTypeScript,
       useP5JS: useP5JS,
       useMermaid: useMermaid,
       useMathJax: useMathJax,

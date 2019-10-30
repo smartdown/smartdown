@@ -88,6 +88,10 @@ const playableTypes = {
     highlight: 'javascript',
     javascript: true
   },
+  'typescript': {
+    highlight: 'TypeScript',
+    javascript: true
+  },
   'd3': {
     highlight: 'javascript',
     javascript: true
@@ -161,6 +165,7 @@ const playableArgNames = [
   'smartdown',
   'p5'
 ];
+const playableArgNamesQuoted = playableArgNames.map(n => `'${n}'`).join(',');
 
 var perPageState = {
   expressionsRegistered: {},
@@ -193,6 +198,7 @@ const Brython = require('./extensions/Brython');
 const D3 = require('./extensions/D3');
 const Plotly = require('./extensions/Plotly');
 const OpenJSCAD = require('./extensions/OpenJSCAD');
+const TypeScript = require('./extensions/TypeScript');
 const Leaflet = require('./extensions/Leaflet');
 const graphvizImages = require('./extensions/Graphviz');
 const Mermaid = require('./extensions/Mermaid.js');
@@ -221,6 +227,7 @@ var markedOpts = {
   sanitize: false,
   smartLists: true,
   smartypants: false,
+  langPrefix: 'hljs ',
   highlight: function (code, lang) {    // , callback)
     var playableType = playableTypes[lang];
     var result;
@@ -558,6 +565,7 @@ function getPrelude(language, code) {
     'three',
     'plotly',
     'openjscad',
+    'typescript',
     'graphviz',
     'abc',
     'abcsheet',
@@ -677,8 +685,8 @@ ${transformedCode}
     }
 
     var highlightLanguage = playableType ? playableType.highlight : 'javascript';
-    var highlightedCode = global.hljs.highlightAuto(code, [highlightLanguage]).value;
-    var highlightedAugmentedCode = global.hljs.highlightAuto(registeredPlayable.augmentedCode, ['javascript']).value;
+    var highlightedCode = hljs.highlightAuto(code, [highlightLanguage]).value;
+    var highlightedAugmentedCode = hljs.highlightAuto(registeredPlayable.augmentedCode, ['javascript']).value;
     var showAugmentedCode = smartdown.showAugmentedCode || debug;
     var debugIsHidden = showAugmentedCode ? '' : 'hidden';
 
@@ -772,17 +780,6 @@ ${kioskToggle}
 
 <div class="smartdown-playable smartdown-${language}" id="${divId}"></div>
 
-
-<button
-  type="button"
-  id="${dbgId}-toggle"
-  href="#"
-  onclick="smartdown.toggleDebug('${dbgId}')"
-  ${debugIsHidden}
-  class="debug-button">
-  Augmented Javascript
-</button>
-
 <div id="${progressId}" class="${progressClass}">
   <div
     class="smartdown-progress-bar smartdown-progress-active"
@@ -795,13 +792,26 @@ ${kioskToggle}
 </${wrapperWrapperElement}>
 
 <div id="${preId}" class="playable-source ${playableAutoplayClass}">
-  <pre>${highlightedCode}</pre>
+  <pre><code class="${playableType.highlight} hljs">${highlightedCode}</code></pre>
 </div>
+
+
+<button
+  type="button"
+  id="${dbgId}-toggle"
+  href="#"
+  onclick="smartdown.toggleDebug('${dbgId}')"
+  ${debugIsHidden}
+  class="debug-button">
+  Augmented Javascript
+</button>
 
 <pre
   id="${dbgId}"
   class="playable-debug-source">
+<code class="hljs javascript">
 ${highlightedAugmentedCode}
+</code>
 </pre>
 `;
 
@@ -811,7 +821,8 @@ ${highlightedAugmentedCode}
   else {
     // console.log('renderCode2', code, language);
 
-    return markedOpts.renderer.baseCodeRenderer(code, language);
+    const renderedCode = markedOpts.renderer.baseCodeRenderer(code, language);
+    return renderedCode;
   }
 }
 
@@ -1033,7 +1044,7 @@ function smartdownLexer(src) {
     // code
     if (cap = this.rules.code.exec(src)) {
       src = src.substring(cap[0].length);
-      out += renderer.codespan(escape(cap[2].trim(), true));
+      out += renderer.codespan(cap[2].trim());
       continue;
     }
 
@@ -1501,6 +1512,9 @@ function renderLink(href, title, text) {
     else if (op === 'CALC') {
       ++uniqueCellIndex;
       var manualInvoke = hasLabel;
+      if (hasLabel) {
+        text = text.replace(/<code class="hljs-inline">(.+)<\/code>/g, '`$1`');
+      }
       var expr = smartdown.registerExpression(uniqueCellIndex, text, lhs, rhs, hasLabel);
       if (manualInvoke) {
         newHTML +=
@@ -1758,6 +1772,11 @@ function enhanceMarkedAndOpts() {
 
   renderer.baseCodeRenderer = renderer.code;
   renderer.code = renderCode;
+  renderer.codespan = function(text) {
+    const result = hljs.highlightAuto(text).value; // '<code>' + text + '</code>';
+    return `<code class="hljs-inline">${result}</code>`;
+  };
+
   renderer.link = renderLink;
   renderer.image = renderImage;
   renderer.paragraph = renderParagraph;
@@ -1924,6 +1943,36 @@ function registerPlayable(prelude, language, renderDivId, divId, preId, dbgId, s
 eval(playable.transformedCode);
 //        this.div.innerHTML='<pre><code>' + playable.transformedCode + '</code></pre>';
 `;
+    }
+    else if (language === 'typescript') {
+      augmentedCode =
+`
+let result = window.ts.transpileModule(playable.code, {
+  compilerOptions: { module: window.ts.ModuleKind.CommonJS }
+});
+
+if (result.diagnostics.length > 0) {
+  console.log('TypeScript transpile diagnostics:');
+  console.log(result.diagnostics);
+}
+
+var argvalues = [...arguments];
+
+const func = new Function(${playableArgNamesQuoted}, result.outputText);
+try {
+  const embedResult = func.apply(this, argvalues);
+}
+catch (e) {
+  console.log('#### Error playing ', language, e);
+}
+
+`;
+
+      // console.log('INVOKE window.smartdownJSModules.typescript.loader');
+
+      // window.smartdownJSModules.typescript.loader(function () {
+      //   console.log('window.smartdownJSModules.typescript.loader', window.ts);
+      // });
     }
     else if (language === 'brython') {
       const brythonScriptId = scriptId + '_brython';
@@ -2553,7 +2602,6 @@ function recursivelyLoadImports(language, divId, importsRemaining, done) {
   // console.log('recursivelyLoadImports', divId, importsRemaining.length);
   if (importsRemaining.length > 0) {
     const nextImport = importsRemaining.shift();
-    // console.log('nextImport', nextImport);
 
     // DRY THIS UP
 
@@ -2605,6 +2653,11 @@ function recursivelyLoadImports(language, divId, importsRemaining, done) {
     }
     else if (nextImport === 'mermaid') {
       window.smartdownJSModules.mermaid.loader(function () {
+        recursivelyLoadImports(language, divId, importsRemaining, done);
+      });
+    }
+    else if (nextImport === 'typescript') {
+      window.smartdownJSModules.typescript.loader(function () {
         recursivelyLoadImports(language, divId, importsRemaining, done);
       });
     }
@@ -4750,7 +4803,7 @@ module.exports = {
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
   showAugmentedCode: false,
-  version: '1.0.20',
+  version: '1.0.21',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,

@@ -36,11 +36,11 @@ export function loadExternal(external: string, loaded: () => void): void {
     loaded();
   }
   else if (window.smartdownJSModules[external].loadedCallbacks.length > 0) {
-    window.smartdownJSModules[external].loadedCallbacks.unshift(loaded);
+    window.smartdownJSModules[external].loadedCallbacks.push(loaded);
     // console.log('loadExternal...External is still loading', external);
   }
   else {
-    window.smartdownJSModules[external].loadedCallbacks.unshift(loaded);
+    window.smartdownJSModules[external].loadedCallbacks.push(loaded);
     // console.log('loadExternal...External initiate load', external);
 
     importScriptUrl(

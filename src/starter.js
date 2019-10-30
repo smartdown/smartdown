@@ -261,14 +261,12 @@ function starter(basePrefix) {
       // console.log('loadHome hashargs', hash, args, window.location.search);
       if (args.indexOf('theme=') === 0) {
         themeName = args.slice('theme='.length);
-        console.log('args themeName', themeName);
       }
     }
 
     if (themeName === '') {
       if (search.indexOf('?theme=') === 0) {
         themeName = search.slice('?theme='.length);
-        console.log('search themeName', themeName);
       }
     }
 

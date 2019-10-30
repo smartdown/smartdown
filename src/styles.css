@@ -204,7 +204,7 @@
 
 .smartdown-container pre {
   display: block;
-  padding: 5px;
+  padding: 0;
   margin: 0 0 10px;
   font-size: inherit;
   line-height: 1.2;
@@ -212,13 +212,7 @@
   // word-break: break-all;
   word-wrap: break-word;
   white-space: pre-wrap;
-  background-color: #f5f5f5;
 
-  border-left: 1px solid #CCC;
-  border-top-left-radius:5px;
-  border-bottom-left-radius:5px;
-
-  background-color: white;  /* rgba(27, 31, 35, 0.05); */
   user-select: text;
 }
 
@@ -227,26 +221,20 @@
   word-wrap: break-word;
   white-space: pre-wrap;
   font-size: inherit;
-  border: none;
-  border-radius: 0;
-  border-left: 1px solid #CCCCBB;
-  border-right: 1px solid #CCCCBB;
-  border-top-left-radius:6px;
-  border-bottom-right-radius:6px;
-  color: black;
-  padding: 2px 6px;
-  background: #FFFFFA;
+
+  padding: 6px;
   font-family: 'Ubuntu Mono', monospace;
   font-weight: 500;
 }
 
-.smartdown-container pre > code {
-  background: inherit;
-  border: none;
+.smartdown-container code.hljs-inline {
+  background: #F0F0F0;
+  padding: 2px 4px;
+}
 
-  padding: 0;
-  font-size: 0.9em;
-  line-height: 0.9em;
+.smartdown-container pre > code {
+  font-size: inherit !important;
+  line-height: inherit !important;
 }
 
 .smartdown-container .pre-scrollable {
@@ -326,8 +314,6 @@ smartdown-checkbox
     height: unset;
     max-width: 100%;
     max-height: 100%;
-    xwidth: 100%;
-    xheight: 100%;
   }
 }
 
@@ -381,7 +367,6 @@ smartdown-checkbox
 
 .smartdown-container .smartdown-plotly {
   width: 100%;
-  xmin-height: 300px;
   height:100%;
   resize: vertical;
   overflow-y: visible;
@@ -428,7 +413,6 @@ smartdown-checkbox
       text-align: center;
     }
     padding: 0;
-    xmargin: auto !important;
     margin: 0;
     width: 100%;
     display: inline-block;
@@ -472,8 +456,6 @@ smartdown-checkbox
       left: 0;
       right: 10px !important;
       bottom: 0 !important;
-      xwidth: unset;
-      xheight: unset;
       background: none;
       padding: 0;
       margin: 0;
@@ -498,9 +480,7 @@ smartdown-checkbox
       text-align: center;
     }
     padding: 0;
-    xmargin: auto !important;
     margin: 0;
-    xwidth: 100%;
     display: inline-block;
   }
 }
@@ -750,7 +730,6 @@ fieldset[disabled] .smartdown-container .btn-infocell.focus {
     &.disclosable-outline-content {
       border: 2px solid lightgray;
       border-radius: 11.5px;
-      xbox-sizing: border-box;
     }
 
     &.disclosable-outline-draggable-content {
@@ -925,9 +904,6 @@ fieldset[disabled] .smartdown-container .btn-infocell.focus {
 
 
 .smartdown-container .infocell-group textarea.infocell-textarea {
-  xdisplay: table-cell;
-  xposition: relative;
-  xz-index: 2;
   float: left;
   height: 100%;
   width: 100%;
@@ -1095,7 +1071,6 @@ fieldset[disabled] .smartdown-container .btn-infocell.focus {
   width: auto;
   height: auto;
   max-width: 100%;
-  xmax-height: 70vh;
   margin: auto;
   display: block;
   pointer-events: initial;
@@ -1349,12 +1324,8 @@ img.media-image path {
 
 .smartdown-container pre.playable-debug-source {
   display: none;
-  border:1px solid dimgray;
-  border-radius: 0;
-  border-top: none;
-  border-right: none;
-  border-bottom-left-radius: 5px;
-  height: 200px;
+  border: 2px solid lightgray;
+  height: 300px;
   overflow-y: scroll;
   resize: vertical;
 }
@@ -1429,9 +1400,9 @@ img.media-image path {
   height: 16px;
   margin: 1px 0;
   padding: 1px 5px;
-  background: black;
+  background: green;
   line-height: 0;
-  color: lightgreen;
+  color: white;
   font-size: 10px;
 }
 
@@ -1686,8 +1657,16 @@ img.media-image path {
   background: #2E2E2E;
 }
 
-.smartdown-outer-container.smartdown-theme-dark div.playable-source pre {
-  background: #555555;
+.smartdown-outer-container.smartdown-theme-dark .smartdown-container .infocell-output,
+.smartdown-outer-container.smartdown-theme-dark .smartdown-container .infocell-output-pre {
+  background: #2E2E2E;
+  color: #EBEBEB;
+}
+
+.smartdown-outer-container.smartdown-theme-dark .hljs,
+.smartdown-outer-container.smartdown-theme-dark .smartdown-container .hljs {
+  background: ghostwhite;
+  color: black;
 }
 
 .smartdown-outer-container.smartdown-theme-dark .smartdown-container .disclosable-wrapper .disclosable-content {
@@ -1703,6 +1682,17 @@ img.media-image path {
   background: #2E2E2E;
   color: #EBEBEB;
 }
+
+.smartdown-theme-dark .smartdown-container pre > code {
+  color: white;
+}
+
+.smartdown-theme-dark .smartdown-container pre > code.hljs,
+.smartdown-theme-dark .smartdown-container code.hljs-inline {
+  background: ghostwhite;
+  color: black;
+}
+
 
 .smartdown-theme-dark .smartdown-container .json-formatter-row {
   background:lightgray;
