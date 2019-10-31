@@ -54,8 +54,8 @@ var vizLiteJS = path.join(nm, '/viz.js/lite.render.js');
 var webcomponentsJS = path.join(nm, '@webcomponents/webcomponentsjs/');
 var threeJS = path.join(nm, '/three/build/three.min.js');
 var topojsonJS = path.join(nm, '/topojson/dist/topojson.min.js');
-// var galleryRoot = '/Users/bud/DoctorBud/smartdown-gallery/';
-var galleryRoot = path.join(nm, 'smartdown-gallery/');
+var galleryRoot = '/Users/bud/DoctorBud/smartdown-gallery/';
+// var galleryRoot = path.join(nm, 'smartdown-gallery/');
 // var galleryResourcesRoot = path.join(nm, 'smartdown-gallery/resources/');
 
 var useOlderBrowsers = false;
@@ -83,7 +83,7 @@ var galleryIgnores = [
   'LICENSE',
   'package.json',
   'index.html',
-  'AAADebug.md',
+  // 'AAADebug.md',
   'ExtensionsPlayableP5X.js'];
 const baseURL = development ? '/' : '/smartdown/';
 

@@ -22,3 +22,4 @@
 - **1.0.19** - Gallery 0.0.47. Updates P5JS to v0.10.2, eliminating use of p5.dom.js. Hide Kiosk button when playable is paused. Improve look and position of Kiosk button. Invoke p5._onresize() when Kiosk mode is toggled. Show progress bar while waiting for smartdown.import() to complete. Use minified version of emoji-js. Generate source maps during 'npm run analyze' to eliminate warnings.
 - **1.0.20** - Port some utility functions to TypeScript. Add support for TypeScript linting and Docma.
 - **1.0.21** - TypeScript support. Gallery 0.0.49. Ensure that code spans are formatted with Highlightjs. Adjust Augmented code button and display to follow the playable progress bar and source. Add Java and Typescript to list of default highlightjs languages. Improve 'smartdown-theme-dark' behavior to deal with highlightjs better and to work better with output cells.
+- **1.0.22** - ???

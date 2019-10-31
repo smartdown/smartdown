@@ -1,9 +1,3 @@
-declare global {
-    interface Window { smartdownJSModules: any; }
-}
-
-window.smartdownJSModules = window.smartdownJSModules || {};
-
 /**
  * Load a script URL into the DOM by adding a script element
  *
@@ -14,7 +8,6 @@ window.smartdownJSModules = window.smartdownJSModules || {};
  * @param {fOnerror} Called on error
  *
  */
-
 
 export function importScriptUrl(sSrc: string, fOnload: Function, fOnerror: Function): void {
   var oHead = document.head || document.getElementsByTagName('head')[0];

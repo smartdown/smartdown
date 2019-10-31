@@ -187,7 +187,7 @@ var smartdownScriptsMap = {};
 var mediaRegistry = {};
 var uniquePlayableIndex = 0;
 
-import {loadExternal} from 'extensions';
+import {loadExternal, registerExtension, ensureExtension} from 'extensions';
 
 
 const mathjaxConfigure = require('./extensions/MathJax');
@@ -202,8 +202,6 @@ const TypeScript = require('./extensions/TypeScript');
 const Leaflet = require('./extensions/Leaflet');
 const graphvizImages = require('./extensions/Graphviz');
 const Mermaid = require('./extensions/Mermaid.js');
-const ABCJS = require('./extensions/ABCJS.js');
-
 
 var P5 = require('./extensions/P5.js');
 
@@ -242,6 +240,16 @@ var markedOpts = {
     return result.value;
   }
 };
+
+function registerDefaultExtensions() {
+  registerExtension(
+    'abc',
+    [
+      'lib/abcjs_midi_5.6.11-min.js'
+    ]);
+}
+
+registerDefaultExtensions();
 
 
 function expandHrefWithLinkRules(href) {
@@ -470,15 +478,16 @@ function queueContentLoad(contentType, baseId, href, title, text) {
   // console.log('queueContentLoad', contentType, baseId, href, title, text);
 
   if (contentType.indexOf('abc') === 0) {
-    window.smartdownJSModules.abc.loader(function () {
-      axios.get(href)
-        .then(function(result) {
-          renderABCIntoDivs(baseId, text, result.data);
-        })
-        .catch(function(err) {
-          console.log('queueContentLoad error', err);
-        });
-    });
+    ensureExtension('abc',
+      function () {
+        axios.get(href)
+          .then(function(result) {
+            renderABCIntoDivs(baseId, text, result.data);
+          })
+          .catch(function(err) {
+            console.log('queueContentLoad error', err);
+          });
+      });
   }
 }
 
@@ -2584,13 +2593,15 @@ ${e}
   </div>
 `;
 
-    window.smartdownJSModules.abc.loader(function () {
-      renderABCIntoDivs(abcBaseId, language, script.text);
+    ensureExtension(
+      'abc',
+      function () {
+        renderABCIntoDivs(abcBaseId, language, script.text);
 
-      if (progress) {
-        progress.style.display = 'none';
-      }
-    });
+        if (progress) {
+          progress.style.display = 'none';
+        }
+      });
   }
   else {
     console.log('language: ', language);
@@ -2647,9 +2658,10 @@ function recursivelyLoadImports(language, divId, importsRemaining, done) {
       });
     }
     else if (nextImport.indexOf('abc') === 0) {
-      window.smartdownJSModules.abc.loader(function () {
-        recursivelyLoadImports(language, divId, importsRemaining, done);
-      });
+      ensureExtension('abc',
+        function () {
+          recursivelyLoadImports(language, divId, importsRemaining, done);
+        });
     }
     else if (nextImport === 'mermaid') {
       window.smartdownJSModules.mermaid.loader(function () {
@@ -3848,9 +3860,11 @@ function renderCell(cellID, variableId, newValue) {
 `;
 
     if (typeof newValue === 'string' && newValue.length > 0) {
-      window.smartdownJSModules.abc.loader(function () {
-        renderABCIntoDivs(abcBaseId, cellInfo.datatype, newValue);
-      });
+      ensureExtension(
+        'abc',
+        function () {
+          renderABCIntoDivs(abcBaseId, cellInfo.datatype, newValue);
+        });
     }
   }
   else if (cellInfo.datatype === 'graphviz') {
