@@ -10,20 +10,13 @@
 
 /* global useFileSaver */
 /* global useLocalForage */
-/* global useThree */
-/* global useLeaflet */
 /* global useGraphviz */
 /* global useBrython */
-/* global useABCJS */
-/* global useD3 */
 /* global useGifffer */
-/* global usePlotly */
-/* global useOpenJSCAD */
 /* global useP5JS */
 /* global useMathJax */
 /* global useStdlib */
 /* global useMermaid */
-/* global ABCJS */
 /* global XMLHttpRequest */
 
 import './polyfills';
@@ -49,6 +42,27 @@ const hljs = require('hljs');
 window.jsyaml = require('js-yaml');
 
 const StackTrace = require('stacktraceJS');
+
+
+import {loadExternal, registerExtension, ensureExtension} from 'extensions';
+
+
+const mathjaxConfigure = require('./extensions/MathJax');
+
+const Stdlib = require('./extensions/Stdlib.js');
+import registerABC from './extensions/ABC';
+import registerD3 from './extensions/D3';
+import registerThree from './extensions/Three';
+const Brython = require('./extensions/Brython');
+import registerPlotly from './extensions/Plotly';
+import registerOpenJSCAD from './extensions/OpenJSCAD';
+const TypeScript = require('./extensions/TypeScript');
+import registerLeaflet from './extensions/Leaflet';
+const graphvizImages = require('./extensions/Graphviz');
+const Mermaid = require('./extensions/Mermaid.js');
+
+var P5 = require('./extensions/P5.js');
+
 
 let fileSaver = {};
 if (useFileSaver) {
@@ -187,26 +201,6 @@ var smartdownScriptsMap = {};
 var mediaRegistry = {};
 var uniquePlayableIndex = 0;
 
-import {loadExternal} from 'extensions';
-
-
-const mathjaxConfigure = require('./extensions/MathJax');
-
-const Stdlib = require('./extensions/Stdlib.js');
-const Three = require('./extensions/Three');
-const Brython = require('./extensions/Brython');
-const D3 = require('./extensions/D3');
-const Plotly = require('./extensions/Plotly');
-const OpenJSCAD = require('./extensions/OpenJSCAD');
-const TypeScript = require('./extensions/TypeScript');
-const Leaflet = require('./extensions/Leaflet');
-const graphvizImages = require('./extensions/Graphviz');
-const Mermaid = require('./extensions/Mermaid.js');
-const ABCJS = require('./extensions/ABCJS.js');
-
-
-var P5 = require('./extensions/P5.js');
-
 function entityEscape(html, encode) {
   return html
     .replace(!encode ? /&(?!#?\w+;)/g : /&/g, '&amp;')
@@ -242,6 +236,17 @@ var markedOpts = {
     return result.value;
   }
 };
+
+function registerDefaultExtensions() {
+  registerABC();
+  registerD3();
+  registerThree();
+  registerPlotly();
+  registerLeaflet();
+  registerOpenJSCAD();
+}
+
+registerDefaultExtensions();
 
 
 function expandHrefWithLinkRules(href) {
@@ -470,15 +475,16 @@ function queueContentLoad(contentType, baseId, href, title, text) {
   // console.log('queueContentLoad', contentType, baseId, href, title, text);
 
   if (contentType.indexOf('abc') === 0) {
-    window.smartdownJSModules.abc.loader(function () {
-      axios.get(href)
-        .then(function(result) {
-          renderABCIntoDivs(baseId, text, result.data);
-        })
-        .catch(function(err) {
-          console.log('queueContentLoad error', err);
-        });
-    });
+    ensureExtension('abc',
+      function () {
+        axios.get(href)
+          .then(function(result) {
+            renderABCIntoDivs(baseId, text, result.data);
+          })
+          .catch(function(err) {
+            console.log('queueContentLoad error', err);
+          });
+      });
   }
 }
 
@@ -563,6 +569,7 @@ function getPrelude(language, code) {
     'p5js',
     'P5JS',
     'three',
+    'leaflet',
     'plotly',
     'openjscad',
     'typescript',
@@ -572,6 +579,13 @@ function getPrelude(language, code) {
     'abcmidi',
     'mermaid',
   ];
+
+  // If a playable is declared with a specific language that has
+  // a shorthand in loadableLanguages, then add that language's extension
+  // as an import. Note that extension may be renamed to plugin, so think
+  // that there's a relation between language and extension/plugin.
+  // E.g., a d3-language playable would have an implicit import of the d3 extension.
+  //
 
   if (loadableLanguages.indexOf(language) >= 0) {
     imports.push(language);
@@ -2319,10 +2333,10 @@ function playPlayableInternal(language, divId) {
       window.d3fc,
       window.d3dc,
       window.topojson,
-      Plotly,
-      Leaflet,
+      window.Plotly,
+      window.Leaflet,
       Stdlib,
-      Three,
+      window.THREE,
       module.exports,
       {}    // This will be a p5 obj in the case of using P5.Loader
     ];
@@ -2584,13 +2598,15 @@ ${e}
   </div>
 `;
 
-    window.smartdownJSModules.abc.loader(function () {
-      renderABCIntoDivs(abcBaseId, language, script.text);
+    ensureExtension(
+      'abc',
+      function () {
+        renderABCIntoDivs(abcBaseId, language, script.text);
 
-      if (progress) {
-        progress.style.display = 'none';
-      }
-    });
+        if (progress) {
+          progress.style.display = 'none';
+        }
+      });
   }
   else {
     console.log('language: ', language);
@@ -2612,7 +2628,12 @@ function recursivelyLoadImports(language, divId, importsRemaining, done) {
       });
     }
     else if (nextImport === 'd3') {
-      window.smartdownJSModules.d3.loader(function () {
+      ensureExtension('d3', function() {
+        recursivelyLoadImports(language, divId, importsRemaining, done);
+      });
+    }
+    else if (nextImport === 'leaflet') {
+      ensureExtension('leaflet', function() {
         recursivelyLoadImports(language, divId, importsRemaining, done);
       });
     }
@@ -2627,17 +2648,17 @@ function recursivelyLoadImports(language, divId, importsRemaining, done) {
       });
     }
     else if (nextImport === 'three') {
-      window.smartdownJSModules.three.loader(function () {
+      ensureExtension('three', function() {
         recursivelyLoadImports(language, divId, importsRemaining, done);
       });
     }
     else if (nextImport === 'plotly') {
-      window.smartdownJSModules.plotly.loader(function () {
+      ensureExtension('plotly', function() {
         recursivelyLoadImports(language, divId, importsRemaining, done);
       });
     }
     else if (nextImport === 'openjscad') {
-      window.smartdownJSModules.openjscad.loader(function () {
+      ensureExtension('openjscad', function() {
         recursivelyLoadImports(language, divId, importsRemaining, done);
       });
     }
@@ -2647,9 +2668,10 @@ function recursivelyLoadImports(language, divId, importsRemaining, done) {
       });
     }
     else if (nextImport.indexOf('abc') === 0) {
-      window.smartdownJSModules.abc.loader(function () {
-        recursivelyLoadImports(language, divId, importsRemaining, done);
-      });
+      ensureExtension('abc',
+        function () {
+          recursivelyLoadImports(language, divId, importsRemaining, done);
+        });
     }
     else if (nextImport === 'mermaid') {
       window.smartdownJSModules.mermaid.loader(function () {
@@ -3720,7 +3742,7 @@ function renderCell(cellID, variableId, newValue) {
       element.innerHTML = '';
     }
     else {
-      window.smartdownJSModules.openjscad.loader(function () {
+      ensureExtension('openjscad', function() {
         element.innerHTML =
 `
   <div
@@ -3848,9 +3870,11 @@ function renderCell(cellID, variableId, newValue) {
 `;
 
     if (typeof newValue === 'string' && newValue.length > 0) {
-      window.smartdownJSModules.abc.loader(function () {
-        renderABCIntoDivs(abcBaseId, cellInfo.datatype, newValue);
-      });
+      ensureExtension(
+        'abc',
+        function () {
+          renderABCIntoDivs(abcBaseId, cellInfo.datatype, newValue);
+        });
     }
   }
   else if (cellInfo.datatype === 'graphviz') {
@@ -4793,7 +4817,7 @@ module.exports = {
   d3fc: null,
   d3cloud: null,
   topojson: null,
-  Three: Three,
+  Three: null,
   lodashEach: window.lodashEach,
   lodashMap: window.lodashMap,
   lodashIsEqual: window.lodashIsEqual,
@@ -4803,7 +4827,7 @@ module.exports = {
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
   showAugmentedCode: false,
-  version: '1.0.21',
+  version: '1.0.22',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,

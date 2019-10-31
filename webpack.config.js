@@ -31,17 +31,10 @@ var nm = path.join(__dirname, 'node_modules');
 var stdlibRoot = path.join(nm, '@stdlib');
 var stdlibDeepRoot = path.join(stdlibRoot, 'stdlib/lib/node_modules/@stdlib');
 var stdlibTreeRoot = path.join(stdlibRoot, 'stdlib/dist/stdlib-tree.js');
-var d3JS = path.join(nm, '/d3/dist/d3.min.js');
-var d3fcJS = path.join(nm, '/d3fc/build/d3fc.js');
-var d3dcJS = path.join(nm, '/dc/dc.min.js');
-var d3dcCSS = path.join(nm, '/dc/dc.min.css');
-var d3cloudJS = path.join(nm, '/d3-cloud/build/d3.layout.cloud.js');
 var emojiJS = path.join(nm, '/emoji-js/lib/emoji.min.js');
-var leafletJSDir = path.join(nm, '/leaflet/dist');
-var leafletJS = path.join(leafletJSDir, 'leaflet.js');
+var abcJS = path.join(app, 'external/abcjs_midi_5.9.1-min.js');
+var abcCSS = path.join(app, 'external/abcjs-midi-no-fa.css');
 var openjscadJS = path.join(app, 'external/openjscad.reentrant.umd.js');
-var abcjsJS = path.join(app, 'external/abcjs_midi_5.6.11-min.js');
-var abcjsCSS = path.join(app, 'external/abcjs_midi.css');
 var giffferJS = path.join(nm, 'gifffer/build/gifffer.min.js');
 var stacktraceJS = path.join(nm, 'stacktrace-js/dist/stacktrace.min.js');
 // var mermaidJS = path.join(nm, 'mermaid/dist/mermaid.min.js');
@@ -52,10 +45,9 @@ var brythonStdlibJS = path.join(nm, '/brython/brython_stdlib.js');
 var vizJS = path.join(nm, '/viz.js/viz.js');
 var vizLiteJS = path.join(nm, '/viz.js/lite.render.js');
 var webcomponentsJS = path.join(nm, '@webcomponents/webcomponentsjs/');
-var threeJS = path.join(nm, '/three/build/three.min.js');
 var topojsonJS = path.join(nm, '/topojson/dist/topojson.min.js');
-// var galleryRoot = '/Users/bud/DoctorBud/smartdown-gallery/';
-var galleryRoot = path.join(nm, 'smartdown-gallery/');
+var galleryRoot = '/Users/bud/DoctorBud/smartdown-gallery/';
+// var galleryRoot = path.join(nm, 'smartdown-gallery/');
 // var galleryResourcesRoot = path.join(nm, 'smartdown-gallery/resources/');
 
 var useOlderBrowsers = false;
@@ -64,17 +56,13 @@ var useLocalForage = true && !test;
 var useLeaflet = true && !test;
 var useGraphviz = !useOlderBrowsers && !test;
 var useBrython = true && !test;
-var useABCJS = true && !test;
-var useD3 = true && !test;
 var useGifffer = true && !test;
-var usePlotly = true && !test;
-var useOpenJSCAD = true && !test;
 var useTypeScript = true && !test;
 var useP5JS = true && !test;
 var useMermaid = true && !test;
 var useMathJax = true;
 var useStdlib = !useOlderBrowsers && !test;
-var useThree = true && !test;
+
 var mode = (nodeEnvironment === 'production' || nodeEnvironment === 'development') ?
             nodeEnvironment : 'production';
 var galleryIgnores = [
@@ -83,7 +71,7 @@ var galleryIgnores = [
   'LICENSE',
   'package.json',
   'index.html',
-  'AAADebug.md',
+  // 'AAADebug.md',
   'ExtensionsPlayableP5X.js'];
 const baseURL = development ? '/' : '/smartdown/';
 
@@ -171,16 +159,8 @@ var config = {
       // '@stdlib/time': path.join(stdlibDeepRoot, 'time'),
       // '@stdlib/tools': path.join(stdlibDeepRoot, 'tools'),
       // '@stdlib/utils': path.join(stdlibDeepRoot, 'utils'),
-      three$: threeJS,
       topojson$: topojsonJS,
-      d3$: d3JS,
-      d3JS$: d3JS,
-      d3fcJS$: d3fcJS,
-      d3dcJS$: d3dcJS,
-      d3dcCSS$: d3dcCSS,
-      d3cloudJS$: d3cloudJS,
       emojiJS$: emojiJS,
-      leafletJS$: leafletJS,
       // mermaidJS$: mermaidJS,
       p5JS$: p5JS,
       p5$: p5JS,
@@ -221,17 +201,12 @@ var config = {
       useLeaflet: useLeaflet,
       useGraphviz: useGraphviz,
       useBrython: useBrython,
-      useABCJS: useABCJS,
-      useD3: useD3,
       useGifffer: useGifffer,
-      usePlotly: usePlotly,
-      useOpenJSCAD: useOpenJSCAD,
       useTypeScript: useTypeScript,
       useP5JS: useP5JS,
       useMermaid: useMermaid,
       useMathJax: useMathJax,
       useStdlib: useStdlib,
-      useThree: useThree
     }),
 
     new CopyWebpackPlugin([
@@ -253,15 +228,12 @@ var config = {
         { from: vizJS },
         { from: vizLiteJS },
         { from: path.join(app, 'external/ldf-client-browser.js') },
+        { from: abcJS },
+        { from: abcCSS },
         { from: openjscadJS },
-        { from: abcjsJS },
-        { from: abcjsCSS },
         { from: brythonJS },
         { from: brythonStdlibJS },
         { from: 'xypic.js' },
-        { from: path.join(leafletJSDir, 'images/marker-icon.png') },
-        { from: path.join(leafletJSDir, 'images/marker-icon-2x.png') },
-        { from: path.join(leafletJSDir, 'images/marker-shadow.png') },
 
         // { from: galleryResourcesRoot, to: './resources/' },
         { from: galleryRoot, to: '../gallery/', ignore: galleryIgnores },
@@ -283,9 +255,6 @@ var config = {
         { from: brythonStdlibJS, to: '../gist/' },
         { from: 'favicons', to: '../gist/' },
         { from: 'xypic.js', to: '../gist/' },
-        { from: path.join(leafletJSDir, 'images/marker-icon.png'), to: '../gist/' },
-        { from: path.join(leafletJSDir, 'images/marker-icon-2x.png'), to: '../gist/' },
-        { from: path.join(leafletJSDir, 'images/marker-shadow.png'), to: '../gist/' },
         // { from: galleryResourcesRoot, to: '../gist/resources/' },
         // { from: galleryRoot, to: '../gist/gallery/', ignore: ['LICENSE', 'package.json'] },
         // { from: '../README.md', to: '../gist/gallery/' },
@@ -313,15 +282,11 @@ var config = {
           { source: outputPath + 'smartdown_stdlib.js', destination: outputPath + '../gist/' },
           { source: outputPath + 'smartdown_vendors~stdlib.js', destination: outputPath + '../gist/' },
           { source: outputPath + 'smartdown_vendors~stdlib-sotu.js', destination: outputPath + '../gist/' },
-          { source: outputPath + 'smartdown_vendors~three.js', destination: outputPath + '../gist/' },
-          // { source: outputPath + 'smartdown_p5DOM.js', destination: outputPath + '../gist/' },
           { source: outputPath + 'smartdown_vendors~p5Sound.js', destination: outputPath + '../gist/' },
-          // { source: outputPath + 'smartdown_vendors~p5DOM~p5Sound~p5js.js', destination: outputPath + '../gist/' },
 
           { source: outputPath + 'smartdown_stdlib.js.map', destination: outputPath + '../gist/' },
           { source: outputPath + 'smartdown_vendors~stdlib.js.map', destination: outputPath + '../gist/' },
           { source: outputPath + 'smartdown_vendors~stdlib-sotu.js.map', destination: outputPath + '../gist/' },
-          { source: outputPath + 'smartdown_vendors~three.js.map', destination: outputPath + '../gist/' },
           // { source: outputPath + 'smartdown_p5DOM.js.map', destination: outputPath + '../gist/' },
           { source: outputPath + 'smartdown_vendors~p5Sound.js.map', destination: outputPath + '../gist/' },
           // { source: outputPath + 'smartdown_vendors~p5DOM~p5Sound~p5js.js.map', destination: outputPath + '../gist/' },
@@ -333,15 +298,8 @@ var config = {
   module: {
     noParse: [
       /node_modules\/localforage\/dist\/localforage.js/,
-      new RegExp(d3JS),
-      new RegExp('d3JS'),
       new RegExp('emojiJS'),
-      // new RegExp(d3fcJS),
-      // new RegExp('d3fcJS'),
-      // new RegExp(mermaidJS),
       new RegExp('mermaidJS'),
-      new RegExp(leafletJS),
-      new RegExp('leafletJS'),
       new RegExp(p5JS),
       new RegExp('p5JS'),
       // new RegExp(vizJS),
