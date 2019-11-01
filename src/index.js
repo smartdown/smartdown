@@ -14,8 +14,6 @@
 /* global useLeaflet */
 /* global useGraphviz */
 /* global useBrython */
-/* global useABCJS */
-/* global useD3 */
 /* global useGifffer */
 /* global usePlotly */
 /* global useOpenJSCAD */
@@ -49,6 +47,27 @@ const hljs = require('hljs');
 window.jsyaml = require('js-yaml');
 
 const StackTrace = require('stacktraceJS');
+
+
+import {loadExternal, registerExtension, ensureExtension} from 'extensions';
+
+
+const mathjaxConfigure = require('./extensions/MathJax');
+
+const Stdlib = require('./extensions/Stdlib.js');
+import registerABC from './extensions/ABC';
+import registerD3 from './extensions/D3';
+import registerThree from './extensions/Three';
+const Brython = require('./extensions/Brython');
+import registerPlotly from './extensions/Plotly';
+const OpenJSCAD = require('./extensions/OpenJSCAD');
+const TypeScript = require('./extensions/TypeScript');
+const Leaflet = require('./extensions/Leaflet');
+const graphvizImages = require('./extensions/Graphviz');
+const Mermaid = require('./extensions/Mermaid.js');
+
+var P5 = require('./extensions/P5.js');
+
 
 let fileSaver = {};
 if (useFileSaver) {
@@ -187,24 +206,6 @@ var smartdownScriptsMap = {};
 var mediaRegistry = {};
 var uniquePlayableIndex = 0;
 
-import {loadExternal, registerExtension, ensureExtension} from 'extensions';
-
-
-const mathjaxConfigure = require('./extensions/MathJax');
-
-const Stdlib = require('./extensions/Stdlib.js');
-const Three = require('./extensions/Three');
-const Brython = require('./extensions/Brython');
-const D3 = require('./extensions/D3');
-const Plotly = require('./extensions/Plotly');
-const OpenJSCAD = require('./extensions/OpenJSCAD');
-const TypeScript = require('./extensions/TypeScript');
-const Leaflet = require('./extensions/Leaflet');
-const graphvizImages = require('./extensions/Graphviz');
-const Mermaid = require('./extensions/Mermaid.js');
-
-var P5 = require('./extensions/P5.js');
-
 function entityEscape(html, encode) {
   return html
     .replace(!encode ? /&(?!#?\w+;)/g : /&/g, '&amp;')
@@ -242,11 +243,10 @@ var markedOpts = {
 };
 
 function registerDefaultExtensions() {
-  registerExtension(
-    'abc',
-    [
-      'lib/abcjs_midi_5.6.11-min.js'
-    ]);
+  registerABC();
+  registerD3();
+  registerThree();
+  registerPlotly();
 }
 
 registerDefaultExtensions();
@@ -2328,10 +2328,10 @@ function playPlayableInternal(language, divId) {
       window.d3fc,
       window.d3dc,
       window.topojson,
-      Plotly,
+      window.Plotly,
       Leaflet,
       Stdlib,
-      Three,
+      window.THREE,
       module.exports,
       {}    // This will be a p5 obj in the case of using P5.Loader
     ];
@@ -2623,7 +2623,7 @@ function recursivelyLoadImports(language, divId, importsRemaining, done) {
       });
     }
     else if (nextImport === 'd3') {
-      window.smartdownJSModules.d3.loader(function () {
+      ensureExtension('d3', function() {
         recursivelyLoadImports(language, divId, importsRemaining, done);
       });
     }
@@ -2638,12 +2638,12 @@ function recursivelyLoadImports(language, divId, importsRemaining, done) {
       });
     }
     else if (nextImport === 'three') {
-      window.smartdownJSModules.three.loader(function () {
+      ensureExtension('three', function() {
         recursivelyLoadImports(language, divId, importsRemaining, done);
       });
     }
     else if (nextImport === 'plotly') {
-      window.smartdownJSModules.plotly.loader(function () {
+      ensureExtension('plotly', function() {
         recursivelyLoadImports(language, divId, importsRemaining, done);
       });
     }
@@ -4807,7 +4807,7 @@ module.exports = {
   d3fc: null,
   d3cloud: null,
   topojson: null,
-  Three: Three,
+  Three: null,
   lodashEach: window.lodashEach,
   lodashMap: window.lodashMap,
   lodashIsEqual: window.lodashIsEqual,

@@ -1,4 +1,6 @@
-import {importScriptUrl} from 'importers';
+/* eslint @typescript-eslint/no-explicit-any: 0 */
+
+import {importScriptUrl, importCssUrl} from 'importers';
 
 window.smartdownJSModules = {};
 
@@ -19,22 +21,29 @@ declare global {
  *
  * @param {name} - Extension name (e.g., 'd3')
  * @param {resources} - List of URLs to load for this extension
- *
+ * @param {configure} - Called after each resource is loaded, to allow for
+ * post-load configuration.
  */
 
-export function registerExtension(name: string, resources: string[]): void {
+export function registerExtension(
+  name: string,
+  resources: any[],
+  configure?: (name: string, index: number, url: string) => void): void {
   if (window.smartdownJSModules[name]) {
     console.log('#registerExtension error: already registered', name, resources);
   }
   else {
-    console.log('#registerExtension: registering', name, resources);
+    // console.log('#registerExtension: registering', name, resources);
 
     window.smartdownJSModules[name] = {
       loader: function(): void {
         console.log('Default loader for ', name);
       },
-      loaded: null,
+      name: name,
+      loaded: false,
+      configure: configure,
       resources: resources,
+      resourceToLoad: 0,
       loadedCallbacks: []
     };
   }
@@ -53,44 +62,79 @@ export function registerExtension(name: string, resources: string[]): void {
  *
  */
 
+function loadResourceList(thisModule: any) {
+  if (thisModule.resources.length <= thisModule.resourceToLoad) {
+    // console.log('loadResourceList all resources loaded for ', thisModule.name, thisModule.resourceToLoad, thisModule.resources.length);
+    const callThese = thisModule.loadedCallbacks;
+    thisModule.loaded = true;
+    thisModule.loadedCallbacks = [];
+    callThese.forEach((loadedCb: Function) => {
+      loadedCb();
+    });
+  }
+  else {
+    const resource = thisModule.resources[thisModule.resourceToLoad];
+    if (typeof resource === 'string') {
+      let url: string = resource;
+
+      if (url.indexOf('http') !== 0) {  // Should be a regex.. FIXME
+        url = window.smartdown.baseURL + url;
+      }
+
+      if (url.endsWith('.css')) {
+        importCssUrl(
+          url,
+          function() {
+            thisModule.resourceToLoad = thisModule.resourceToLoad + 1;
+            loadResourceList(thisModule);
+          },
+          function(e: any) {
+            console.log('loadResourceList importCssUrl error', thisModule.name, url, e);
+          });
+      }
+      else {
+        importScriptUrl(
+          url,
+          function() {
+            thisModule.resourceToLoad = thisModule.resourceToLoad + 1;
+            loadResourceList(thisModule);
+          },
+          function(e: any) {
+            console.log('loadResourceList importScriptUrl error', thisModule.name, url, e);
+          });
+      }
+    }
+    else if (typeof resource === 'function') {
+      resource();
+      thisModule.resourceToLoad = thisModule.resourceToLoad + 1;
+      loadResourceList(thisModule);
+    }
+    else {
+      console.log('loadResourceList unknown resource type ', thisModule.name, typeof resource, resource);
+    }
+  }
+}
+
+
 export function ensureExtension(name: string, loaded: () => void): void {
   if (!window.smartdownJSModules[name]) {
     console.log('#ensureExtension error: not registered', name);
   }
   else {
-    console.log('#ensureExtension', name);
+    // console.log('#ensureExtension', name);
+    const thisModule = window.smartdownJSModules[name];
 
-    if (window.smartdownJSModules[name].loaded) {
+    if (thisModule.loaded) {
       loaded();
     }
-    else if (window.smartdownJSModules[name].loadedCallbacks.length > 0) {
-      window.smartdownJSModules[name].loadedCallbacks.push(loaded);
+    else if (thisModule.loadedCallbacks.length > 0) {
+      thisModule.loadedCallbacks.push(loaded);
       // console.log('ensureExtension...External is still loading', name);
     }
     else {
-      window.smartdownJSModules[name].loadedCallbacks.push(loaded);
+      thisModule.loadedCallbacks.push(loaded);
 
-      let url: string = window.smartdownJSModules[name].resources[0];
-      if (url.indexOf('http') === 0) {  // Should be a regex.. FIXME
-        url = window.smartdown.baseURL + url;
-      }
-
-      console.log('ensureExtension...External initiate load', name, url);
-
-      importScriptUrl(
-        url,
-        function() {
-          console.log('ensureExtension...load complete', name, url);
-          const callThese = window.smartdownJSModules[name].loadedCallbacks;
-          window.smartdownJSModules[name].loaded = true;
-          window.smartdownJSModules[name].loadedCallbacks = [];
-          callThese.forEach((loadedCb: Function) => {
-            loadedCb();
-          });
-        },
-        function(error: string): void {
-          console.log('#ensureExtension load error:', error, name);
-        });
+      loadResourceList(thisModule);
     }
   }
 }
