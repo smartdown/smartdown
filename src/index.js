@@ -13,8 +13,6 @@
 /* global useGraphviz */
 /* global useBrython */
 /* global useGifffer */
-/* global usePlotly */
-/* global useOpenJSCAD */
 /* global useP5JS */
 /* global useMathJax */
 /* global useStdlib */
@@ -57,7 +55,7 @@ import registerD3 from './extensions/D3';
 import registerThree from './extensions/Three';
 const Brython = require('./extensions/Brython');
 import registerPlotly from './extensions/Plotly';
-const OpenJSCAD = require('./extensions/OpenJSCAD');
+import registerOpenJSCAD from './extensions/OpenJSCAD';
 const TypeScript = require('./extensions/TypeScript');
 import registerLeaflet from './extensions/Leaflet';
 const graphvizImages = require('./extensions/Graphviz');
@@ -245,6 +243,7 @@ function registerDefaultExtensions() {
   registerThree();
   registerPlotly();
   registerLeaflet();
+  registerOpenJSCAD();
 }
 
 registerDefaultExtensions();
@@ -2659,7 +2658,7 @@ function recursivelyLoadImports(language, divId, importsRemaining, done) {
       });
     }
     else if (nextImport === 'openjscad') {
-      window.smartdownJSModules.openjscad.loader(function () {
+      ensureExtension('openjscad', function() {
         recursivelyLoadImports(language, divId, importsRemaining, done);
       });
     }
@@ -3743,7 +3742,7 @@ function renderCell(cellID, variableId, newValue) {
       element.innerHTML = '';
     }
     else {
-      window.smartdownJSModules.openjscad.loader(function () {
+      ensureExtension('openjscad', function() {
         element.innerHTML =
 `
   <div

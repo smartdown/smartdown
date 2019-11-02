@@ -32,8 +32,8 @@ var stdlibRoot = path.join(nm, '@stdlib');
 var stdlibDeepRoot = path.join(stdlibRoot, 'stdlib/lib/node_modules/@stdlib');
 var stdlibTreeRoot = path.join(stdlibRoot, 'stdlib/dist/stdlib-tree.js');
 var emojiJS = path.join(nm, '/emoji-js/lib/emoji.min.js');
-var leafletJSDir = path.join(nm, '/leaflet/dist');
-var leafletJS = path.join(leafletJSDir, 'leaflet.js');
+var abcJS = path.join(app, 'external/abcjs_midi_5.9.1-min.js');
+var abcCSS = path.join(app, 'external/abcjs-midi-no-fa.css');
 var openjscadJS = path.join(app, 'external/openjscad.reentrant.umd.js');
 var giffferJS = path.join(nm, 'gifffer/build/gifffer.min.js');
 var stacktraceJS = path.join(nm, 'stacktrace-js/dist/stacktrace.min.js');
@@ -57,7 +57,6 @@ var useLeaflet = true && !test;
 var useGraphviz = !useOlderBrowsers && !test;
 var useBrython = true && !test;
 var useGifffer = true && !test;
-var useOpenJSCAD = true && !test;
 var useTypeScript = true && !test;
 var useP5JS = true && !test;
 var useMermaid = true && !test;
@@ -162,7 +161,6 @@ var config = {
       // '@stdlib/utils': path.join(stdlibDeepRoot, 'utils'),
       topojson$: topojsonJS,
       emojiJS$: emojiJS,
-      leafletJS$: leafletJS,
       // mermaidJS$: mermaidJS,
       p5JS$: p5JS,
       p5$: p5JS,
@@ -204,7 +202,6 @@ var config = {
       useGraphviz: useGraphviz,
       useBrython: useBrython,
       useGifffer: useGifffer,
-      useOpenJSCAD: useOpenJSCAD,
       useTypeScript: useTypeScript,
       useP5JS: useP5JS,
       useMermaid: useMermaid,
@@ -231,13 +228,12 @@ var config = {
         { from: vizJS },
         { from: vizLiteJS },
         { from: path.join(app, 'external/ldf-client-browser.js') },
+        { from: abcJS },
+        { from: abcCSS },
         { from: openjscadJS },
         { from: brythonJS },
         { from: brythonStdlibJS },
         { from: 'xypic.js' },
-        { from: path.join(leafletJSDir, 'images/marker-icon.png') },
-        { from: path.join(leafletJSDir, 'images/marker-icon-2x.png') },
-        { from: path.join(leafletJSDir, 'images/marker-shadow.png') },
 
         // { from: galleryResourcesRoot, to: './resources/' },
         { from: galleryRoot, to: '../gallery/', ignore: galleryIgnores },
@@ -259,9 +255,6 @@ var config = {
         { from: brythonStdlibJS, to: '../gist/' },
         { from: 'favicons', to: '../gist/' },
         { from: 'xypic.js', to: '../gist/' },
-        { from: path.join(leafletJSDir, 'images/marker-icon.png'), to: '../gist/' },
-        { from: path.join(leafletJSDir, 'images/marker-icon-2x.png'), to: '../gist/' },
-        { from: path.join(leafletJSDir, 'images/marker-shadow.png'), to: '../gist/' },
         // { from: galleryResourcesRoot, to: '../gist/resources/' },
         // { from: galleryRoot, to: '../gist/gallery/', ignore: ['LICENSE', 'package.json'] },
         // { from: '../README.md', to: '../gist/gallery/' },
@@ -307,8 +300,6 @@ var config = {
       /node_modules\/localforage\/dist\/localforage.js/,
       new RegExp('emojiJS'),
       new RegExp('mermaidJS'),
-      new RegExp(leafletJS),
-      new RegExp('leafletJS'),
       new RegExp(p5JS),
       new RegExp('p5JS'),
       // new RegExp(vizJS),
