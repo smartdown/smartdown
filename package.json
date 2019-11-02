@@ -1,6 +1,6 @@
 {
   "name": "smartdown",
-  "version": "1.0.22",
+  "version": "1.0.23",
   "description": "A library for translating, rendering and interacting with Smartdown documents. Smartdown is an extension of Markdown that provides richer media support and reactive programming capability.",
   "main": "dist/lib/smartdown.js",
   "scripts": {
@@ -52,7 +52,7 @@
     "@typescript-eslint/eslint-plugin": "^2.6.0",
     "@typescript-eslint/parser": "^2.6.0",
     "ajv": "^6.10.2",
-    "autoprefixer": "^9.7.0",
+    "autoprefixer": "^9.7.1",
     "babel-eslint": "^10.0.3",
     "babel-loader": "^8.0.6",
     "chromedriver": "^78.0.1",
@@ -88,7 +88,7 @@
     "web-audio-mock-api": "^1.0.0",
     "webpack": "^4.41.2",
     "webpack-bundle-analyzer": "^3.6.0",
-    "webpack-cli": "^3.3.9",
+    "webpack-cli": "^3.3.10",
     "webpack-dev-server": "^3.9.0",
     "webpack-node-externals": "^1.7.2",
     "yargs": "^14.2.0"
@@ -103,14 +103,14 @@
     "emoji-js": "^3.4.1",
     "file-saver": "^2.0.2",
     "gifffer": "^1.5.4",
-    "highlight.js": "^9.15.10",
+    "highlight.js": "^9.16.2",
     "ieee754": "^1.1.13",
     "js-yaml": "^3.13.1",
     "localforage": "^1.7.3",
     "lodash": "^4.17.15",
     "marked": "^0.7.0",
     "p5": "^0.10.2",
-    "smartdown-gallery": "0.0.49",
+    "smartdown-gallery": "0.0.50",
     "stacktrace-js": "^2.0.1",
     "vdom-to-html": "^2.3.1",
     "viz.js": "^2.1.2"
