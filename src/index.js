@@ -10,8 +10,6 @@
 
 /* global useFileSaver */
 /* global useLocalForage */
-/* global useThree */
-/* global useLeaflet */
 /* global useGraphviz */
 /* global useBrython */
 /* global useGifffer */
@@ -21,7 +19,6 @@
 /* global useMathJax */
 /* global useStdlib */
 /* global useMermaid */
-/* global ABCJS */
 /* global XMLHttpRequest */
 
 import './polyfills';
@@ -62,7 +59,7 @@ const Brython = require('./extensions/Brython');
 import registerPlotly from './extensions/Plotly';
 const OpenJSCAD = require('./extensions/OpenJSCAD');
 const TypeScript = require('./extensions/TypeScript');
-const Leaflet = require('./extensions/Leaflet');
+import registerLeaflet from './extensions/Leaflet';
 const graphvizImages = require('./extensions/Graphviz');
 const Mermaid = require('./extensions/Mermaid.js');
 
@@ -247,6 +244,7 @@ function registerDefaultExtensions() {
   registerD3();
   registerThree();
   registerPlotly();
+  registerLeaflet();
 }
 
 registerDefaultExtensions();
@@ -572,6 +570,7 @@ function getPrelude(language, code) {
     'p5js',
     'P5JS',
     'three',
+    'leaflet',
     'plotly',
     'openjscad',
     'typescript',
@@ -581,6 +580,13 @@ function getPrelude(language, code) {
     'abcmidi',
     'mermaid',
   ];
+
+  // If a playable is declared with a specific language that has
+  // a shorthand in loadableLanguages, then add that language's extension
+  // as an import. Note that extension may be renamed to plugin, so think
+  // that there's a relation between language and extension/plugin.
+  // E.g., a d3-language playable would have an implicit import of the d3 extension.
+  //
 
   if (loadableLanguages.indexOf(language) >= 0) {
     imports.push(language);
@@ -2329,7 +2335,7 @@ function playPlayableInternal(language, divId) {
       window.d3dc,
       window.topojson,
       window.Plotly,
-      Leaflet,
+      window.Leaflet,
       Stdlib,
       window.THREE,
       module.exports,
@@ -2624,6 +2630,11 @@ function recursivelyLoadImports(language, divId, importsRemaining, done) {
     }
     else if (nextImport === 'd3') {
       ensureExtension('d3', function() {
+        recursivelyLoadImports(language, divId, importsRemaining, done);
+      });
+    }
+    else if (nextImport === 'leaflet') {
+      ensureExtension('leaflet', function() {
         recursivelyLoadImports(language, divId, importsRemaining, done);
       });
     }
