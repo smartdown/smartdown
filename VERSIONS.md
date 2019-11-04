@@ -24,3 +24,7 @@
 - **1.0.21** - TypeScript support. Gallery 0.0.49. Ensure that code spans are formatted with Highlightjs. Adjust Augmented code button and display to follow the playable progress bar and source. Add Java and Typescript to list of default highlightjs languages. Improve 'smartdown-theme-dark' behavior to deal with highlightjs better and to work better with output cells.
 - **1.0.22** - Refactors many of the extension loaders to use the new extensions.ts mechanism. This is a work-in-progress towards reducing the base bundle size of Smartdown and porting to TypeScript. Updates ABCJS. Renames /extensions/ABCJS.js to /extensions/ABC.js.
 - **1.0.23** - Use Gallery 0.0.50.
+- **1.0.24** - Gallery 0.0.51. Adds vdom-to-html, for use by Stdlib and others. Refactor more dependent packages (e.g., Mermaid, Stdlib) to use the newly evolving plugin extension mechanism. Adds 'this.sizeChanged()' detection to a playable. Adds experimental /console option to playables to display per-playable errors and logging. Adds better reporting of TypeScript transpilation errors.
+
+
+

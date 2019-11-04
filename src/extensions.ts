@@ -4,6 +4,8 @@ import {importScriptUrl, importCssUrl} from 'importers';
 
 window.smartdownJSModules = {};
 
+const registeredExtensions: any = {};
+
 // https://stackoverflow.com/a/12709880/5667222
 declare global {
     interface Window {
@@ -12,6 +14,9 @@ declare global {
     }
 }
 
+export function isExtensionRegistered(name: string): boolean {
+  return registeredExtensions[name] !== undefined;
+}
 
 /**
  * Register a named extension
@@ -29,13 +34,13 @@ export function registerExtension(
   name: string,
   resources: any[],
   configure?: (name: string, index: number, url: string) => void): void {
-  if (window.smartdownJSModules[name]) {
+  if (registeredExtensions[name]) {
     console.log('#registerExtension error: already registered', name, resources);
   }
   else {
     // console.log('#registerExtension: registering', name, resources);
 
-    window.smartdownJSModules[name] = {
+    registeredExtensions[name] = {
       loader: function(): void {
         console.log('Default loader for ', name);
       },
@@ -117,12 +122,12 @@ function loadResourceList(thisModule: any) {
 
 
 export function ensureExtension(name: string, loaded: () => void): void {
-  if (!window.smartdownJSModules[name]) {
+  if (!registeredExtensions[name]) {
     console.log('#ensureExtension error: not registered', name);
   }
   else {
     // console.log('#ensureExtension', name);
-    const thisModule = window.smartdownJSModules[name];
+    const thisModule = registeredExtensions[name];
 
     if (thisModule.loaded) {
       loaded();

@@ -1,7 +1,6 @@
 import {registerExtension} from 'extensions';
 
 export default function registerD3() {
-  console.log('registerD3');
   registerExtension(
     'd3',
     [

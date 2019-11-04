@@ -3,7 +3,6 @@ import {registerExtension} from 'extensions';
 // https://leafletjs.com/download.html
 
 export default function registerLeaflet() {
-  console.log('registerLeaflet');
   registerExtension(
     'leaflet',
     [

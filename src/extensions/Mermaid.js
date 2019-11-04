@@ -1,7 +1,8 @@
-/* global window */
-/* global useMermaid */
+import {registerExtension} from 'extensions';
 
-var Mermaid = {
+/* global window */
+
+export var Mermaid = {
   mermaid: null,
   mermaidRender: null
 };
@@ -52,124 +53,90 @@ function mermaidRender(div, code) {
   }
 }
 
-if (useMermaid) {
-  function initializeMermaid() {
-    Mermaid.mermaid = window.mermaid;
-    Mermaid.mermaidRender = mermaidRender;
+function initializeMermaid() {
+  Mermaid.mermaid = window.mermaid;
+  Mermaid.mermaidRender = mermaidRender;
 
-    var config = {
-      startOnLoad: false,
-      cloneCssStyles: false,
-      logLevel: 3,
-      // theme: 'dark',
-      // logLevel , decides the amount of logging to be used.
-      //    * debug: 1
-      //    * info: 2
-      //    * warn: 3
-      //    * error: 4
-      //    * fatal: 5
+  var config = {
+    startOnLoad: false,
+    cloneCssStyles: false,
+    logLevel: 3,
+    // theme: 'dark',
+    // logLevel , decides the amount of logging to be used.
+    //    * debug: 1
+    //    * info: 2
+    //    * warn: 3
+    //    * error: 4
+    //    * fatal: 5
 
+    htmlLabels: true,
+    fontSize: 16,
+    flowchart: {
       htmlLabels: true,
+      useMaxWidth: false,
+    },
+    sequenceDiagram: {
+      diagramMarginX: 50,
+      diagramMarginY: 20,
+      actorMargin: 40,
+      width: 120,
+      height: 40,
+      boxMargin: 20,
+      boxTextMargin: 5,
+      noteMargin: 5,
+      messageMargin: 55,
+      mirrorActors: false,
+      bottomMarginAdj: 0,
+      useMaxWidth: false,
+    },
+    ganttchart: {
+      titleTopMargin: 15,
+      diagramMarginX: 10,
+      diagramMarginY: 10,
+      barHeight: 20,
+      barGap: 4,
+      topPadding: 50,
+      sidePadding: 75,
+      gridLineStartPadding: 35,
       fontSize: 16,
-      flowchart: {
-        htmlLabels: true,
-        useMaxWidth: false,
-      },
-      sequenceDiagram: {
-        diagramMarginX: 50,
-        diagramMarginY: 20,
-        actorMargin: 40,
-        width: 120,
-        height: 40,
-        boxMargin: 20,
-        boxTextMargin: 5,
-        noteMargin: 5,
-        messageMargin: 55,
-        mirrorActors: false,
-        bottomMarginAdj: 0,
-        useMaxWidth: false,
-      },
-      ganttchart: {
-        titleTopMargin: 15,
-        diagramMarginX: 10,
-        diagramMarginY: 10,
-        barHeight: 20,
-        barGap: 4,
-        topPadding: 50,
-        sidePadding: 75,
-        gridLineStartPadding: 35,
-        fontSize: 16,
-        numberSectionStyles: 3,
-        useMaxWidth: false,
-        // axisFormatter: [
-        //   // Within a day
-        //   ['%I:%M', function (d) {
-        //     return d.getHours();
-        //   }],
-        //   // Monday a week
-        //   ['w. %U', function (d) {
-        //     return d.getDay() === 1;
-        //   }],
-        //   // Day within a week (not monday)
-        //   ['%a %d', function (d) {
-        //     return d.getDay() && d.getDate() !== 1;
-        //   }],
-        //   // within a month
-        //   ['%b %d', function (d) {
-        //     return d.getDate() !== 1;
-        //   }],
-        //   // Month
-        //   ['%m-%y', function (d) {
-        //     return d.getMonth();
-        //   }]
-        // ]
-      }
-    };
-
-    Mermaid.mermaid.initialize(config);
-  }
-
-  function loadMermaid(loaded) {
-    // console.log('loadMermaid...', window.smartdownJSModules.mermaid.loadedCallbacks.length, loaded, JSON.stringify(window.smartdownJSModules.mermaid.loadedCallbacks, null, 2));
-    if (window.smartdownJSModules.mermaid.loaded) {
-      loaded();
+      numberSectionStyles: 3,
+      useMaxWidth: false,
+      // axisFormatter: [
+      //   // Within a day
+      //   ['%I:%M', function (d) {
+      //     return d.getHours();
+      //   }],
+      //   // Monday a week
+      //   ['w. %U', function (d) {
+      //     return d.getDay() === 1;
+      //   }],
+      //   // Day within a week (not monday)
+      //   ['%a %d', function (d) {
+      //     return d.getDay() && d.getDate() !== 1;
+      //   }],
+      //   // within a month
+      //   ['%b %d', function (d) {
+      //     return d.getDate() !== 1;
+      //   }],
+      //   // Month
+      //   ['%m-%y', function (d) {
+      //     return d.getMonth();
+      //   }]
+      // ]
     }
-    else if (window.smartdownJSModules.mermaid.loadedCallbacks.length > 0) {
-      window.smartdownJSModules.mermaid.loadedCallbacks.push(loaded);
-      // console.log('loadmermaid...mermaid is still loading', JSON.stringify(window.smartdownJSModules.mermaid.loadedCallbacks, null, 2));
-    }
-    else {
-      window.smartdownJSModules.mermaid.loadedCallbacks.push(loaded);
-
-      const url = 'https://unpkg.com/mermaid@7.1.2/dist/mermaid.min.js';
-      window.smartdown.importScriptUrl(
-        url,
-        function(script) {
-          /* global Mermaid */
-
-          // mermaid = window.mermaid;
-          // console.log('mermaidPackage', mermaidPackage);
-          // Object.keys(mermaidPackage).forEach(slot => {
-          //   // console.log('...slot', slot, mermaidPackage[slot]);
-          //   Mermaid[slot] = mermaidPackage[slot];
-          // });
-
-          initializeMermaid();
-
-          const callThese = window.smartdownJSModules.mermaid.loadedCallbacks;
-          window.smartdownJSModules.mermaid.loadedCallbacks = [];
-          callThese.forEach(loadedCb => {
-            loadedCb();
-          });
-        });
-    }
-  }
-
-  window.smartdownJSModules.mermaid = {
-    loader: loadMermaid,
-    loaded: null,
-    loadedCallbacks: []
   };
+
+  Mermaid.mermaid.initialize(config);
 }
 
-module.exports = Mermaid;
+export function registerMermaid() {
+  registerExtension(
+    'mermaid',
+    [
+      'https://unpkg.com/mermaid@7.1.2/dist/mermaid.min.js',
+      function() {
+        console.log('mermaid loaded');
+        initializeMermaid();
+      }
+    ]);
+}

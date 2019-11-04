@@ -1,7 +1,6 @@
 import {registerExtension} from 'extensions';
 
 export default function registerThree() {
-  console.log('registerThree');
   registerExtension(
     'three',
     [

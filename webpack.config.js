@@ -29,15 +29,12 @@ var outputPath = path.join(__dirname, 'dist/lib/');
 var outputFile = libraryName + '.js';
 var nm = path.join(__dirname, 'node_modules');
 var stdlibRoot = path.join(nm, '@stdlib');
-var stdlibDeepRoot = path.join(stdlibRoot, 'stdlib/lib/node_modules/@stdlib');
-var stdlibTreeRoot = path.join(stdlibRoot, 'stdlib/dist/stdlib-tree.js');
 var emojiJS = path.join(nm, '/emoji-js/lib/emoji.min.js');
 var abcJS = path.join(app, 'external/abcjs_midi_5.9.1-min.js');
 var abcCSS = path.join(app, 'external/abcjs-midi-no-fa.css');
 var openjscadJS = path.join(app, 'external/openjscad.reentrant.umd.js');
 var giffferJS = path.join(nm, 'gifffer/build/gifffer.min.js');
 var stacktraceJS = path.join(nm, 'stacktrace-js/dist/stacktrace.min.js');
-// var mermaidJS = path.join(nm, 'mermaid/dist/mermaid.min.js');
 var p5JS = path.join(nm, '/p5/lib/p5.min.js');
 // var p5JS = path.join(nm, '/p5/lib/p5.js');
 var brythonJS = path.join(nm, '/brython/brython.js');
@@ -57,11 +54,8 @@ var useLeaflet = true && !test;
 var useGraphviz = !useOlderBrowsers && !test;
 var useBrython = true && !test;
 var useGifffer = true && !test;
-var useTypeScript = true && !test;
 var useP5JS = true && !test;
-var useMermaid = true && !test;
 var useMathJax = true;
-var useStdlib = !useOlderBrowsers && !test;
 
 var mode = (nodeEnvironment === 'production' || nodeEnvironment === 'development') ?
             nodeEnvironment : 'production';
@@ -71,7 +65,7 @@ var galleryIgnores = [
   'LICENSE',
   'package.json',
   'index.html',
-  // 'AAADebug.md',
+  'AAADebug.md',
   'ExtensionsPlayableP5X.js'];
 const baseURL = development ? '/' : '/smartdown/';
 
@@ -122,46 +116,9 @@ var config = {
       'gifffer': giffferJS,
       'stacktraceJS': stacktraceJS,
       'esprima$': path.join(__dirname, 'NOP.js'),
-      '@stdlib': stdlibRoot,
-      'stdlib': stdlibRoot,
-      'stdlib$': stdlibTreeRoot,
-      'stdlibSOTU': path.join(stdlibDeepRoot, 'datasets/sotu/lib/browser_db.js?FooBar'),
-      // '@stdlib': stdlibRoot,
-      // 'stdlib': stdlibRoot,
-      // '@stdlib/array': path.join(stdlibDeepRoot, 'array'),
-      // '@stdlib/assert': path.join(stdlibDeepRoot, 'assert'),
-      // '@stdlib/bench': path.join(stdlibDeepRoot, 'bench'),
-      // '@stdlib/blas': path.join(stdlibDeepRoot, 'blas'),
-      // '@stdlib/buffer': path.join(stdlibDeepRoot, 'buffer'),
-      // '@stdlib/constants': path.join(stdlibDeepRoot, 'constants'),
-      // '@stdlib/complex': path.join(stdlibDeepRoot, 'complex'),
-      // '@stdlib/crypto': path.join(stdlibDeepRoot, 'crypto'),
-      'stdlibDatasets': path.join(stdlibDeepRoot, 'datasets'),
-      // '@stdlib/error': path.join(stdlibDeepRoot, 'error'),
-      // '@stdlib/fastmath': path.join(stdlibDeepRoot, 'fastmath'),
-      // '@stdlib/fs': path.join(stdlibDeepRoot, 'fs'),
-      // '@stdlib/math': path.join(stdlibDeepRoot, 'math'),
-      // '@stdlib/ml': path.join(stdlibDeepRoot, 'ml'),
-      // '@stdlib/namespace': path.join(stdlibDeepRoot, 'namespace'),
-      // '@stdlib/ndarray': path.join(stdlibDeepRoot, 'ndarray'),
-      // '@stdlib/net': path.join(stdlibDeepRoot, 'net'),
-      // '@stdlib/nlp': path.join(stdlibDeepRoot, 'nlp'),
-      // '@stdlib/number': path.join(stdlibDeepRoot, 'number'),
-      // '@stdlib/os': path.join(stdlibDeepRoot, 'os'),
-      // '@stdlib/package.json': path.join(stdlibDeepRoot, 'package.json'),
-      // '@stdlib/plot': path.join(stdlibDeepRoot, 'plot'),
-      // '@stdlib/random': path.join(stdlibDeepRoot, 'random'),
-      // '@stdlib/regexp': path.join(stdlibDeepRoot, 'regexp'),
-      // '@stdlib/repl': path.join(stdlibDeepRoot, 'repl'),
-      // '@stdlib/stats': path.join(stdlibDeepRoot, 'stats'),
-      // '@stdlib/streams': path.join(stdlibDeepRoot, 'streams'),
-      // '@stdlib/string': path.join(stdlibDeepRoot, 'string'),
-      // '@stdlib/time': path.join(stdlibDeepRoot, 'time'),
-      // '@stdlib/tools': path.join(stdlibDeepRoot, 'tools'),
-      // '@stdlib/utils': path.join(stdlibDeepRoot, 'utils'),
+
       topojson$: topojsonJS,
       emojiJS$: emojiJS,
-      // mermaidJS$: mermaidJS,
       p5JS$: p5JS,
       p5$: p5JS,
       'rx$': 'rx/dist/rx.all.js'
@@ -202,11 +159,8 @@ var config = {
       useGraphviz: useGraphviz,
       useBrython: useBrython,
       useGifffer: useGifffer,
-      useTypeScript: useTypeScript,
       useP5JS: useP5JS,
-      useMermaid: useMermaid,
       useMathJax: useMathJax,
-      useStdlib: useStdlib,
     }),
 
     new CopyWebpackPlugin([
@@ -226,6 +180,10 @@ var config = {
         { from: path.join(webcomponentsJS, 'webcomponents-loader.js') },
         { from: path.join(webcomponentsJS, 'bundles/'), to: './bundles/' },
         { from: vizJS },
+        { from: path.join(stdlibRoot, 'stdlib/dist/stdlib-tree.min.js') },
+        { from: path.join(stdlibRoot, 'stdlib/dist/stdlib-datasets-tree-exclude.min.js') },
+        { from: path.join(stdlibRoot, 'stdlib/dist/stdlib-datasets-sotu.min.js') },
+
         { from: vizLiteJS },
         { from: path.join(app, 'external/ldf-client-browser.js') },
         { from: abcJS },
@@ -279,17 +237,9 @@ var config = {
           { source: outputPath + 'smartdown.js.map', destination: outputPath + '../gist/' },
           { source: outputPath + 'smartdown.css.map', destination: outputPath + '../gist/' },
 
-          { source: outputPath + 'smartdown_stdlib.js', destination: outputPath + '../gist/' },
-          { source: outputPath + 'smartdown_vendors~stdlib.js', destination: outputPath + '../gist/' },
-          { source: outputPath + 'smartdown_vendors~stdlib-sotu.js', destination: outputPath + '../gist/' },
           { source: outputPath + 'smartdown_vendors~p5Sound.js', destination: outputPath + '../gist/' },
 
-          { source: outputPath + 'smartdown_stdlib.js.map', destination: outputPath + '../gist/' },
-          { source: outputPath + 'smartdown_vendors~stdlib.js.map', destination: outputPath + '../gist/' },
-          { source: outputPath + 'smartdown_vendors~stdlib-sotu.js.map', destination: outputPath + '../gist/' },
-          // { source: outputPath + 'smartdown_p5DOM.js.map', destination: outputPath + '../gist/' },
           { source: outputPath + 'smartdown_vendors~p5Sound.js.map', destination: outputPath + '../gist/' },
-          // { source: outputPath + 'smartdown_vendors~p5DOM~p5Sound~p5js.js.map', destination: outputPath + '../gist/' },
         ]
       }
     })
@@ -299,7 +249,6 @@ var config = {
     noParse: [
       /node_modules\/localforage\/dist\/localforage.js/,
       new RegExp('emojiJS'),
-      new RegExp('mermaidJS'),
       new RegExp(p5JS),
       new RegExp('p5JS'),
       // new RegExp(vizJS),
