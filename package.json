@@ -1,6 +1,6 @@
 {
   "name": "smartdown",
-  "version": "1.0.24",
+  "version": "1.0.25",
   "description": "A library for translating, rendering and interacting with Smartdown documents. Smartdown is an extension of Markdown that provides richer media support and reactive programming capability.",
   "main": "dist/lib/smartdown.js",
   "scripts": {
@@ -49,8 +49,8 @@
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
     "@babel/plugin-transform-modules-umd": "^7.2.0",
     "@babel/preset-env": "^7.6.3",
-    "@typescript-eslint/eslint-plugin": "^2.6.0",
-    "@typescript-eslint/parser": "^2.6.0",
+    "@typescript-eslint/eslint-plugin": "^2.6.1",
+    "@typescript-eslint/parser": "^2.6.1",
     "ajv": "^6.10.2",
     "autoprefixer": "^9.7.1",
     "babel-eslint": "^10.0.3",
@@ -110,7 +110,7 @@
     "lodash": "^4.17.15",
     "marked": "^0.7.0",
     "p5": "^0.10.2",
-    "smartdown-gallery": "0.0.51",
+    "smartdown-gallery": "0.0.52",
     "stacktrace-js": "^2.0.1",
     "vdom-to-html": "^2.3.1",
     "viz.js": "^2.1.2"

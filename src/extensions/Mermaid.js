@@ -2,9 +2,21 @@ import {registerExtension} from 'extensions';
 
 /* global window */
 
-export var Mermaid = {
+const Mermaid = {
   mermaid: null,
   mermaidRender: null
+};
+
+Mermaid.register = function register() {
+  registerExtension(
+    'mermaid',
+    [
+      'https://unpkg.com/mermaid@7.1.2/dist/mermaid.min.js',
+      function() {
+        console.log('mermaid loaded');
+        initializeMermaid();
+      }
+    ]);
 };
 
 function fixupMermaidSVG(svgCode) {
@@ -129,14 +141,4 @@ function initializeMermaid() {
   Mermaid.mermaid.initialize(config);
 }
 
-export function registerMermaid() {
-  registerExtension(
-    'mermaid',
-    [
-      'https://unpkg.com/mermaid@7.1.2/dist/mermaid.min.js',
-      function() {
-        console.log('mermaid loaded');
-        initializeMermaid();
-      }
-    ]);
-}
+export default Mermaid;

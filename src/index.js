@@ -54,8 +54,8 @@ import registerPlotly from './extensions/Plotly';
 import registerOpenJSCAD from './extensions/OpenJSCAD';
 import registerLeaflet from './extensions/Leaflet';
 import registerTypeScript from './extensions/TypeScript';
-import {registerMermaid, Mermaid} from './extensions/Mermaid';
-import {registerStdlib, Stdlib} from './extensions/Stdlib';
+import Mermaid from './extensions/Mermaid';
+import Stdlib from './extensions/Stdlib';
 
 const Brython = require('./extensions/Brython');
 const graphvizImages = require('./extensions/Graphviz');
@@ -244,8 +244,8 @@ function registerDefaultExtensions() {
   registerLeaflet();
   registerOpenJSCAD();
   registerTypeScript();
-  registerMermaid();
-  registerStdlib();
+  Mermaid.register();
+  Stdlib.register();
 }
 
 registerDefaultExtensions();
@@ -622,7 +622,6 @@ function renderCodeInternal(renderDivId, code, language, prelude) {
   var playable = languageOpts.indexOf('playable') >= 0;
   var autoplay = languageOpts.indexOf('autoplay') >= 0;
   var debug = languageOpts.indexOf('debug') >= 0;
-  var konsole = languageOpts.indexOf('console') >= 0;
   var kiosk = languageOpts.indexOf('kiosk') >= 0;
   var inline = languageOpts.indexOf('inline') >= 0;
   var center = languageOpts.indexOf('center') >= 0;
@@ -707,7 +706,6 @@ ${transformedCode}
     var highlightedCode = hljs.highlightAuto(code, [highlightLanguage]).value;
     var highlightedAugmentedCode = hljs.highlightAuto(registeredPlayable.augmentedCode, ['javascript']).value;
     var debugIsHidden = debug ? '' : 'hidden';
-    var consoleIsHidden = konsole ? '' : 'hidden';
 
     var kioskClass = kiosk ? 'smartdown-playable-kiosk' : '';
     var kioskToggle = !kiosk ? '' :
@@ -842,7 +840,7 @@ ${highlightedAugmentedCode}
   id="${consoleToggleId}"
   href="#"
   onclick="smartdown.toggleConsole('${consoleId}')"
-  ${consoleIsHidden}
+  hidden
   class="playable-console-button">
   Console
 </button>
@@ -1994,7 +1992,7 @@ let result = window.ts.transpileModule(playable.code, {
 
 if (result.diagnostics.length > 0) {
   result.diagnostics.forEach(d => {
-    smartdown.consoleWrite(playable.consoleId, '# ' + d.messageText);
+    this.log('# ' + d.messageText);
   });
 }
 
@@ -2005,7 +2003,7 @@ try {
   const embedResult = func.apply(this, argvalues);
 }
 catch (e) {
-  smartdown.consoleWrite(playable.consoleId, ['#### Error playing augmented TypeScript', e].join(' '));
+  this.log(playable, ['#### Error playing augmented TypeScript', e].join(' '));
 }
 `;
 
@@ -2366,7 +2364,7 @@ function playPlayableInternal(language, divId) {
       window.Leaflet,
       window.Stdlib,
       window.THREE,
-      module.exports,
+      module.exports, // smartdown
       {}    // This will be a p5 obj in the case of using P5.Loader
     ];
     playable.embedThis = {
@@ -2375,6 +2373,9 @@ function playPlayableInternal(language, divId) {
       progress: progress,
       dependOn: [],
       depend: null,
+      log: function(msg) {
+        smartdown.consoleWrite(playable, msg);
+      },
       atExitHandlers: [],
       atExit: function(func) {
         // console.log('atExit', func, this);
@@ -2393,7 +2394,7 @@ function playPlayableInternal(language, divId) {
         }
       }
       catch (e) {
-        smartdown.consoleWrite(playable.consoleId, ['#### Error playing ', language, e].join(' '));
+        playable.embedThis.log(['#### Error playing ', language, e].join(' '));
         div.innerHTML =
 `
 <pre><code style="color:tomato;">
@@ -2798,13 +2799,17 @@ function toggleConsole(divId) {
 }
 
 
-function consoleWrite(divId, msg) {
-  const formatted = `#SD[${divId}] ${msg}`;
+function consoleWrite(playable, msg) {
+  const formatted = `#SD[${playable.divId}] ${msg}`;
   console.log(formatted);
-  var div = document.getElementById(divId);
+  const div = document.getElementById(playable.consoleId);
   if (div) {
     div.style.display = 'block';
     div.innerText = div.innerText + formatted + '\n';
+  }
+  const toggle = document.getElementById(playable.consoleToggleId);
+  if (toggle) {
+    toggle.style.display = 'block';
   }
 }
 
@@ -4845,7 +4850,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.24',
+  version: '1.0.25',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,
