@@ -183,7 +183,6 @@
 
 .smartdown-container a {
   font-size: 1.05em;
-  color: #639ad7;
   color: #337ab7;
   text-decoration: none;
   word-break: break-all;
@@ -192,7 +191,6 @@
 
 .smartdown-container a:hover,
 .smartdown-container a:focus {
-  color: #5382ac;
   color: #23527c;
   text-decoration: underline;
 }
@@ -1689,6 +1687,16 @@ img.media-image path {
 
 .smartdown-outer-container.smartdown-theme-dark {
   background: #2E2E2E;
+
+  .smartdown-container pre.playable-console {
+    background: inherit;
+  }
+
+  .smartdown-container a:hover,
+  .smartdown-container a:focus {
+    color: #539ad7;
+  }
+
 }
 
 .smartdown-outer-container.smartdown-theme-dark .smartdown-container .infocell-output,

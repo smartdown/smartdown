@@ -1,6 +1,6 @@
 {
   "name": "smartdown",
-  "version": "1.0.25",
+  "version": "1.0.26",
   "description": "A library for translating, rendering and interacting with Smartdown documents. Smartdown is an extension of Markdown that provides richer media support and reactive programming capability.",
   "main": "dist/lib/smartdown.js",
   "scripts": {
@@ -45,10 +45,10 @@
   },
   "homepage": "https://github.com/smartdown/smartdown#readme",
   "devDependencies": {
-    "@babel/core": "^7.6.4",
+    "@babel/core": "7.6.4",
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
-    "@babel/plugin-transform-modules-umd": "^7.2.0",
-    "@babel/preset-env": "^7.6.3",
+    "@babel/plugin-transform-modules-umd": "7.2.0",
+    "@babel/preset-env": "7.6.3",
     "@typescript-eslint/eslint-plugin": "^2.6.1",
     "@typescript-eslint/parser": "^2.6.1",
     "ajv": "^6.10.2",
@@ -56,7 +56,7 @@
     "babel-eslint": "^10.0.3",
     "babel-loader": "^8.0.6",
     "chromedriver": "^78.0.1",
-    "copy-webpack-plugin": "^5.0.4",
+    "copy-webpack-plugin": "^5.0.5",
     "css-loader": "3.2.0",
     "docma": "^3.2.2",
     "eslint": "^6.6.0",
@@ -83,7 +83,7 @@
     "source-map": "^0.7.3",
     "style-loader": "^1.0.0",
     "ts-loader": "^6.2.1",
-    "typescript": "^3.6.4",
+    "typescript": "^3.7.2",
     "uglifyjs-webpack-plugin": "^2.2.0",
     "web-audio-mock-api": "^1.0.0",
     "webpack": "^4.41.2",
@@ -110,7 +110,7 @@
     "lodash": "^4.17.15",
     "marked": "^0.7.0",
     "p5": "^0.10.2",
-    "smartdown-gallery": "0.0.52",
+    "smartdown-gallery": "0.0.53",
     "stacktrace-js": "^2.0.1",
     "vdom-to-html": "^2.3.1",
     "viz.js": "^2.1.2"

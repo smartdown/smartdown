@@ -272,6 +272,7 @@ function starter(basePrefix) {
 
     var container = document.getElementById('smartdown-outer-container');
     if (container) {
+      container.classList.remove('smartdown-theme-blog');
       container.classList.remove('smartdown-theme-chat');
       container.classList.remove('smartdown-theme-dark');
 

@@ -1985,8 +1985,24 @@ eval(playable.transformedCode);
     else if (language === 'typescript') {
       augmentedCode =
 `// Augmented TypeScript Code to be transpiled.
-let result = window.ts.transpileModule(playable.code, {
-  compilerOptions: { module: window.ts.ModuleKind.CommonJS },
+
+const asyncWrapper =
+\`
+const outerThis = this;
+return (async function() {
+\${playable.code}
+}).call(outerThis);
+\`;
+
+let result = window.ts.transpileModule(
+  asyncWrapper,
+  {
+    compilerOptions: {
+      module: window.ts.ModuleKind.CommonJS,
+      target: 'es6',
+      allowJs: true,
+      checkJs: true,
+  },
   reportDiagnostics: true,
 });
 
@@ -1996,22 +2012,8 @@ if (result.diagnostics.length > 0) {
   });
 }
 
-var argvalues = [...arguments];
-
-try {
-  const func = new Function(${playableArgNamesQuoted}, result.outputText);
-  const embedResult = func.apply(this, argvalues);
-}
-catch (e) {
-  this.log(playable, ['#### Error playing augmented TypeScript', e].join(' '));
-}
+return smartdown.runFunction(result.outputText, this, [...arguments], 'typescript', this.div);
 `;
-
-      // console.log('INVOKE window.smartdownJSModules.typescript.loader');
-
-      // window.smartdownJSModules.typescript.loader(function () {
-      //   console.log('window.smartdownJSModules.typescript.loader', window.ts);
-      // });
     }
     else if (language === 'brython') {
       const brythonScriptId = scriptId + '_brython';
@@ -2285,6 +2287,17 @@ ${code}
 jscadViewer.setJsCad(diagramSource);
 `;
     }
+    else {
+      augmentedCode =
+`
+(async () => {
+
+  ${code}
+
+})();
+
+`;
+    }
   }
 
   perPageState.playablesRegistered[divId] = {
@@ -2321,6 +2334,29 @@ jscadViewer.setJsCad(diagramSource);
   return perPageState.playablesRegistered[divId];
 }
 
+function runFunction(code, embedThis, argValues, language, div) {
+  const func = new Function(...playableArgNames, code);
+  let embedResult = null;
+  try {
+    embedResult = func.apply(embedThis, argValues);
+  }
+  catch (e) {
+    embedThis.log(`# Error playing ${language} playable: ${e}`);
+    if (div) {
+      div.innerHTML =
+`
+<pre><code style="color:maroon;">
+<b>Error Playing ${language} playable</b>
+<hr>
+${e}
+</code></pre>
+`;
+    };
+  }
+
+  return embedResult;
+}
+
 
 function playPlayableInternal(language, divId) {
   // console.log('playPlayableInternal', divId);
@@ -2352,7 +2388,7 @@ function playPlayableInternal(language, divId) {
   var playableType = playableTypes[language];
   if (playableType.javascript) {
     /* eslint no-new-func: 0 */
-    var argvalues = [
+    var argValues = [
       playable,
       smartdownVariables,
       P5.Loader,
@@ -2384,73 +2420,12 @@ function playPlayableInternal(language, divId) {
     };
 
     if (language.toLowerCase() !== 'p5js') {
-      const func = new Function(...playableArgNames, script.text);
-      try {
-        const embedResult = func.apply(playable.embedThis, argvalues);
-        if (language === 'leaflet') {
-          if (!playable.embedThis.leafletMap) {
-            playable.embedThis.leafletMap = embedResult;
-          }
-        }
-      }
-      catch (e) {
-        playable.embedThis.log(['#### Error playing ', language, e].join(' '));
-        div.innerHTML =
-`
-<pre><code style="color:tomato;">
-<b>Error Initializing ${language}</b>
-${e}
-</code></pre>
-`;
+      const embedResult = smartdown.runFunction(playable.augmentedCode, playable.embedThis, argValues, language, div);
+      if (language === 'leaflet' && !playable.embedThis.leafletMap) {
+        playable.embedThis.leafletMap = embedResult;
       }
     }
     else {
-      // if (playable.language === 'P5JS') {
-      //   playable.augmentedCode =
-      //     `
-      //     // Augmented P5JS script to support Global Mode emulation.
-      //     // function(${playableArgNames.join(', ')})
-      //     p5.TriOsc = P5.TriOsc;
-      //     p5.FFT = P5.FFT;
-      //     p5.Vector = P5.Vector;
-
-      //     //P5.SystemVarDecls
-      //     ${P5.SystemVarDecls}
-
-      //     //P5.VarDefs
-      //     ${P5.VarDefs}
-
-      //     // -----------------
-      //     // Begin User Script
-      //     ${playable.code}
-      //     // End User Script
-      //     // -----------------
-
-      //     //P5.UserFunctionDefs
-      //     ${P5.UserFunctionDefs}
-      //     `;
-      // }
-      // else {
-      //   playable.augmentedCode =
-      //     `
-      //     // Augmented P5JS script
-      //     // function(${playableArgNames.join(', ')})
-
-      //     p5.TriOsc = P5.TriOsc;
-      //     p5.FFT = P5.FFT;
-      //     p5.Vector = P5.Vector;
-
-      //     // -----------------
-      //     // Begin User Script
-      //     ${playable.code}
-      //     // End User Script
-      //     // -----------------
-      //     `;
-      // }
-
-      // divDbg.innerHTML = playable.augmentedCode;
-      let func = new Function(...playableArgNames, playable.augmentedCode);
-
       /* xeslint no-eval: 0 */
 
       /* eslint no-inner-declarations: 0 */
@@ -2510,10 +2485,11 @@ ${e}
         }
       };
 
+      let func = new Function(...playableArgNames, playable.augmentedCode);
       playable.embedThis.IAMP5 = 'IAMP5';
       func = func.bind(
         playable.embedThis,
-        ...(argvalues.slice(0, -1))
+        ...(argValues.slice(0, -1))
       );
 
       try {
@@ -2800,6 +2776,9 @@ function toggleConsole(divId) {
 
 
 function consoleWrite(playable, msg) {
+  if (typeof msg === 'object') {
+    msg = JSON.stringify(msg, null, 2);
+  }
   const formatted = `#SD[${playable.divId}] ${msg}`;
   console.log(formatted);
   const div = document.getElementById(playable.consoleId);
@@ -4850,7 +4829,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.25',
+  version: '1.0.26',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,
@@ -4859,6 +4838,7 @@ module.exports = {
   openJSCAD: {},
   fileSaver: fileSaver,
   vdomToHtml: vdomToHtml,
+  runFunction: runFunction,
 };
 
 window.smartdown = module.exports;
