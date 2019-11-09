@@ -235,6 +235,22 @@ function starter(basePrefix) {
     }
   }
 
+
+  function updateTheme(themeName) {
+    var container = document.getElementById('smartdown-outer-container');
+    if (container) {
+      if (themeName !== '') {
+        [...container.classList].forEach(c => {
+          if (c.indexOf('smartdown-theme-') === 0) {
+            // console.log('updateTheme: Removing class ', c);
+            container.classList.remove(c);
+          }
+        });
+        container.classList.add(`smartdown-theme-${themeName}`);
+      }
+    }
+  }
+
   function loadHome(baseHash) {
     var hash = window.location.hash;
     if (baseHash) {
@@ -270,16 +286,7 @@ function starter(basePrefix) {
       }
     }
 
-    var container = document.getElementById('smartdown-outer-container');
-    if (container) {
-      container.classList.remove('smartdown-theme-blog');
-      container.classList.remove('smartdown-theme-chat');
-      container.classList.remove('smartdown-theme-dark');
-
-      if (themeName !== '') {
-        container.classList.add('smartdown-theme-' + themeName);
-      }
-    }
+    updateTheme(themeName);
 
     if (hash === '') {
       hash = defaultHome;
@@ -394,15 +401,7 @@ function starter(basePrefix) {
         console.log('hashchange themeName', themeName);
       }
 
-      var container = document.getElementById('smartdown-outer-container');
-      if (container) {
-        container.classList.remove('smartdown-theme-chat');
-        container.classList.remove('smartdown-theme-dark');
-
-        if (themeName !== '') {
-          container.classList.add('smartdown-theme-' + themeName);
-        }
-      }
+      updateTheme(themeName);
     }
 
     if (inhibitHash === hash) {
