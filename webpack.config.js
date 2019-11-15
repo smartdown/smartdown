@@ -51,7 +51,6 @@ var useOlderBrowsers = false;
 var useFileSaver = true && !test;
 var useLocalForage = true && !test;
 var useLeaflet = true && !test;
-var useGraphviz = !useOlderBrowsers && !test;
 var useBrython = true && !test;
 var useGifffer = true && !test;
 var useP5JS = true && !test;
@@ -66,7 +65,14 @@ var galleryIgnores = [
   'package.json',
   'index.html',
   'AAADebug.md',
-  'ExtensionsPlayableP5X.js'];
+  'CrosswordBackup.md',
+  'DBpedia.md',
+  'ExtensionsPlayableP5X.js',
+  'LDFPic.md',
+  'MusicTest.md',
+  'Wikidata.md',
+  'resources/crystal2.mid',
+  'resources/crystal2.ogg'];
 const baseURL = development ? '/' : '/smartdown/';
 
 var config = {
@@ -156,7 +162,6 @@ var config = {
       useFileSaver: useFileSaver,
       useLocalForage: useLocalForage,
       useLeaflet: useLeaflet,
-      useGraphviz: useGraphviz,
       useBrython: useBrython,
       useGifffer: useGifffer,
       useP5JS: useP5JS,

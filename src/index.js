@@ -10,7 +10,6 @@
 
 /* global useFileSaver */
 /* global useLocalForage */
-/* global useGraphviz */
 /* global useBrython */
 /* global useGifffer */
 /* global useP5JS */
@@ -623,6 +622,7 @@ function renderCodeInternal(renderDivId, code, language, prelude) {
   var autoplay = languageOpts.indexOf('autoplay') >= 0;
   var debug = languageOpts.indexOf('debug') >= 0;
   var kiosk = languageOpts.indexOf('kiosk') >= 0;
+  var kioskable = languageOpts.indexOf('kioskable') >= 0;
   var inline = languageOpts.indexOf('inline') >= 0;
   var center = languageOpts.indexOf('center') >= 0;
   var targetDivId = null;
@@ -708,7 +708,7 @@ ${transformedCode}
     var debugIsHidden = debug ? '' : 'hidden';
 
     var kioskClass = kiosk ? 'smartdown-playable-kiosk' : '';
-    var kioskToggle = !kiosk ? '' :
+    var kioskToggle = !(kiosk || kioskable) ? '' :
 `
   <button type="button"
     href="#"
@@ -1220,7 +1220,6 @@ function renderImage(href, title, text) {
       if (specialClass) {
         out += ' class="' + specialClass + '"';
       }
-      out += this.options.xhtml ? '/>' : '';
     }
     if (title) {
       out += ' title="' + title + '"';
@@ -1299,7 +1298,7 @@ function renderImage(href, title, text) {
       if (specialClass) {
         out += ' class="' + specialClass + '"';
       }
-      out += this.options.xhtml ? '/>' : '';
+      out += this.options.xhtml ? '/>' : '>';
     }
   }
 
@@ -1559,7 +1558,7 @@ function renderLink(href, title, text) {
 `<button
   class="btn-infocell btn-infocell-calc"
   onclick="smartdown.computeStoredExpression('${expr.exprId}')">
-  <span id="${expr.labelId}">${expr.labelText}</span>
+  <span id="${expr.labelId}">${decodeURIComponent(expr.labelText)}</span>
 </button>`;
       }
       else {
@@ -4829,7 +4828,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.27',
+  version: '1.0.28',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,
@@ -4839,6 +4838,10 @@ module.exports = {
   fileSaver: fileSaver,
   vdomToHtml: vdomToHtml,
   runFunction: runFunction,
+  // isExtensionRegistered: isExtensionRegistered,
+  loadExternal: loadExternal,
+  // registerExtension: registerExtension,
+  ensureExtension: ensureExtension,
 };
 
 window.smartdown = module.exports;

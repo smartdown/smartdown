@@ -4,7 +4,7 @@ export default function registerTypeScript() {
   registerExtension(
     'typescript',
     [
-      'https://cdn.jsdelivr.net/npm/typescript@3.6.4/lib/typescript.min.js',
+      'https://cdn.jsdelivr.net/npm/typescript/lib/typescript.min.js',
     ]);
 }
 

@@ -105,8 +105,9 @@ function starter(basePrefix) {
       inhibitHash = '#' + cardURL;
       // console.log('inhibitHash', inhibitHash);
     }
-    if (inhibitHash !== window.location.hash) {
-      // console.log('inhibitHash', inhibitHash, window.location.hash);
+    // if (inhibitHash !== window.location.hash) {
+    if (window.location.hash.indexOf(inhibitHash) !== 0) {
+      console.log('inhibitHash', inhibitHash, window.location.hash);
       window.location.hash = inhibitHash;
     }
     if (themeName !== '') {
@@ -398,10 +399,8 @@ function starter(basePrefix) {
       hash = hash.slice(0, argsPos);
       if (args.indexOf('theme=') === 0) {
         themeName = args.slice('theme='.length);
-        console.log('hashchange themeName', themeName);
+        updateTheme(themeName);
       }
-
-      updateTheme(themeName);
     }
 
     if (inhibitHash === hash) {

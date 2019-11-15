@@ -168,7 +168,7 @@ function calcTSV(key, body, done) {
     }
   }
   else {
-    window.smartdownJSModules.d3.loader(function() {
+    smartdown.ensureExtension('d3', function() {
       calcTSV(key, translatedURL, done);
     });
   }
@@ -217,7 +217,7 @@ function calcCSV(key, body, done) {
     }
   }
   else {
-    window.smartdownJSModules.d3.loader(function() {
+    smartdown.ensureExtension('d3', function() {
       calcCSV(key, translatedURL, done);
     });
   }

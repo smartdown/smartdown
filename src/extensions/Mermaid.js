@@ -11,7 +11,7 @@ Mermaid.register = function register() {
   registerExtension(
     'mermaid',
     [
-      'https://unpkg.com/mermaid@7.1.2/dist/mermaid.min.js',
+      'https://unpkg.com/mermaid/dist/mermaid.min.js',
       function() {
         console.log('mermaid loaded');
         initializeMermaid();

@@ -6,8 +6,8 @@ export default function registerLeaflet() {
   registerExtension(
     'leaflet',
     [
-      'https://unpkg.com/leaflet@1.5.1/dist/leaflet.js',
-      'https://unpkg.com/leaflet@1.5.1/dist/leaflet.css',
+      'https://unpkg.com/leaflet/dist/leaflet.js',
+      'https://unpkg.com/leaflet/dist/leaflet.css',
       function() {
         console.log('leaflet', window.Leaflet, window.L);
         window.Leaflet = window.L;

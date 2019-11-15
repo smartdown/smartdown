@@ -82,10 +82,6 @@ function loadResourceList(thisModule: any) {
     if (typeof resource === 'string') {
       let url: string = resource;
 
-      if (url.indexOf('http') !== 0) {  // Should be a regex.. FIXME
-        url = window.smartdown.baseURL + url;
-      }
-
       if (url.endsWith('.css')) {
         importCssUrl(
           url,
@@ -155,42 +151,65 @@ export function ensureExtension(name: string, loaded: () => void): void {
  *
  */
 
-export function loadExternal(external: string, loaded: () => void): void {
-  // console.log('loadExternal...', external);
-  if (!window.smartdownJSModules[external]) {
-    window.smartdownJSModules[external] = {
+export function loadExternal(url: string, loaded: () => void): void {
+  // console.log('loadExternal...', url);
+
+  if (!window.smartdownJSModules[url]) {
+    window.smartdownJSModules[url] = {
       loader: function(): void {
-        console.log('why you callin loadExternal', external);
+        console.log('why you callin loadExternal', url);
       },
       loaded: null,
       loadedCallbacks: []
     };
   }
 
-  if (window.smartdownJSModules[external].loaded) {
+  if (window.smartdownJSModules[url].loaded) {
     loaded();
   }
-  else if (window.smartdownJSModules[external].loadedCallbacks.length > 0) {
-    window.smartdownJSModules[external].loadedCallbacks.push(loaded);
-    // console.log('loadExternal...External is still loading', external);
+  else if (window.smartdownJSModules[url].loadedCallbacks.length > 0) {
+    window.smartdownJSModules[url].loadedCallbacks.push(loaded);
+    // console.log('loadExternal...External is still loading', url);
   }
   else {
-    window.smartdownJSModules[external].loadedCallbacks.push(loaded);
-    // console.log('loadExternal...External initiate load', external);
+    window.smartdownJSModules[url].loadedCallbacks.push(loaded);
+    // console.log('loadExternal...External initiate load', url);
 
-    importScriptUrl(
-      external,
-      function() {
-        // console.log('loadExternal...load complete', external);
-        const callThese = window.smartdownJSModules[external].loadedCallbacks;
-        window.smartdownJSModules[external].loaded = true;
-        window.smartdownJSModules[external].loadedCallbacks = [];
-        callThese.forEach((loadedCb: Function) => {
-          loadedCb();
+    if (url.endsWith('.css')) {
+      importCssUrl(
+        url,
+        function() {
+          console.log('loadExternal...load CSS complete', url);
+          const callThese = window.smartdownJSModules[url].loadedCallbacks;
+          window.smartdownJSModules[url].loaded = true;
+          window.smartdownJSModules[url].loadedCallbacks = [];
+          callThese.forEach((loadedCb: Function) => {
+            loadedCb();
+          });
+        },
+        function(error: string): void {
+          console.log('loadExternal...load error', error, url);
         });
-      },
-      function(error: string): void {
-        console.log('loadExternal...load error', error);
-      });
+    }
+    else if (url.endsWith('.js')) {
+      importScriptUrl(
+        url,
+        function() {
+          console.log('loadExternal...load Script complete', url);
+          const callThese = window.smartdownJSModules[url].loadedCallbacks;
+          window.smartdownJSModules[url].loaded = true;
+          window.smartdownJSModules[url].loadedCallbacks = [];
+          callThese.forEach((loadedCb: Function) => {
+            loadedCb();
+          });
+        },
+        function(error: string): void {
+          console.log('loadExternal...load error', error, url);
+        });
+    }
+    else {
+      console.log('loadExternal...unknown extension type: ', url);
+    }
+
   }
 }
