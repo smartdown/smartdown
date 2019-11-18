@@ -845,12 +845,9 @@ ${highlightedAugmentedCode}
   Console
 </button>
 
-<pre
-  id="${consoleId}"
-  class="playable-console">
-  <code>
-  </code>
-</pre>
+<div
+   id="${consoleId}"
+   class="playable-console"><pre id="${consoleId}-pre"></pre></div>
 `;
 
       return playableScript + playableCodeDisplay;
@@ -2333,11 +2330,11 @@ jscadViewer.setJsCad(diagramSource);
   return perPageState.playablesRegistered[divId];
 }
 
-function runFunction(code, embedThis, argValues, language, div) {
+async function runFunction(code, embedThis, argValues, language, div) {
   const func = new Function(...playableArgNames, code);
   let embedResult = null;
   try {
-    embedResult = func.apply(embedThis, argValues);
+    embedResult = await func.apply(embedThis, argValues);
   }
   catch (e) {
     embedThis.log(`# Error playing ${language} playable: ${e}`);
@@ -2357,7 +2354,7 @@ ${e}
 }
 
 
-function playPlayableInternal(language, divId) {
+async function playPlayableInternal(language, divId) {
   // console.log('playPlayableInternal', divId);
 
   var playable = perPageState.playablesRegistered[divId];
@@ -2406,10 +2403,10 @@ function playPlayableInternal(language, divId) {
       env: smartdownVariables,
       div: div,
       progress: progress,
-      dependOn: [],
+      dependOn: {},
       depend: null,
-      log: function(msg) {
-        smartdown.consoleWrite(playable, msg);
+      log: function(...args) {
+        smartdown.consoleWrite(playable, args);
       },
       atExitHandlers: [],
       atExit: function(func) {
@@ -2419,7 +2416,7 @@ function playPlayableInternal(language, divId) {
     };
 
     if (language.toLowerCase() !== 'p5js') {
-      const embedResult = smartdown.runFunction(playable.augmentedCode, playable.embedThis, argValues, language, div);
+      const embedResult = await smartdown.runFunction(playable.augmentedCode, playable.embedThis, argValues, language, div);
       if (language === 'leaflet' && !playable.embedThis.leafletMap) {
         playable.embedThis.leafletMap = embedResult;
       }
@@ -2532,37 +2529,51 @@ ${e}
 
     if (playable && playable.playing) {
       const { depend, dependOn } = playable.embedThis;
-      const lastValues = playable.dependLastValues;
-      const possiblyModifiedProgressDiv = playable.embedThis.progress;
+      const progress = playable.embedThis.progress;
+      let atLeastOneDefined = false;
 
-      if (depend) {
-        let signal = false;
-        if (dependOn) {
+      if (Array.isArray(dependOn)) {
+        // Legacy mode with a single .depend() method
+        if (!depend) {
+          atLeastOneDefined = true; // To drop the progress bar
+        }
+        else {
           let atLeastOneUndefined = false;
           dependOn.forEach(varname => {
-            // console.log('...varname', varname, lastValues[varname]);
-
             const newValue = smartdownVariables[varname];
             if (newValue === undefined) {
               atLeastOneUndefined = true;
             }
-            lastValues[varname] = newValue;
+            playable.dependLastValues[varname] = newValue;
           });
-          signal = !atLeastOneUndefined;
-        }
-        else {
-          signal = true;
-        }
 
-        if (signal) {
-          if (possiblyModifiedProgressDiv) {
-            possiblyModifiedProgressDiv.style.display = 'none';
+          if (!atLeastOneUndefined) {
+            await depend.apply(playable.embedThis);
           }
-          depend.apply(playable.embedThis);
         }
       }
-      else if (possiblyModifiedProgressDiv) {
-        possiblyModifiedProgressDiv.style.display = 'none';
+      else if (dependOn) {
+        let atLeastOneEvaluated = false;
+        for (const varname in dependOn) {
+          atLeastOneEvaluated = true;
+          const newValue = smartdownVariables[varname];
+          playable.dependLastValues[varname] = newValue;
+
+          if (newValue !== undefined) {
+            atLeastOneDefined = true;
+            dependOn[varname].apply(playable.embedThis);
+          }
+        }
+
+        if (!atLeastOneEvaluated) {
+          atLeastOneDefined = true; // To drop the progress bar
+        }
+      }
+
+      if (atLeastOneDefined) {
+        if (progress) {
+          progress.style.display = 'none';
+        }
       }
     }
   }
@@ -2774,16 +2785,22 @@ function toggleConsole(divId) {
 }
 
 
-function consoleWrite(playable, msg) {
-  if (typeof msg === 'object') {
-    msg = JSON.stringify(msg, null, 2);
-  }
-  const formatted = `#SD[${playable.divId}] ${msg}`;
-  console.log(formatted);
+function consoleWrite(playable, args) {
+  let msg = '';
+  args.forEach((arg) => {
+    if (typeof arg === 'object') {
+      arg = JSON.stringify(arg, null, 2);
+    }
+    msg += arg + ' ';
+  });
+
+  console.log(`#${playable.divId}: ${msg}`);
   const div = document.getElementById(playable.consoleId);
   if (div) {
     div.style.display = 'block';
-    div.innerText = div.innerText + formatted + '\n';
+    const pre = document.getElementById(playable.consoleId + '-pre');
+    pre.innerText = pre.innerText + msg + '\n';
+    div.scrollTop = div.scrollHeight
   }
   const toggle = document.getElementById(playable.consoleToggleId);
   if (toggle) {
@@ -3949,7 +3966,7 @@ function propagateModel() {
 }
 
 
-function updateProcesses(id, newValue) {
+async function updateProcesses(id, newValue) {
   smartdown.computeExpressions();
 
   if (id) {
@@ -3971,45 +3988,61 @@ function updateProcesses(id, newValue) {
     });
   }
 
-  each(perPageState.playablesRegisteredOrder, function (playable) {
+  each(perPageState.playablesRegisteredOrder, async function (playable) {
     if (playable) {
       let progress = document.getElementById(playable.progressId);
 
       if (playable.playing) {
         const {depend, dependOn} = playable.embedThis;
         // console.log('.........playable', playable, dependOn, depend);
-        if (depend) {
-          let signal = false;
+        if (Array.isArray(dependOn)) {
+          if (depend) {
+            let signal = false;
 
-          if (dependOn) {
-            let atLeastOneUndefined = false;
-            dependOn.forEach(varname => {
-              const oldValue = playable.dependLastValues[varname];
-              const newValue = smartdownVariables[varname];
-              playable.dependLastValues[varname] = newValue;
-              if (newValue === undefined) {
-                atLeastOneUndefined = true;
+            if (dependOn) {
+              let atLeastOneUndefined = false;
+              dependOn.forEach(varname => {
+                const oldValue = playable.dependLastValues[varname];
+                const newValue = smartdownVariables[varname];
+                playable.dependLastValues[varname] = newValue;
+                if (newValue === undefined) {
+                  atLeastOneUndefined = true;
+                }
+
+                // console.log('............varname', varname, oldValue, newValue);
+
+                if (!areValuesSameEnough(varname, oldValue, newValue)) {
+                  signal = true;
+                }
+              });
+              if (atLeastOneUndefined) {
+                signal = false;
               }
+            }
+            else {
+              signal = true;
+            }
 
-              // console.log('............varname', varname, oldValue, newValue);
-
-              if (!areValuesSameEnough(varname, oldValue, newValue)) {
-                signal = true;
+            if (signal) {
+              if (progress) {
+                progress.style.display = 'none';
               }
-            });
-            if (atLeastOneUndefined) {
-              signal = false;
+              depend.apply(playable.embedThis);
             }
           }
-          else {
-            signal = true;
-          }
+        }
+        else if (dependOn) {
+          for (const varname in dependOn) {
+            const oldValue = playable.dependLastValues[varname];
+            const newValue = smartdownVariables[varname];
+            playable.dependLastValues[varname] = newValue;
 
-          if (signal) {
-            if (progress) {
-              progress.style.display = 'none';
+            if (!areValuesSameEnough(varname, oldValue, newValue)) {
+              if (progress) {
+                progress.style.display = 'none';
+              }
+              dependOn[varname].apply(playable.embedThis);
             }
-            depend.apply(playable.embedThis);
           }
         }
       }
@@ -4828,7 +4861,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.28',
+  version: '1.0.29',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,

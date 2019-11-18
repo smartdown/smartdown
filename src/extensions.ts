@@ -179,7 +179,6 @@ export function loadExternal(url: string, loaded: () => void): void {
       importCssUrl(
         url,
         function() {
-          console.log('loadExternal...load CSS complete', url);
           const callThese = window.smartdownJSModules[url].loadedCallbacks;
           window.smartdownJSModules[url].loaded = true;
           window.smartdownJSModules[url].loadedCallbacks = [];
@@ -195,7 +194,6 @@ export function loadExternal(url: string, loaded: () => void): void {
       importScriptUrl(
         url,
         function() {
-          console.log('loadExternal...load Script complete', url);
           const callThese = window.smartdownJSModules[url].loadedCallbacks;
           window.smartdownJSModules[url].loaded = true;
           window.smartdownJSModules[url].loadedCallbacks = [];

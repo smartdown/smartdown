@@ -64,7 +64,7 @@ var galleryIgnores = [
   'LICENSE',
   'package.json',
   'index.html',
-  'AAADebug.md',
+  // 'AAADebug.md',
   'CrosswordBackup.md',
   'DBpedia.md',
   'ExtensionsPlayableP5X.js',
@@ -290,14 +290,16 @@ var config = {
         use: {
           loader: 'babel-loader',
           options: {
+            babelrc: false,
             comments: true,
             cacheDirectory: false,
             presets: ['@babel/preset-env'],
             plugins: [
               '@babel/plugin-syntax-dynamic-import',
               '@babel/plugin-transform-modules-umd',
-              // '@babel/plugin-transform-block-scoping'
-            ]
+              // '@babel/plugin-transform-block-scoping',
+              "@babel/plugin-transform-runtime",
+            ],
           },
         },
       },

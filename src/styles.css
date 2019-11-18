@@ -292,6 +292,11 @@ smartdown-checkbox
   padding: 0;
   border: none;
 
+  &.smartdown-stdlib > svg {
+    margin: auto;
+    display: block;
+  }
+
   &:empty {
     height: 2px;
     background: transparent;
@@ -972,7 +977,7 @@ fieldset[disabled] .smartdown-container .btn-infocell.focus {
   display: inline-block;
   user-select: text;
   margin:0;
-  padding: 1px 4px;
+  padding: 1px 6px;
 }
 
 .smartdown-container .infocell-output.smartdown-svg {
@@ -1353,16 +1358,19 @@ img.media-image path {
   font-weight: 500;
 }
 
-.smartdown-container pre.playable-console {
+.smartdown-container div.playable-console {
+  resize: vertical;
+  height: 100px;
   display: none;
   border: 2px solid lightsteelblue;
   background: #F0F0F0;
-  padding: 5px 10px;
-  height: 100px;
   overflow-y: scroll;
-  resize: vertical;
-  font-size: 0.8em;
-  vertical-align: top;
+
+  > pre {
+    padding: 5px 10px;
+    font-size: 0.8em;
+    vertical-align: top;
+  }
 }
 
 .smartdown-container button.playable-button {
@@ -1688,8 +1696,9 @@ img.media-image path {
 .smartdown-outer-container.smartdown-theme-dark {
   background: #2E2E2E;
 
-  .smartdown-container pre.playable-console {
+  .smartdown-container div.playable-console {
     background: inherit;
+    color: lightgreen;
   }
 
   .smartdown-container a:hover,
@@ -1707,7 +1716,7 @@ img.media-image path {
 
 .smartdown-outer-container.smartdown-theme-dark .hljs,
 .smartdown-outer-container.smartdown-theme-dark .smartdown-container .hljs {
-  background: ghostwhite;
+  background: palegoldenrod;
   color: black;
 }
 
@@ -1731,13 +1740,13 @@ img.media-image path {
 
 .smartdown-theme-dark .smartdown-container pre > code.hljs,
 .smartdown-theme-dark .smartdown-container code.hljs-inline {
-  background: ghostwhite;
+  background: palegoldenrod;
   color: black;
 }
 
 
 .smartdown-theme-dark .smartdown-container .json-formatter-row {
-  background:lightgray;
+  background: lightgray;
 }
 
 
