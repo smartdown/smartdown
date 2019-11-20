@@ -64,7 +64,7 @@ var galleryIgnores = [
   'LICENSE',
   'package.json',
   'index.html',
-  // 'AAADebug.md',
+  'AAADebug.md',
   'CrosswordBackup.md',
   'DBpedia.md',
   'ExtensionsPlayableP5X.js',

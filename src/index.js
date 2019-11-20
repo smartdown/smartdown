@@ -2548,6 +2548,7 @@ ${e}
           });
 
           if (!atLeastOneUndefined) {
+            atLeastOneDefined = true;
             await depend.apply(playable.embedThis);
           }
         }
@@ -4861,7 +4862,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.29',
+  version: '1.0.30',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,

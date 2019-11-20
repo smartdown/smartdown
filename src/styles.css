@@ -1003,7 +1003,7 @@ fieldset[disabled] .smartdown-container .btn-infocell.focus {
 
 
 .smartdown-container .infocell-output-pre {
-  height: 40vh;
+  max-height: 40vh;
   display: block;
   border:1px solid lightgray;
   font-size: 0.9em;
