@@ -28,15 +28,15 @@ var themeName = '';
  * @example
  * // Use the smartdown/starter.js convenience wrapper to initialize smartdown.
  * // See smartdown/src/SimpleSiteExample/ for usage within an index.html.
- * <script src="lib/starter.js"></script>
+ * <script src="lib/starter.js">< /script>
  * <script>
  *   window.smartdownResourceURL = '';
  *   window.smartdownBaseURL = '/';
  *   window.smartdownStarter();
- * </script>
+ * < /script>
  */
 
-function starter(basePrefix) {
+function starter(basePrefix, doneHandler) {
   var defaultHome = 'Home';
   var baseURL = 'https://https://smartdown.github.io/smartdown/';
   var resourceURL = baseURL + 'lib/resources/';
@@ -45,6 +45,7 @@ function starter(basePrefix) {
   var gistHashPrefix = 'gist/';
   var outputDivSelector = '#smartdown-output';
   var postLoadMutator = null;
+  var adjustHash = true;
   var media = {
     cloud: '/gallery/resources/cloud.jpg',
     badge: '/gallery/resources/badge.svg',
@@ -85,6 +86,9 @@ function starter(basePrefix) {
   if (typeof smartdownPostLoadMutator === 'function') {
     postLoadMutator = smartdownPostLoadMutator;
   }
+  if (typeof smartdownAdjustHash === 'boolean') {
+    adjustHash = smartdownAdjustHash;
+  }
 
   if (typeof smartdownMedia === 'object') {
     media = Object.assign(media, smartdownMedia);
@@ -94,20 +98,20 @@ function starter(basePrefix) {
 
   /* Common code above between inline/blocks helpers */
 
-  function cardLoaded(sourceText, cardKey, cardURL) {
+  function cardLoaded(sourceText, cardKey, cardURL, outputDivId) {
     if (postLoadMutator) {
       sourceText = postLoadMutator(sourceText, cardKey, cardURL, defaultHome);
     }
     multiparts = smartdown.partitionMultipart(sourceText);
-    var output = document.querySelectorAll(outputDivSelector)[0];
+    var output = document.getElementById(outputDivId);
     inhibitHash = '#' + cardKey;
     if (lastLoadedRawPrefix !== rawPrefix) {
       inhibitHash = '#' + cardURL;
       // console.log('inhibitHash', inhibitHash);
     }
     // if (inhibitHash !== window.location.hash) {
-    if (window.location.hash.indexOf(inhibitHash) !== 0) {
-      console.log('inhibitHash', inhibitHash, window.location.hash);
+    if (adjustHash && window.location.hash.indexOf(inhibitHash) !== 0) {
+      // console.log('inhibitHash', inhibitHash, window.location.hash);
       window.location.hash = inhibitHash;
     }
     if (themeName !== '') {
@@ -136,19 +140,21 @@ function starter(basePrefix) {
     });
   }
 
-  function loadAsyncCard(cardKey, cardURL) {
-    // console.log('loadAsyncCard', cardKey, cardURL);
+  function loadAsyncCard(cardKey, cardURL, outputDivId) {
+    // console.log('loadAsyncCard', cardKey, cardURL, outputDivId);
+
     var oReq = new XMLHttpRequest();
     oReq.addEventListener('load', function() {
-      cardLoaded(this.responseText, cardKey, cardURL);
+      cardLoaded(this.responseText, cardKey, cardURL, outputDivId);
     });
     oReq.open('GET', cardURL);
     oReq.send();
   }
 
 
-  function relativeCardLoader(cardKey) {
-    // console.log('relativeCardLoader', cardKey, window.location.hash, window.location.pathname);
+  function relativeCardLoader(cardKey, outputDivId) {
+    // console.log('relativeCardLoader', cardKey, outputDivId, window.location.hash, window.location.pathname);
+
     cardKey = cardKey.replace(/#/g, '');
     // console.log('# cardKey', cardKey);
     // console.log('# lastLoadedRawPrefix', lastLoadedRawPrefix);
@@ -187,14 +193,14 @@ function starter(basePrefix) {
         lastLoadedRawPrefix = cardKey.slice(0, endOfPath + 1);
         // console.log('...lastLoadedRawPrefix1', lastLoadedRawPrefix);
       }
-      loadAsyncCard(cardKey, cardKey);
+      loadAsyncCard(cardKey, cardKey, outputDivId);
     }
     else if (cardKey.indexOf('/') === 0) {
       gistOrg = '';
       gistID = '';
       lastLoadedRawPrefix = rawPrefix;
       // console.log('...lastLoadedRawPrefix2', lastLoadedRawPrefix);
-      loadAsyncCard(cardKey, cardKey);
+      loadAsyncCard(cardKey, cardKey, outputDivId);
     }
     else if (gistOrg !== '' && gistID !== '') {
       var gistAPIBase = 'https://api.github.com/gists/' + gistID;
@@ -214,7 +220,7 @@ function starter(basePrefix) {
           cardKey = gistHashPrefix + gistOrg + '/' + gistID + '/' + cardKey;
           lastLoadedRawPrefix = 'https://gist.githubusercontent.com/' + gistOrg + '/' + gistID + '/raw/';
 
-          loadAsyncCard(cardKey, gistFileURL);
+          loadAsyncCard(cardKey, gistFileURL, outputDivId);
         }
       });
       oReq.open('GET', gistAPIBase);
@@ -225,14 +231,14 @@ function starter(basePrefix) {
       const loadableKey = keyParts.slice(0, -1).join(':');
       const suffix = (loadableKey === '') ? '' : (loadableKey + '.md');
       const cardURL = lastLoadedRawPrefix + suffix;
-      loadAsyncCard(cardKey, cardURL);
+      loadAsyncCard(cardKey, cardURL, outputDivId);
     }
     else {
       gistOrg = '';
       gistID = '';
       const suffix = (cardKey === '') ? '' : (cardKey + '.md');
       const cardURL = lastLoadedRawPrefix + suffix;
-      loadAsyncCard(cardKey, cardURL);
+      loadAsyncCard(cardKey, cardURL, outputDivId);
     }
   }
 
@@ -292,7 +298,7 @@ function starter(basePrefix) {
     if (hash === '') {
       hash = defaultHome;
     }
-    relativeCardLoader(hash);
+    relativeCardLoader(hash, document.querySelectorAll(outputDivSelector)[0].id);
   }
 
   var calcHandlers = smartdown.defaultCalcHandlers;
@@ -430,9 +436,12 @@ function starter(basePrefix) {
     loadHome(basePrefix);
   }
 
+  if (!doneHandler) {
+    doneHandler = loadHomeDefault;
+  }
   // console.log(JSON.stringify(media, null, 2));
   // console.log(JSON.stringify(linkRules, null, 2));
-  smartdown.initialize(media, baseURL, loadHomeDefault, relativeCardLoader, calcHandlers, linkRules);
+  smartdown.initialize(media, baseURL, doneHandler, relativeCardLoader, calcHandlers, linkRules);
 }
 
 window.smartdownStarter = starter;

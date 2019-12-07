@@ -1563,7 +1563,13 @@ function renderLink(href, title, text) {
       }
     }
     else if (op === 'GO') {
-      newHTML += '<button class="btn-infocell btn-infocell-go" onclick="smartdown.goToCard(\'' + lhs + '\', event)">' + decodeURIComponent(text) + '</button>';
+      newHTML += '<button class="btn-infocell btn-infocell-go" onclick="smartdown.goToCard(\'' +
+      lhs +
+      '\', event, \'' +
+      currentRenderDiv.id +
+      '\')">' +
+      decodeURIComponent(text) +
+      '</button>';
     }
     else if (op === 'DIV') {
       if (hasLabel) {
@@ -4685,12 +4691,12 @@ function computeExpression(entry, done) {
 }
 
 
-function goToCard(cardKey, event) {
+function goToCard(cardKey, event, outputDivId) {
   event.preventDefault();
   event.stopPropagation();
   cardLoading = true;
   if (cardLoader) {
-    cardLoader(cardKey);
+    cardLoader(cardKey, outputDivId);
   }
   else {
     var that = this;
@@ -4862,7 +4868,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.30',
+  version: '1.0.31',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,
