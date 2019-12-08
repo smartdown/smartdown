@@ -8,7 +8,7 @@
     "jsx": "react",
     "allowJs": true,
  	"noEmitOnError": true,
-    "lib": ["dom", "es6"],
+    "lib": ["es6", "dom"],
     "strictFunctionTypes": true,
   }
 }

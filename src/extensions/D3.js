@@ -18,7 +18,7 @@ export default function registerD3() {
       function() {
         window.smartdown.topojson = window.topojson;
       },
-      'lib/webcomponents-loader.js',
+      'smartdownBase:lib/webcomponents-loader.js',
       'https://cdnjs.cloudflare.com/ajax/libs/crossfilter2/1.4.7/crossfilter.min.js',
       'https://unpkg.com/d3fc/build/d3fc.js',
       function() {

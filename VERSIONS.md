@@ -32,7 +32,5 @@
 - **1.0.29** - Gallery 0.0.56. Improves consoleWrite so that it can take an arbitrary amount of arguments, and so that new output scrolls the div to the bottom. Adds @babel/plugin-transform-runtime to support async/await. Adds a new version of dependOn that allows an author to specify per-trigger depend functions. Improves theme-dark look for the playable console.
 - **1.0.30** - Gallery 0.0.57. Use 40vh for max-height, rather than height, for output cells of type JSON. Fix bug where a dependent playable with a preset variable would not hide the blue progress bar.
 - **1.0.31** - Add doneHandler to smartdown.initialize() to support deferred loading of the initial content. Improve starter.js so that it can handle tunnelling for multiple independent smartdown-output divs. Adjust smartdown.goToCard() so that it receives an outputDivId so that rendering of the tunnelled card occurs in the correct div. Add smartdownAdjustHash boolean to starter.js context so that tunnelling can optionally not adjust the window.location.hash.
-
-
-
+- **1.0.32** - Fix importers.ts so that the special prefix smartdownBase: is replaced with smartdown.baseURL at load-time.
 

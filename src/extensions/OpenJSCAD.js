@@ -10,6 +10,6 @@ export default function registerOpenJSCAD() {
   registerExtension(
     'openjscad',
     [
-      'lib/openjscad.reentrant.umd.js',
+      'smartdownBase:lib/openjscad.reentrant.umd.js',
     ]);
 }

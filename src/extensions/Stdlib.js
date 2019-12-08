@@ -7,8 +7,8 @@ Stdlib.register = function register() {
   registerExtension(
     'stdlib',
     [
-      'lib/stdlib-tree.min.js',
-      'lib/stdlib-datasets-tree-exclude.min.js',
+      'smartdownBase:lib/stdlib-tree.min.js',
+      'smartdownBase:lib/stdlib-datasets-tree-exclude.min.js',
       function() {
         Stdlib.vdomToHtml = smartdown.vdomToHtml;
         window.Stdlib = Stdlib;
@@ -33,7 +33,7 @@ Stdlib.loadSOTU = function loadSOTU(loaded) {
     // console.log('loadSOTU already loaded');
   }
   else {
-    const url = window.smartdown.baseURL + 'lib/stdlib-datasets-sotu.min.js';
+    const url = 'smartdownBase:lib/stdlib-datasets-sotu.min.js';
     importScriptUrl(
       url,
       function() {

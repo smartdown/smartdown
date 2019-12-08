@@ -4868,7 +4868,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.31',
+  version: '1.0.32',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,

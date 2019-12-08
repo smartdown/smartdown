@@ -9,15 +9,28 @@
  *
  */
 
+function expandSrc(sSrc: string): string {
+  const basePrefix = 'smartdownBase:';
+  let expandedSrc = sSrc;
+  if (expandedSrc.indexOf(basePrefix) === 0) {
+    expandedSrc = window.smartdown.baseURL + expandedSrc.slice(basePrefix.length);
+  }
+
+  return expandedSrc;
+}
+
+
 export function importScriptUrl(sSrc: string, fOnload: Function, fOnerror: Function): void {
   var oHead = document.head || document.getElementsByTagName('head')[0];
+  const expandedSrc = expandSrc(sSrc);
+
   function loadError(oError: Event | string): void {
     if (fOnerror) {
       console.log('calling fOnerror');
       fOnerror(oError);
     }
     else {
-      throw new URIError('The script ' + sSrc + ' is not accessible.');
+      throw new URIError('The script ' + expandedSrc + ' is not accessible.');
     }
   }
 
@@ -25,7 +38,7 @@ export function importScriptUrl(sSrc: string, fOnload: Function, fOnerror: Funct
   oScript.type = 'text\/javascript';
   oScript.onerror = loadError;
   oScript.async = true;
-  oScript.src = sSrc;
+  oScript.src = expandedSrc;
   oHead.appendChild(oScript);
   if (fOnload) {
     oScript.onload = function (evt: Event): void {
@@ -49,8 +62,9 @@ export function importScriptUrl(sSrc: string, fOnload: Function, fOnerror: Funct
  *
  */
 
-export function importTextUrl(url: string, fOnload: (error: string) => void, fOnerror: Function): void {
-  // console.log('importTextUrl', url);
+export function importTextUrl(sSrc: string, fOnload: (error: string) => void, fOnerror: Function): void {
+  const expandedSrc = expandSrc(sSrc);
+
   var xhr = new XMLHttpRequest();
   xhr.onreadystatechange = function (): void {
     if (this.readyState === 4) {
@@ -62,7 +76,7 @@ export function importTextUrl(url: string, fOnload: (error: string) => void, fOn
       }
     }
   };
-  xhr.open('GET', url);
+  xhr.open('GET', sSrc);
   xhr.send();
 }
 
@@ -75,15 +89,18 @@ export function importCssCode(cssCode: string): void {
 }
 
 
-export function importCssUrl(href: string, fOnload: Function, fOnerror: Function): void {
+export function importCssUrl(sSrc: string, fOnload: Function, fOnerror: Function): void {
   var oHead = document.head || document.getElementsByTagName('head')[0];
+
+  const expandedSrc = expandSrc(sSrc);
+
   function loadError(oError: Event | string): void {
     if (fOnerror) {
       console.log('calling fOnerror');
       fOnerror(oError);
     }
     else {
-      throw new URIError('The stylesheet ' + href + ' is not accessible.');
+      throw new URIError('The stylesheet ' + expandedSrc + ' is not accessible.');
     }
   }
 
@@ -91,11 +108,10 @@ export function importCssUrl(href: string, fOnload: Function, fOnerror: Function
   oLink.rel  = 'stylesheet';
   oLink.type = 'text/css';
   oLink.onerror = loadError;
-  oLink.href = href;
+  oLink.href = expandedSrc;
   oHead.appendChild(oLink);
   if (fOnload) {
     oLink.onload = function (evt: Event): void {
-      console.log
       fOnload(evt);
     };
   }

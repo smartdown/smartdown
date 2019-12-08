@@ -40,10 +40,10 @@ function loadGraphviz(loaded) {
   else {
     window.smartdownJSModules.graphviz.loadedCallbacks.push(loaded);
     window.smartdown.importScriptUrl(
-      window.smartdown.baseURL + 'lib/viz.js',
+      'smartdownBase:lib/viz.js',
       function(script1) {
         window.smartdown.importScriptUrl(
-          window.smartdown.baseURL + 'lib/lite.render.js',
+          'smartdownBase:lib/lite.render.js',
           function(script2) {
             registerMediaWithGraphviz();
             const callThese = window.smartdownJSModules.graphviz.loadedCallbacks;

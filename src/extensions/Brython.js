@@ -25,11 +25,11 @@ if (useBrython) {
       else {
         window.smartdown.importScriptUrl(
           // 'https://cdn.rawgit.com/brython-dev/brython/3.6.2/www/src/brython.js',
-          window.smartdown.baseURL + 'lib/brython.js',
+          'smartdownBase:lib/brython.js',
           function(script1) {
             window.smartdown.importScriptUrl(
               // 'https://cdn.rawgit.com/brython-dev/brython/3.6.2/www/src/brython_stdlib.js',
-              window.smartdown.baseURL + 'lib/brython_stdlib.js',
+              'smartdownBase:lib/brython_stdlib.js',
               function(script2) {
                 Brython = window.brython;
                 window.smartdownJSModules.brython.loaded = Brython;
