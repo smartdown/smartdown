@@ -52,6 +52,7 @@ import registerThree from './extensions/Three';
 import registerPlotly from './extensions/Plotly';
 import registerOpenJSCAD from './extensions/OpenJSCAD';
 import registerLeaflet from './extensions/Leaflet';
+import registerReact from './extensions/React';
 import registerTypeScript from './extensions/TypeScript';
 import Mermaid from './extensions/Mermaid';
 import Stdlib from './extensions/Stdlib';
@@ -102,6 +103,10 @@ const playableTypes = {
   },
   'typescript': {
     highlight: 'TypeScript',
+    javascript: true
+  },
+  'react': {
+    highlight: 'javascript',
     javascript: true
   },
   'd3': {
@@ -242,6 +247,7 @@ function registerDefaultExtensions() {
   registerPlotly();
   registerLeaflet();
   registerOpenJSCAD();
+  registerReact();
   registerTypeScript();
   Mermaid.register();
   Stdlib.register();
@@ -572,6 +578,7 @@ function getPrelude(language, code) {
     'plotly',
     'openjscad',
     'typescript',
+    'react',
     'graphviz',
     'abc',
     'abcsheet',
@@ -1982,6 +1989,35 @@ function registerPlayable(prelude, language, renderDivId, divId, preId, dbgId, d
 // console.log('playable:${uniquePlayableIndex}:', playable);
 eval(playable.transformedCode);
 //        this.div.innerHTML='<pre><code>' + playable.transformedCode + '</code></pre>';
+`;
+    }
+    else if (language === 'react') {
+      augmentedCode =
+`// Augmented React Code to be transpiled.
+
+let transformedReactCode;
+try {
+  transformedReactCode = Babel.transform(playable.code,
+    {
+      presets: [['es2015', { modules: false }], 'react', 'stage-0']
+    }).code;
+}
+catch (e) {
+  console.log('error in Babel.transform()', e);
+  result.diagnostics.forEach(d => {
+    this.log('# ' + d.messageText);
+  });
+}
+
+const asyncWrapperCode =
+\`
+const outerThis = this;
+return (async function() {
+\${transformedReactCode}
+}).call(outerThis);
+\`;
+
+return smartdown.runFunction(asyncWrapperCode, this, [...arguments], 'react', this.div);
 `;
     }
     else if (language === 'typescript') {
@@ -4868,7 +4904,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.32',
+  version: '1.0.33',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,

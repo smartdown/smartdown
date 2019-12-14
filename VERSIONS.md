@@ -33,4 +33,4 @@
 - **1.0.30** - Gallery 0.0.57. Use 40vh for max-height, rather than height, for output cells of type JSON. Fix bug where a dependent playable with a preset variable would not hide the blue progress bar.
 - **1.0.31** - Add doneHandler to smartdown.initialize() to support deferred loading of the initial content. Improve starter.js so that it can handle tunnelling for multiple independent smartdown-output divs. Adjust smartdown.goToCard() so that it receives an outputDivId so that rendering of the tunnelled card occurs in the correct div. Add smartdownAdjustHash boolean to starter.js context so that tunnelling can optionally not adjust the window.location.hash.
 - **1.0.32** - Fix importers.ts so that the special prefix smartdownBase: is replaced with smartdown.baseURL at load-time.
-
+- **1.0.33** - Gallery 0.0.58. Improve starter.js to deal with Solid hashes and tunnels. Adds support for a React playable, which uses Babel to transpile JSX.
