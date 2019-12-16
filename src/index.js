@@ -52,8 +52,8 @@ import registerThree from './extensions/Three';
 import registerPlotly from './extensions/Plotly';
 import registerOpenJSCAD from './extensions/OpenJSCAD';
 import registerLeaflet from './extensions/Leaflet';
-import registerReact from './extensions/React';
-import registerTypeScript from './extensions/TypeScript';
+import React from './extensions/React';
+import Typescript from './extensions/Typescript';
 import Mermaid from './extensions/Mermaid';
 import Stdlib from './extensions/Stdlib';
 
@@ -247,8 +247,8 @@ function registerDefaultExtensions() {
   registerPlotly();
   registerLeaflet();
   registerOpenJSCAD();
-  registerReact();
-  registerTypeScript();
+  React.register();
+  Typescript.register();
   Mermaid.register();
   Stdlib.register();
 }
@@ -523,7 +523,7 @@ function areValuesSameEnough(varname, oldValue, newValue) {
 //
 
 
-function recursivelyLoadIncludes(prefixCode, language, includesRemaining, done) {
+function recursivelyLoadIncludes(prefixCode, includesRemaining, done) {
   if (includesRemaining.length > 0) {
     const nextInclude = includesRemaining.shift();
     // console.log('nextInclude', nextInclude);
@@ -535,7 +535,6 @@ function recursivelyLoadIncludes(prefixCode, language, includesRemaining, done) 
 
         recursivelyLoadIncludes(
           prefixCode + nextIncludeText,
-          language,
           includesRemaining,
           done);
       },
@@ -550,7 +549,6 @@ function recursivelyLoadIncludes(prefixCode, language, includesRemaining, done) 
 `;
         recursivelyLoadIncludes(
           prefixCode + errorText,
-          language,
           includesRemaining,
           done);
       }
@@ -621,10 +619,7 @@ function getPrelude(language, code) {
   };
 }
 
-function renderCodeInternal(renderDivId, code, language, prelude) {
-  language = language || '';
-  var languageElements = language.split('/');
-  var languageOpts = languageElements.slice(1);
+function renderCodeInternal(renderDivId, code, language, languageOpts, prelude) {
   var playable = languageOpts.indexOf('playable') >= 0;
   var autoplay = languageOpts.indexOf('autoplay') >= 0;
   var debug = languageOpts.indexOf('debug') >= 0;
@@ -633,8 +628,6 @@ function renderCodeInternal(renderDivId, code, language, prelude) {
   var inline = languageOpts.indexOf('inline') >= 0;
   var center = languageOpts.indexOf('center') >= 0;
   var targetDivId = null;
-
-  language = languageElements[0];
 
   var playableType = playableTypes[language];
   if (playableType && (playable || autoplay)) {
@@ -869,17 +862,24 @@ ${highlightedAugmentedCode}
 }
 
 
-function renderCode(code, language) {
-  language = (language || '').replace(/ /g, '');
-  var languageElements = language.split('/');
+function renderCode(code, languageString) {
+  languageString = (languageString || '').replace(/ /g, '');
+  var languageElements = languageString.split('/');
   var languageOpts = languageElements.slice(1);
   var playable = languageOpts.indexOf('playable') >= 0;
   var autoplay = languageOpts.indexOf('autoplay') >= 0;
   // // var debug = languageOpts.indexOf('debug') >= 0;
 
-  const baseLanguage = languageElements[0];
+  let language = languageElements[0];
+  if (language === 'javascript') {
+    languageOpts.forEach(o => {
+      if (playableTypes[o] && playableTypes[o].javascript) {
+        language = o;
+      }
+    });
+  }
 
-  const prelude = getPrelude(baseLanguage, code);
+  const prelude = getPrelude(language, code);
 
   const bp = currentBackpatches[currentRenderDiv.id];
 
@@ -897,10 +897,10 @@ function renderCode(code, language) {
 
     const includesRemaining = prelude.includes.slice(0);  // Copy
     const prefixCode = '';
-    recursivelyLoadIncludes(prefixCode, language, includesRemaining, function(includedCode) {
+    recursivelyLoadIncludes(prefixCode, includesRemaining, function(includedCode) {
       const saveRenderDiv = currentRenderDiv;
       currentRenderDiv = backpatch.currentRenderDiv;
-      const renderedExpandedCode = renderCodeInternal(currentRenderDiv.id, includedCode, language, prelude);
+      const renderedExpandedCode = renderCodeInternal(currentRenderDiv.id, includedCode, language, languageOpts, prelude);
       currentRenderDiv = saveRenderDiv;
       const patch = bp[backpatchIndex];
 
@@ -917,7 +917,7 @@ function renderCode(code, language) {
     return deferredCode;
   }
   else {
-    return renderCodeInternal(currentRenderDiv.id, code, language, prelude);
+    return renderCodeInternal(currentRenderDiv.id, code, language, languageOpts, prelude);
   }
 }
 
@@ -1992,66 +1992,10 @@ eval(playable.transformedCode);
 `;
     }
     else if (language === 'react') {
-      augmentedCode =
-`// Augmented React Code to be transpiled.
-
-let transformedReactCode;
-try {
-  transformedReactCode = Babel.transform(playable.code,
-    {
-      presets: [['es2015', { modules: false }], 'react', 'stage-0']
-    }).code;
-}
-catch (e) {
-  console.log('error in Babel.transform()', e);
-  result.diagnostics.forEach(d => {
-    this.log('# ' + d.messageText);
-  });
-}
-
-const asyncWrapperCode =
-\`
-const outerThis = this;
-return (async function() {
-\${transformedReactCode}
-}).call(outerThis);
-\`;
-
-return smartdown.runFunction(asyncWrapperCode, this, [...arguments], 'react', this.div);
-`;
+      augmentedCode = React.generateAugmentedPlayable();
     }
     else if (language === 'typescript') {
-      augmentedCode =
-`// Augmented TypeScript Code to be transpiled.
-
-const asyncWrapper =
-\`
-const outerThis = this;
-return (async function() {
-\${playable.code}
-}).call(outerThis);
-\`;
-
-let result = window.ts.transpileModule(
-  asyncWrapper,
-  {
-    compilerOptions: {
-      module: window.ts.ModuleKind.CommonJS,
-      target: 'es6',
-      allowJs: true,
-      checkJs: true,
-  },
-  reportDiagnostics: true,
-});
-
-if (result.diagnostics.length > 0) {
-  result.diagnostics.forEach(d => {
-    this.log('# ' + d.messageText);
-  });
-}
-
-return smartdown.runFunction(result.outputText, this, [...arguments], 'typescript', this.div);
-`;
+      augmentedCode = Typescript.generateAugmentedPlayable();
     }
     else if (language === 'brython') {
       const brythonScriptId = scriptId + '_brython';
@@ -2674,7 +2618,7 @@ ${e}
 
 
 function recursivelyLoadImports(language, divId, importsRemaining, done) {
-  // console.log('recursivelyLoadImports', divId, importsRemaining.length);
+  // console.log('recursivelyLoadImports', language, divId, JSON.stringify(importsRemaining), importsRemaining.length);
   if (importsRemaining.length > 0) {
     const nextImport = importsRemaining.shift();
 
@@ -4904,7 +4848,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.33',
+  version: '1.0.34',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,

@@ -1,54 +1,49 @@
 import {registerExtension} from 'extensions';
 
-export default function registerTypeScript() {
-  registerExtension(
-    'typescript',
-    [
-      'https://cdn.jsdelivr.net/npm/typescript/lib/typescript.min.js',
-    ]);
+const Typescript = {
+  register() {
+    registerExtension(
+      'typescript',
+      [
+        'https://cdn.jsdelivr.net/npm/typescript/lib/typescript.min.js',
+      ]);
+  },
+
+  generateAugmentedPlayable() {
+    const augmentedCode =
+`// Augmented TypeScript Code to be transpiled.
+
+const asyncWrapper =
+\`
+const outerThis = this;
+return (async function() {
+\${playable.code}
+}).call(outerThis);
+\`;
+
+let result = window.ts.transpileModule(
+  asyncWrapper,
+  {
+    compilerOptions: {
+      module: window.ts.ModuleKind.CommonJS,
+      target: 'es6',
+      allowJs: true,
+      checkJs: true,
+  },
+  reportDiagnostics: true,
+});
+
+if (result.diagnostics.length > 0) {
+  result.diagnostics.forEach(d => {
+    this.log('# ' + d.messageText);
+  });
 }
 
+return smartdown.runFunction(result.outputText, this, [...arguments], 'typescript', this.div);
+`;
 
-///* global window */
-///* global useTypeScript */
-///* global smartdown */
-//
-//var TypeScript = {};
-//if (useTypeScript) {
-//  function loadTypeScript(loaded) {
-//    // console.log('loadTypeScript...', window.smartdownJSModules.typescript.loadedCallbacks.length, loaded, JSON.stringify(window.smartdownJSModules.typescript.loadedCallbacks, null, 2));
-//    if (window.smartdownJSModules.typescript.loaded) {
-//      loaded();
-//    }
-//    else if (window.smartdownJSModules.typescript.loadedCallbacks.length > 0) {
-//      window.smartdownJSModules.typescript.loadedCallbacks.push(loaded);
-//      // console.log('loadtypescript...typescript is still loading', JSON.stringify(window.smartdownJSModules.typescript.loadedCallbacks, null, 2));
-//    }
-//    else {
-//      window.smartdownJSModules.typescript.loadedCallbacks.push(loaded);
-//
-//      console.log('loading typescript');
-//      window.smartdown.importScriptUrl(
-//        'https://cdn.jsdelivr.net/npm/typescript@3.6.4/lib/typescript.min.js',
-//        function(s) {
-//          console.log('loaded typescript', window, s);
-//
-//          const callThese = window.smartdownJSModules.typescript.loadedCallbacks;
-//          // window.smartdownJSModules.typescript.loaded = true;
-//          window.smartdownJSModules.typescript.loadedCallbacks = [];
-//          callThese.forEach(loadedCb => {
-//            loadedCb();
-//          });
-//        });
-//    }
-//  }
-//
-//  window.smartdownJSModules.typescript = {
-//    loader: loadTypeScript,
-//    loaded: null,
-//    loadedCallbacks: []
-//  };
-//}
-//
-//module.exports = TypeScript;
-//
+    return augmentedCode;
+  }
+}
+
+export default Typescript;
