@@ -35,3 +35,4 @@
 - **1.0.32** - Fix importers.ts so that the special prefix smartdownBase: is replaced with smartdown.baseURL at load-time.
 - **1.0.33** - Gallery 0.0.58. Improve starter.js to deal with Solid hashes and tunnels. Adds support for a React playable, which uses Babel to transpile JSX.
 - **1.0.34** - Gallery 0.0.60. Refactor some extensions to use new plugin format. When declaring a Javascript playable such as a D3 or React playable, you can declare the more specific language as a playable qualifier and use 'javascript' as the primary language; this aids syntax highlighting in most editors.
+- **1.0.35** - Gallery 0.0.61. Simplify how Gallery files are included in build.

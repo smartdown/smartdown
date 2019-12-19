@@ -61,18 +61,10 @@ var mode = (nodeEnvironment === 'production' || nodeEnvironment === 'development
 var galleryIgnores = [
   '.git/**',
   '.gitignore',
+  'hide/*',
   'LICENSE',
   'package.json',
-  'index.html',
-  'AAADebug.md',
-  'CrosswordBackup.md',
-  'DBpedia.md',
-  'ExtensionsPlayableP5X.js',
-  'LDFPic.md',
-  'MusicTest.md',
-  'Wikidata.md',
-  'resources/crystal2.mid',
-  'resources/crystal2.ogg'];
+  'index.html'];
 const baseURL = development ? '/' : '/smartdown/';
 
 var config = {
