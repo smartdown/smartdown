@@ -298,6 +298,7 @@ function starter(basePrefix, doneHandler) {
     if (hash === '') {
       hash = defaultHome;
     }
+
     relativeCardLoader(hash, document.querySelectorAll(outputDivSelector)[0].id);
   }
 
@@ -423,7 +424,8 @@ function starter(basePrefix, doneHandler) {
       if (cardKey === '') {
         cardKey = defaultHome;
       }
-      relativeCardLoader(cardKey);
+
+      relativeCardLoader(cardKey, document.querySelectorAll(outputDivSelector)[0].id);
     }
 
     return false;
