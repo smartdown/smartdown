@@ -25,8 +25,8 @@ export default function registerD3() {
         window.d3fc = window.fc;
         window.smartdown.d3fc = window.d3fc;
       },
-      'https://unpkg.com/dc/dc.js',
-      'https://unpkg.com/dc/dc.min.css',
+      'https://unpkg.com/dc@3.1.9/dc.js',
+      'https://unpkg.com/dc@3.1.9/dc.min.css',
       function() {
         window.d3dc = window.dc;
         window.smartdown.d3dc = window.d3dc;

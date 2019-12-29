@@ -236,8 +236,16 @@ function starter(basePrefix, doneHandler) {
     else {
       gistOrg = '';
       gistID = '';
-      const suffix = (cardKey === '') ? '' : (cardKey + '.md');
-      const cardURL = lastLoadedRawPrefix + suffix;
+      const suffix = cardKey.endsWith('.md') ? '' : '.md';
+      let cardURL = lastLoadedRawPrefix + cardKey + suffix;
+
+      // Hack for Solid
+      if (lastLoadedRawPrefix.endsWith('/public/smartdown/')) {
+        const parts = lastLoadedRawPrefix.split('/');
+        const minusLastPart = parts.slice(0, -2).join('/');
+        cardURL = minusLastPart + '/' + cardKey + suffix;
+      }
+
       loadAsyncCard(cardKey, cardURL, outputDivId);
     }
   }

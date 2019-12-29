@@ -37,3 +37,5 @@
 - **1.0.34** - Gallery 0.0.60. Refactor some extensions to use new plugin format. When declaring a Javascript playable such as a D3 or React playable, you can declare the more specific language as a playable qualifier and use 'javascript' as the primary language; this aids syntax highlighting in most editors.
 - **1.0.35** - Gallery 0.0.61. Simplify how Gallery files are included in build.
 - **1.0.36** - Gallery 0.0.62. Fixes bug in starter.js that crashed when hash location changed handler was called.
+- **1.0.37** - Adds version number to unpkg.com/dc because the 4.0.0beta is incompatible and not working. Adds a Solid-specific hack to starter.js so that card names like 'Home.md' or 'Home' are interpreted as '/public/Home.md'.
+
