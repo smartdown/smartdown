@@ -38,7 +38,8 @@ var themeName = '';
 
 function starter(basePrefix, doneHandler) {
   var defaultHome = 'Home';
-  var baseURL = 'https://https://smartdown.github.io/smartdown/';
+
+  var baseURL = 'https://unpkg.com/smartdown/dist/';
   var resourceURL = baseURL + 'lib/resources/';
   var rawPrefix = window.location.origin + window.location.pathname;
   var gistPathPrefix = '';

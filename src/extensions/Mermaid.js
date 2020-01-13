@@ -87,7 +87,7 @@ function initializeMermaid() {
       htmlLabels: true,
       useMaxWidth: false,
     },
-    sequenceDiagram: {
+    sequence: {
       diagramMarginX: 50,
       diagramMarginY: 20,
       actorMargin: 40,

@@ -25,17 +25,23 @@ let result = window.ts.transpileModule(
   asyncWrapper,
   {
     compilerOptions: {
-      module: window.ts.ModuleKind.CommonJS,
+      // esModuleInterop: true,
+      // allowUmdGlobalAccess: true,
+      // alwaysStrict: true,
+      // isolatedModules: true,
+      module: 'commonjs',
       target: 'es6',
       allowJs: true,
       checkJs: true,
+      diagnostics: true,
+      extendedDiagnostics: true,
   },
   reportDiagnostics: true,
 });
 
 if (result.diagnostics.length > 0) {
   result.diagnostics.forEach(d => {
-    this.log('# ' + d.messageText);
+    console.log('# ' + d.messageText);
   });
 }
 

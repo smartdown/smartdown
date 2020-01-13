@@ -24,7 +24,7 @@ const emojiInstance = new emoji();
 const emojiReplacer = match => emojiInstance.replace_colons(match);
 import axios from 'axios';
 
-import {importScriptUrl, importTextUrl, importCssCode, importCssUrl} from 'importers';
+import {importScriptUrl, importModuleUrl, importTextUrl, importCssCode, importCssUrl} from 'importers';
 
 require('./styles.css');
 
@@ -200,6 +200,7 @@ var cardLoading = false;
 var smartdownVariables = {};
 var smartdownScripts = [];
 var smartdownScriptsMap = {};
+var es6Playables = {};
 
 var mediaRegistry = {};
 var uniquePlayableIndex = 0;
@@ -592,17 +593,22 @@ function getPrelude(language, code) {
   //
 
   if (loadableLanguages.indexOf(language) >= 0) {
-    imports.push(language);
+    imports.push([language, false]);
   }
 
   if (playableType && (playableType.javascript || language === 'graphviz')) {
     const lines = code.split('\n');
     const usePrefix = '//smartdown.import=';
+    const usePrefixM = '//smartdown.importmodule=';
     const includePrefix = '//smartdown.include=';
     lines.forEach(line => {
       if (line.indexOf(usePrefix) === 0) {
         const rhs = line.slice(usePrefix.length);
-        imports.push(rhs);
+        imports.push([rhs, false]);
+      }
+      else if (line.indexOf(usePrefixM) === 0) {
+        const rhs = line.slice(usePrefixM.length);
+        imports.push([rhs, true]);
       }
       else if (line.indexOf(includePrefix) === 0) {
         const rhs = line.slice(includePrefix.length);
@@ -622,6 +628,7 @@ function getPrelude(language, code) {
 function renderCodeInternal(renderDivId, code, language, languageOpts, prelude) {
   var playable = languageOpts.indexOf('playable') >= 0;
   var autoplay = languageOpts.indexOf('autoplay') >= 0;
+  var isModule = languageOpts.indexOf('module') >= 0;
   var debug = languageOpts.indexOf('debug') >= 0;
   var kiosk = languageOpts.indexOf('kiosk') >= 0;
   var kioskable = languageOpts.indexOf('kioskable') >= 0;
@@ -634,7 +641,6 @@ function renderCodeInternal(renderDivId, code, language, languageOpts, prelude) 
     // console.log('renderCodeInternal', renderDivId, code, language, languageOpts, prelude);
 
     ++uniquePlayableIndex;
-    var scriptId = `script_playable_${uniquePlayableIndex}`;
     var divId = `div_playable_${uniquePlayableIndex}`;
     var preId = `pre_playable_${uniquePlayableIndex}`;
     var dbgId = `dbg_playable_${uniquePlayableIndex}`;
@@ -664,43 +670,16 @@ function renderCodeInternal(renderDivId, code, language, languageOpts, prelude) 
       dbgToggleId,
       consoleId,
       consoleToggleId,
-      scriptId,
       functionId,
       playId,
       stopId,
       progressId,
       autoplay,
+      isModule,
       code,
       playableType.transform,
       targetDivId
     );
-
-    var playableScript = '';
-
-    if (playableType.javascript) {
-      var transformedCode = registeredPlayable.augmentedCode;
-      //       if (language === 'go' && playableType.transform) {
-      //         transformedCode =
-      // `
-      // // console.log('playable:${uniquePlayableIndex}:', playable);
-      // eval(playable.transformedCode);
-      // //        this.div.innerHTML='<pre><code>' + playable.transformedCode + '</code></pre>';
-      // `;
-      //       }
-      playableScript =
-`
-<script id="${scriptId}">
-${transformedCode}
-</script>
-`;
-    }
-    else {
-      playableScript =
-`
-<script id="${scriptId}" type="application/x-${language}">${code}</script>
-`;
-
-    }
 
     var highlightLanguage = playableType ? playableType.highlight : 'javascript';
     var highlightedCode = hljs.highlightAuto(code, [highlightLanguage]).value;
@@ -765,7 +744,7 @@ ${playableDiv}
 </${wrapperWrapperElement}>
 `;
 
-      return playableScript + playableWrapper;
+      return playableWrapper;
     }
     else {
       var playableButtons =
@@ -850,7 +829,7 @@ ${highlightedAugmentedCode}
    class="playable-console"><pre id="${consoleId}-pre"></pre></div>
 `;
 
-      return playableScript + playableCodeDisplay;
+      return playableCodeDisplay;
     }
   }
   else {
@@ -1972,7 +1951,7 @@ function computeExpressions() {
   /* eslint-enable guard-for-in */
 }
 
-function registerPlayable(prelude, language, renderDivId, divId, preId, dbgId, dbgToggleId, consoleId, consoleToggleId, scriptId, functionId, playId, stopId, progressId, autoplay, code, transform, targetDivId) {
+function registerPlayable(prelude, language, renderDivId, divId, preId, dbgId, dbgToggleId, consoleId, consoleToggleId, functionId, playId, stopId, progressId, autoplay, isModule, code, transform, targetDivId) {
   var augmentedCode = code;
   var playableType = playableTypes[language];
 
@@ -1998,7 +1977,7 @@ eval(playable.transformedCode);
       augmentedCode = Typescript.generateAugmentedPlayable();
     }
     else if (language === 'brython') {
-      const brythonScriptId = scriptId + '_brython';
+      const brythonScriptId = divId + '_brython';
       augmentedCode =
 `
 const pythonSource =
@@ -2069,36 +2048,6 @@ else {
   div.innerHTML = '<h4>' + errorMsg + '</h4>';
 }
 `;
-
-      // Other tactics that failed...
-
-      // eval(__BRYTHON__.py2js(src).to_js()))
-      // $B.py2js = function(src, module, locals_id, parent_scope, line_info){
-      //     // src = Python source (string)
-      //     // module = module name (string)
-      //     // locals_id = the id of the block that will be created
-      //     // parent_scope = the scope where the code is created
-      //     // line_info = [line_num, parent_block_id] if debug mode is set
-      //     //
-      //     // Returns a tree structure representing the Python source code
-
-      // {
-      //   const brythonResult = brython({
-      //    debug: 1,
-      //    ipy_id: ['${brythonScriptId}'],
-      //    args: [smartdownPlayableContext, '${brythonScriptId}']});
-      //   console.log('__BRYTHON__.__ARGV', __BRYTHON__.__ARGV);
-      // }
-      // else if (true) {
-
-      // {
-      //   const $B = __BRYTHON__;
-      //   console.log('$B defined', $B);
-      //   console.log('$B.builtins.dict', $B.builtins.dict);
-      //   var ns = $B.$call($B.builtins.dict)();
-      //   const brythonResult2 = $B.builtins.exec(pythonSource, ns);
-      //   console.log('brythonResult2', brythonResult2);
-      // }
     }
     else if (language.toLowerCase() === 'p5js') {
       if (language === 'P5JS') {
@@ -2269,6 +2218,16 @@ ${code}
 jscadViewer.setJsCad(diagramSource);
 `;
     }
+    else if (isModule) {
+      augmentedCode =
+`
+${code}
+
+if (typeof start !== 'undefined') {
+  smartdown.es6Playables['${divId}'].start = start;
+}
+`;
+    }
     else {
       augmentedCode =
 `
@@ -2291,12 +2250,13 @@ jscadViewer.setJsCad(diagramSource);
     dbgToggleId: dbgToggleId,
     consoleId: consoleId,
     consoleToggleId: consoleToggleId,
-    scriptId: scriptId,
     functionId: functionId,
     playId: playId,
     stopId: stopId,
     progressId: progressId,
     autoplay: autoplay,
+    isModule: isModule,
+    es6ModuleScript: null,
     playing: false,
     dependLastValues: {},
     p5: null,
@@ -2340,6 +2300,41 @@ ${e}
 }
 
 
+async function runModule(playable, div, argValues, language) {
+  const divId = playable.divId;
+  const code = playable.augmentedCode;
+  const embedThis = playable.embedThis;
+  // console.log('runModule', playable, embedThis, code.slice(0, 50));
+
+  var s = document.createElement('script');
+  playable.es6ModuleScript = s;
+  if (smartdown.es6Playables[divId]) {
+    console.log('runModule error: smartdown.es6Playables[divId] exists', divId, smartdown.es6Playables[divId]);
+  }
+  smartdown.es6Playables[divId] = {
+    script: s,
+    start: null,
+  }
+  s.type = 'module';
+  s.onload = function (evt) {
+    // console.log('...onload', evt, divId, smartdown.es6Playables[divId]);
+    if (smartdown.es6Playables[divId].start) {
+      smartdown.es6Playables[divId].start(embedThis);
+    }
+  };
+  s.onerror = function (error) {
+    console.log('runModule...onerror', error);
+  };
+  s.async = false;
+  s.text = code;
+
+  document.head.appendChild(s);
+  const embedResult = null;
+
+  return embedResult;
+}
+
+
 async function playPlayableInternal(language, divId) {
   // console.log('playPlayableInternal', divId);
 
@@ -2350,7 +2345,6 @@ async function playPlayableInternal(language, divId) {
   // var divDbgToggle = document.getElementById(playable.dbgToggleId);
   var play = document.getElementById(playable.playId);
   var stop = document.getElementById(playable.stopId);
-  var script = document.getElementById(playable.scriptId);
   var progress = document.getElementById(playable.progressId);
   if (play) {
     play.style.display = 'none';
@@ -2402,9 +2396,14 @@ async function playPlayableInternal(language, divId) {
     };
 
     if (language.toLowerCase() !== 'p5js') {
-      const embedResult = await smartdown.runFunction(playable.augmentedCode, playable.embedThis, argValues, language, div);
-      if (language === 'leaflet' && !playable.embedThis.leafletMap) {
-        playable.embedThis.leafletMap = embedResult;
+      if (playable.isModule) {
+        const embedResult = await smartdown.runModule(playable, div, argValues, language);
+      }
+      else {
+        const embedResult = await smartdown.runFunction(playable.augmentedCode, playable.embedThis, argValues, language, div);
+        if (language === 'leaflet' && !playable.embedThis.leafletMap) {
+          playable.embedThis.leafletMap = embedResult;
+        }
       }
     }
     else {
@@ -2565,7 +2564,7 @@ ${e}
     }
   }
   else if (language === 'mermaid') {
-    Mermaid.mermaidRender(div, script.text);
+    Mermaid.mermaidRender(div, playable.code);
 
     if (progress) {
       progress.style.display = 'none';
@@ -2577,7 +2576,8 @@ ${e}
       var options = {
         images: graphvizImages
       };
-      (new window.Viz()).renderString(script.text, options).then(result => {
+
+      (new window.Viz()).renderString(playable.code, options).then(result => {
         if (progress) {
           progress.style.display = 'none';
         }
@@ -2604,7 +2604,7 @@ ${e}
     ensureExtension(
       'abc',
       function () {
-        renderABCIntoDivs(abcBaseId, language, script.text);
+        renderABCIntoDivs(abcBaseId, language, playable.code);
 
         if (progress) {
           progress.style.display = 'none';
@@ -2620,7 +2620,9 @@ ${e}
 function recursivelyLoadImports(language, divId, importsRemaining, done) {
   // console.log('recursivelyLoadImports', language, divId, JSON.stringify(importsRemaining), importsRemaining.length);
   if (importsRemaining.length > 0) {
-    const nextImport = importsRemaining.shift();
+    const nextImportPair = importsRemaining.shift();
+    const nextImport = nextImportPair[0];
+    const nextImportIsModule = nextImportPair[1];
 
     // DRY THIS UP
 
@@ -2645,7 +2647,7 @@ function recursivelyLoadImports(language, divId, importsRemaining, done) {
       });
     }
     else {
-      loadExternal(nextImport, function () {
+      loadExternal(nextImport, nextImportIsModule, function () {
         recursivelyLoadImports(language, divId, importsRemaining, done);
       });
     }
@@ -2748,6 +2750,12 @@ function resetPlayable(language, divId, throwAway) {
           }
         }
       }
+
+      if (playable.isModule) {
+        console.log('resetPlayable isModule', playable.es6ModuleScript);
+        playable.es6ModuleScript.remove();
+        playable.es6ModuleScript = null;
+      }
     }
 
     div.innerHTML = '';
@@ -2781,13 +2789,20 @@ function consoleWrite(playable, args) {
     msg += arg + ' ';
   });
 
-  console.log(`#${playable.divId}: ${msg}`);
   const div = document.getElementById(playable.consoleId);
   if (div) {
     div.style.display = 'block';
     const pre = document.getElementById(playable.consoleId + '-pre');
     pre.innerText = pre.innerText + msg + '\n';
-    div.scrollTop = div.scrollHeight
+    div.scrollTop = div.scrollHeight;
+    const nLines = pre.innerText.split('\n').length;
+    const maxLinesClip = 10;
+    const nLinesClipped = Math.min(nLines, maxLinesClip);
+    const lineHeight = 25;
+    const newHeight = nLinesClipped * lineHeight;
+    if (newHeight > div.scrollHeight) {
+      div.style.height = `${newHeight}px`;
+    }
   }
   const toggle = document.getElementById(playable.consoleToggleId);
   if (toggle) {
@@ -3382,18 +3397,17 @@ function cleanupOrphanedStuff() {
   const newPR = {};
 
   each(perPageState.playablesRegisteredOrder, function (playable) {
-    // console.log('cleanupOrphanedStuff/playable', playable.divId, playable.scriptId, playable);
+    // console.log('cleanupOrphanedStuff/playable', playable.divId, playable);
     var element1 = document.getElementById(playable.divId);
-    var element2 = document.getElementById(playable.scriptId);
 
-    if (element1 && element2) {
+    if (element1) {
       newPRO.push(playable);
       newPR[playable.divId] = playable;
-      // console.log('...cleanupOrphanedStuff/playable div found', playable.playing, playable.divId, playable.scriptId, playable, element1, element2);
+      // console.log('...cleanupOrphanedStuff/playable div found', playable.playing, playable.divId, playable, element1, element2);
     }
     else {
       playable.deleted = true;
-      // console.log('...cleanupOrphanedStuff/playable div not found', playable.playing, playable.divId, playable.scriptId, playable, element1, element2);
+      // console.log('...cleanupOrphanedStuff/playable div not found', playable.playing, playable.divId, playable, element1, element2);
     }
   });
 
@@ -3410,20 +3424,14 @@ function resetAllPlayables(outputDiv, throwAway) {
       const playableElement = document.getElementById(playable.divId);
       if (playableElement) {
         // console.log('resetAllPlayables', playable.divId, playableElement, perPageState.playablesRegisteredOrder);
-        const playableScript = document.getElementById(playable.scriptId);
-        if (playableScript) {
-          resetPlayable(
-            playable.language,
-            playable.divId,
-            throwAway
-          );
-        }
-        else {
-          console.log('resetAllPlayables SCRIPT DIV NOT FOUND', outputDiv.id, playable.divId, playable.scriptId, playable);
-        }
+        resetPlayable(
+          playable.language,
+          playable.divId,
+          throwAway
+        );
       }
       else {
-        console.log('resetAllPlayables PLAYABLE DIV NOT FOUND', outputDiv.id, playable.divId, playable.scriptId, playable);
+        console.log('resetAllPlayables PLAYABLE DIV NOT FOUND', outputDiv.id, playable.divId, playable);
       }
     }
   });
@@ -3438,7 +3446,7 @@ function transformPlayables(outputDiv, done) {
     each(perPageState.playablesRegisteredOrder, function (playable) {
       if (playable.transform) {
         if (outputDiv.id) {
-          var sel = '#' + outputDiv.id + ' #' + playable.scriptId;
+          var sel = '#' + outputDiv.id + ' #' + playable.divId;
           var divHere = document.querySelectorAll(sel);
           if (divHere && divHere.length > 0) {
             playablesToTransform.push(playable);
@@ -4822,6 +4830,7 @@ module.exports = {
   importCssCode: importCssCode,
   importCssUrl: importCssUrl,
   importScriptUrl: importScriptUrl,
+  importModuleUrl: importModuleUrl,
   importTextUrl: importTextUrl,
   linkRules: linkRules,
   expandHrefWithLinkRules: expandHrefWithLinkRules,
@@ -4848,7 +4857,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.37',
+  version: '1.0.38',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,
@@ -4858,10 +4867,12 @@ module.exports = {
   fileSaver: fileSaver,
   vdomToHtml: vdomToHtml,
   runFunction: runFunction,
+  runModule: runModule,
   // isExtensionRegistered: isExtensionRegistered,
   loadExternal: loadExternal,
   // registerExtension: registerExtension,
   ensureExtension: ensureExtension,
+  es6Playables: es6Playables,
 };
 
 window.smartdown = module.exports;

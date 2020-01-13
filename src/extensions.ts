@@ -1,6 +1,6 @@
 /* eslint @typescript-eslint/no-explicit-any: 0 */
 
-import {importScriptUrl, importCssUrl} from 'importers';
+import {importScriptUrl, importModuleUrl, importCssUrl} from 'importers';
 
 window.smartdownJSModules = {};
 
@@ -151,8 +151,8 @@ export function ensureExtension(name: string, loaded: () => void): void {
  *
  */
 
-export function loadExternal(url: string, loaded: () => void): void {
-  // console.log('loadExternal...', url);
+export function loadExternal(url: string, isModule: boolean, loaded: () => void): void {
+  // console.log('loadExternal...', url, isModule);
 
   if (!window.smartdownJSModules[url]) {
     window.smartdownJSModules[url] = {
@@ -191,19 +191,36 @@ export function loadExternal(url: string, loaded: () => void): void {
         });
     }
     else if (url.endsWith('.js')) {
-      importScriptUrl(
-        url,
-        function() {
-          const callThese = window.smartdownJSModules[url].loadedCallbacks;
-          window.smartdownJSModules[url].loaded = true;
-          window.smartdownJSModules[url].loadedCallbacks = [];
-          callThese.forEach((loadedCb: Function) => {
-            loadedCb();
+      if (isModule) {
+        importModuleUrl(
+          url,
+          function() {
+            const callThese = window.smartdownJSModules[url].loadedCallbacks;
+            window.smartdownJSModules[url].loaded = true;
+            window.smartdownJSModules[url].loadedCallbacks = [];
+            callThese.forEach((loadedCb: Function) => {
+              loadedCb();
+            });
+          },
+          function(error: string): void {
+            console.log('loadExternal...load error', error, url);
           });
-        },
-        function(error: string): void {
-          console.log('loadExternal...load error', error, url);
-        });
+      }
+      else {
+        importScriptUrl(
+          url,
+          function() {
+            const callThese = window.smartdownJSModules[url].loadedCallbacks;
+            window.smartdownJSModules[url].loaded = true;
+            window.smartdownJSModules[url].loadedCallbacks = [];
+            callThese.forEach((loadedCb: Function) => {
+              loadedCb();
+            });
+          },
+          function(error: string): void {
+            console.log('loadExternal...load error', error, url);
+          });
+      }
     }
     else {
       console.log('loadExternal...unknown extension type: ', url);

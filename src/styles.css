@@ -1360,7 +1360,7 @@ img.media-image path {
 
 .smartdown-container div.playable-console {
   resize: vertical;
-  height: 100px;
+  height: 40px;
   display: none;
   border: 2px solid lightsteelblue;
   background: #F0F0F0;

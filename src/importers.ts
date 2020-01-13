@@ -20,7 +20,7 @@ function expandSrc(sSrc: string): string {
 }
 
 
-export function importScriptUrl(sSrc: string, fOnload: Function, fOnerror: Function): void {
+function importScriptUrlWithModule(sSrc: string, isModule: boolean, fOnload: Function, fOnerror: Function): void {
   var oHead = document.head || document.getElementsByTagName('head')[0];
   const expandedSrc = expandSrc(sSrc);
 
@@ -35,18 +35,30 @@ export function importScriptUrl(sSrc: string, fOnload: Function, fOnerror: Funct
   }
 
   var oScript = document.createElement('script');
-  oScript.type = 'text\/javascript';
+  oScript.type = isModule ? 'module' : 'text\/javascript';
   oScript.onerror = loadError;
-  oScript.async = true;
-  oScript.src = expandedSrc;
-  oHead.appendChild(oScript);
+  oScript.async = false;
+  oScript.src = expandedSrc; // Do this last
+
+  (oHead as any).appendChild(oScript);
+
   if (fOnload) {
     oScript.onload = function (evt: Event): void {
-      console.log
+      // console.log('onload', evt);
       fOnload(evt);
     };
   }
 }
+
+export function importScriptUrl(sSrc: string, fOnload: Function, fOnerror: Function): void {
+  importScriptUrlWithModule(sSrc, false, fOnload, fOnerror);
+}
+
+
+export function importModuleUrl(sSrc: string, fOnload: Function, fOnerror: Function): void {
+  importScriptUrlWithModule(sSrc, true, fOnload, fOnerror);
+}
+
 
 /**
  * Load the contents of a URL via XMLHttpRequest
@@ -82,15 +94,15 @@ export function importTextUrl(sSrc: string, fOnload: (error: string) => void, fO
 
 
 export function importCssCode(cssCode: string): void {
-  var styleElement = document.createElement('style') as HTMLStyleElement;
+  const styleElement: HTMLStyleElement = document.createElement('style');
   styleElement.type = 'text/css';
-  styleElement.appendChild(document.createTextNode(cssCode));
-  document.getElementsByTagName('head')[0].appendChild(styleElement);
+  (styleElement as any).appendChild(document.createTextNode(cssCode));
+  (document.getElementsByTagName('head')[0] as any).appendChild(styleElement);
 }
 
 
 export function importCssUrl(sSrc: string, fOnload: Function, fOnerror: Function): void {
-  var oHead = document.head || document.getElementsByTagName('head')[0];
+  const oHead = document.head || document.getElementsByTagName('head')[0];
 
   const expandedSrc = expandSrc(sSrc);
 
@@ -104,12 +116,12 @@ export function importCssUrl(sSrc: string, fOnload: Function, fOnerror: Function
     }
   }
 
-  var oLink = document.createElement('link');
+  const oLink: HTMLLinkElement = document.createElement('link');
   oLink.rel  = 'stylesheet';
   oLink.type = 'text/css';
   oLink.onerror = loadError;
   oLink.href = expandedSrc;
-  oHead.appendChild(oLink);
+  (oHead as any).appendChild(oLink);
   if (fOnload) {
     oLink.onload = function (evt: Event): void {
       fOnload(evt);

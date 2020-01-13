@@ -38,4 +38,9 @@
 - **1.0.35** - Gallery 0.0.61. Simplify how Gallery files are included in build.
 - **1.0.36** - Gallery 0.0.62. Fixes bug in starter.js that crashed when hash location changed handler was called.
 - **1.0.37** - Adds version number to unpkg.com/dc because the 4.0.0beta is incompatible and not working. Adds a Solid-specific hack to starter.js so that card names like 'Home.md' or 'Home' are interpreted as '/public/Home.md'.
+- **1.0.38** - Gallery 0.0.63. Improves behavior of consoleWrite() so that the size adjusts to about 10 lines and then begins scrolling. Adds experimental (and not yet working) ability to import ES6 modules and to declare a playable as a type=module script. Updates Mermaid config to use new sequence diagram config. Removes unnecessary script element used to hold source code.
+
+
+
+
 
