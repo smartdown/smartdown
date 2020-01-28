@@ -994,6 +994,33 @@ fieldset[disabled] .smartdown-container .btn-infocell.focus {
   padding:5px;
 }
 
+
+.smartdown-container .infocell-output.smartdown-flavor-pill {
+  padding: 0.1em 0.6em;
+  border-radius: 5em;
+}
+
+.smartdown-container .infocell-output.smartdown-flavor-red {
+  background: rgba(255,0,0,0.3);
+}
+
+.smartdown-container .infocell-output.smartdown-flavor-green {
+  background: rgba(50,205,50,0.3);
+}
+
+.smartdown-container .infocell-output.smartdown-flavor-blue {
+  background: rgba(80,80,255,0.3);
+}
+
+.smartdown-container .infocell-output.smartdown-flavor-orange {
+  background: rgba(255,165,0,0.3);
+}
+
+.smartdown-container .infocell-output.smartdown-flavor-gold {
+  background: rgba(255,215,0,0.3);
+}
+
+
 .smartdown-container .infocell-group .infocell-output {
   display: table-cell;
   height: 100%;

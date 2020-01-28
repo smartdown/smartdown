@@ -10,9 +10,7 @@
 
 /* global useFileSaver */
 /* global useLocalForage */
-/* global useBrython */
 /* global useGifffer */
-/* global useP5JS */
 /* global useMathJax */
 /* global XMLHttpRequest */
 
@@ -1578,9 +1576,16 @@ function renderLink(href, title, text) {
 
       const outputCellIdParts = lhs.split(/[\|\!]/g);
       var outputType = 'text';
+      let flavors = '';
       if (outputCellIdParts.length > 1) {
         lhs = outputCellIdParts[0];
         outputType = outputCellIdParts[1];
+        if (outputType === '') {
+          outputType = 'text';
+        }
+        const tmp = outputCellIdParts.slice(2);
+        tmp.unshift('');
+        flavors = tmp.join(' smartdown-flavor-');
       }
 
       smartdownCells[outputCellId] = {
@@ -1597,12 +1602,13 @@ function renderLink(href, title, text) {
         }
       }
 
+      // DRY this up. It's stupidly repetitive
       if (outputType !== '' && outputType !== 'text' && outputType !== 'url') {
         var smartdownClass = 'smartdown-' + outputType;
-        newHTML += `<div class="infocell-output ${smartdownClass}" id="${outputCellId}"></div>`;
+        newHTML += `<div class="infocell-output ${smartdownClass} ${flavors}" id="${outputCellId}"></div>`;
       }
       else {
-        newHTML += `<span class="infocell-output" id="${outputCellId}"></span>`;
+        newHTML += `<span class="infocell-output ${flavors}" id="${outputCellId}"></span>`;
       }
       if (hasLabel) {
         newHTML += '</span>';
@@ -1974,7 +1980,7 @@ eval(playable.transformedCode);
       augmentedCode = React.generateAugmentedPlayable();
     }
     else if (language === 'typescript') {
-      augmentedCode = Typescript.generateAugmentedPlayable();
+      augmentedCode = Typescript.generateAugmentedPlayable(divId, isModule);
     }
     else if (language === 'brython') {
       const brythonScriptId = divId + '_brython';
@@ -2300,7 +2306,7 @@ ${e}
 }
 
 
-async function runModule(playable, div, argValues, language) {
+async function runModule(playable, argValues, language) {
   const divId = playable.divId;
   const code = playable.augmentedCode;
   const embedThis = playable.embedThis;
@@ -2319,7 +2325,7 @@ async function runModule(playable, div, argValues, language) {
   s.onload = function (evt) {
     // console.log('...onload', evt, divId, smartdown.es6Playables[divId]);
     if (smartdown.es6Playables[divId].start) {
-      smartdown.es6Playables[divId].start(embedThis);
+      smartdown.es6Playables[divId].start(embedThis, ...argValues);
     }
   };
   s.onerror = function (error) {
@@ -2380,7 +2386,7 @@ async function playPlayableInternal(language, divId) {
       {}    // This will be a p5 obj in the case of using P5.Loader
     ];
     playable.embedThis = {
-      env: smartdownVariables,
+      // env: smartdownVariables,
       div: div,
       progress: progress,
       dependOn: {},
@@ -2397,7 +2403,12 @@ async function playPlayableInternal(language, divId) {
 
     if (language.toLowerCase() !== 'p5js') {
       if (playable.isModule) {
-        const embedResult = await smartdown.runModule(playable, div, argValues, language);
+        if (playable.language === 'typescript') {
+          const embedResult = await smartdown.runFunction(playable.augmentedCode, playable.embedThis, argValues, language, div);
+        }
+        else {
+          const embedResult = await smartdown.runModule(playable, argValues, language);
+        }
       }
       else {
         const embedResult = await smartdown.runFunction(playable.augmentedCode, playable.embedThis, argValues, language, div);
@@ -4552,15 +4563,31 @@ function setVariable(id, newValue, type) {
   }
 }
 
-function setVariables(assignments) {
-  each(assignments, assignment => {
-    var newValue = assignment.rhs;
-    if (assignment.type === 'number') {
-      newValue = Number(newValue);
-    }
-    changeVariable(assignment.lhs, newValue);
-  });
+function set(varnameOrAssignments, varValue, varType) {
+  if (arguments.length > 1) {
+    setVariable(varnameOrAssignments, varValue, varType);
+  }
+  else {
+    setVariables(varnameOrAssignments);
+  }
+}
 
+
+function setVariables(assignments) {
+  if (Array.isArray(assignments)) {
+    each(assignments, assignment => {
+      var newValue = assignment.rhs;
+      if (assignment.type === 'number') {
+        newValue = Number(newValue);
+      }
+      changeVariable(assignment.lhs, newValue);
+    });
+  }
+  else {
+    for (let varname in assignments) {
+      changeVariable(varname, assignments[varname]);
+    }
+  }
   ensureCells();
   updateProcesses();
 }
@@ -4818,6 +4845,7 @@ module.exports = {
   computeStoredExpression: computeStoredExpression,
   setVariable: setVariable,
   // forceVariable: forceVariable,
+  set: set,
   setVariables: setVariables,
   setPersistence: setPersistence,
   computeExpression: computeExpression,
@@ -4857,7 +4885,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.38',
+  version: '1.0.39',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,
