@@ -157,7 +157,18 @@
   }
 }
 
+.smartdown-container a.smartdown-h-anchor {
+  text-decoration: none;
+  vertical-align: text-top;
+  font-size: 0.5em;
+  opacity: 0;
+  margin: 0 0 0 0.5em;
+}
 
+.smartdown-container :hover > a.smartdown-h-anchor {
+  text-decoration: none;
+  opacity: 1;
+}
 
 .smartdown-container hr {
   height: 0;

@@ -58,7 +58,7 @@ function starter(basePrefix, doneHandler) {
     'medieval-gate': '/gallery/resources/medieval-gate.svg'
   };
   var multiparts = {};
-  var inhibitHash = '';
+  var rootHash = '';
   var gistOrg = '';
   var gistID = '';
 
@@ -99,21 +99,27 @@ function starter(basePrefix, doneHandler) {
 
   /* Common code above between inline/blocks helpers */
 
-  function cardLoaded(sourceText, cardKey, cardURL, outputDivId) {
+  function cardLoaded(sourceText, cardKey, cardURL, outputDivId, cardKeySubhash) {
+    // console.log('cardLoaded', cardURL, cardKey, cardKeySubhash);
     if (postLoadMutator) {
       sourceText = postLoadMutator(sourceText, cardKey, cardURL, defaultHome);
     }
     multiparts = smartdown.partitionMultipart(sourceText);
     var output = document.getElementById(outputDivId);
-    inhibitHash = '#' + cardKey;
+    rootHash = '#' + cardKey;
     if (lastLoadedRawPrefix !== rawPrefix) {
-      inhibitHash = '#' + cardURL;
-      // console.log('inhibitHash', inhibitHash);
+      rootHash = '#' + cardURL;
+      // console.log('rootHash', rootHash);
     }
-    // if (inhibitHash !== window.location.hash) {
-    if (adjustHash && window.location.hash.indexOf(inhibitHash) !== 0) {
-      // console.log('inhibitHash', inhibitHash, window.location.hash);
-      window.location.hash = inhibitHash;
+    // if (rootHash !== window.location.hash) {
+    if (adjustHash &&
+        window.location.hash.indexOf(rootHash) !== 0) {
+      if (window.location.hash.indexOf('#SD_') === 0) {
+        window.location.hash = `${rootHash}${window.location.hash}`;
+      }
+      else {
+        window.location.hash = rootHash;
+      }
     }
     if (themeName !== '') {
       window.location.search = `?theme=${themeName}`;
@@ -134,6 +140,13 @@ function starter(basePrefix, doneHandler) {
       document.body.scrollTop = 0; // For Chrome, Safari and Opera
       document.documentElement.scrollTop = 0; // For IE and Firefox
 
+      if (cardKeySubhash) {
+        const target = document.getElementById(cardKeySubhash);
+        if (target) {
+          target.scrollIntoView();
+        }
+      }
+
       if (!output.id) {
         output.id = 'smartdown-output-' + String(Math.random()).slice(2);
       }
@@ -141,22 +154,31 @@ function starter(basePrefix, doneHandler) {
     });
   }
 
-  function loadAsyncCard(cardKey, cardURL, outputDivId) {
+  function loadAsyncCard(cardKey, cardURL, outputDivId, cardKeySubhash) {
     // console.log('loadAsyncCard', cardKey, cardURL, outputDivId);
 
     var oReq = new XMLHttpRequest();
     oReq.addEventListener('load', function() {
-      cardLoaded(this.responseText, cardKey, cardURL, outputDivId);
+      cardLoaded(this.responseText, cardKey, cardURL, outputDivId, cardKeySubhash);
     });
     oReq.open('GET', cardURL);
     oReq.send();
   }
 
 
-  function relativeCardLoader(cardKey, outputDivId) {
-    // console.log('relativeCardLoader', cardKey, outputDivId, window.location.hash, window.location.pathname);
+  function relativeCardLoader(cardKeyWithHash, outputDivId) {
+    // console.log('relativeCardLoader', cardKeyWithHash, outputDivId, window.location.hash, window.location.pathname);
 
-    cardKey = cardKey.replace(/#/g, '');
+    let cardKey = cardKeyWithHash.replace(/^#+/, '');
+    const cardKeyHashParts = cardKey.split('#');
+    let cardKeySubhash = null;
+    if (cardKeyHashParts.length > 1) {
+      cardKey = cardKeyHashParts[0];
+      cardKeySubhash = cardKeyHashParts[1];
+    }
+
+    // console.log('cardKey', cardKeyWithHash, cardKey, cardKeySubhash);
+
     // console.log('# cardKey', cardKey);
     // console.log('# lastLoadedRawPrefix', lastLoadedRawPrefix);
     // console.log('# gistPathPrefix', gistPathPrefix);
@@ -194,7 +216,7 @@ function starter(basePrefix, doneHandler) {
         lastLoadedRawPrefix = cardKey.slice(0, endOfPath + 1);
         // console.log('...lastLoadedRawPrefix1', lastLoadedRawPrefix);
       }
-      loadAsyncCard(cardKey, cardKey, outputDivId);
+      loadAsyncCard(cardKey, cardKey, outputDivId, cardKeySubhash);
     }
     else if (cardKey.indexOf('/') === 0) {
       gistOrg = '';
@@ -221,7 +243,7 @@ function starter(basePrefix, doneHandler) {
           cardKey = gistHashPrefix + gistOrg + '/' + gistID + '/' + cardKey;
           lastLoadedRawPrefix = 'https://gist.githubusercontent.com/' + gistOrg + '/' + gistID + '/raw/';
 
-          loadAsyncCard(cardKey, gistFileURL, outputDivId);
+          loadAsyncCard(cardKey, gistFileURL, outputDivId, cardKeySubhash);
         }
       });
       oReq.open('GET', gistAPIBase);
@@ -232,7 +254,7 @@ function starter(basePrefix, doneHandler) {
       const loadableKey = keyParts.slice(0, -1).join(':');
       const suffix = (loadableKey === '') ? '' : (loadableKey + '.md');
       const cardURL = lastLoadedRawPrefix + suffix;
-      loadAsyncCard(cardKey, cardURL, outputDivId);
+      loadAsyncCard(cardKey, cardURL, outputDivId, cardKeySubhash);
     }
     else {
       gistOrg = '';
@@ -247,7 +269,7 @@ function starter(basePrefix, doneHandler) {
         cardURL = minusLastPart + '/' + cardKey + suffix;
       }
 
-      loadAsyncCard(cardKey, cardURL, outputDivId);
+      loadAsyncCard(cardKey, cardURL, outputDivId, cardKeySubhash);
     }
   }
 
@@ -271,16 +293,13 @@ function starter(basePrefix, doneHandler) {
     var hash = window.location.hash;
     if (baseHash) {
       var hashElements = hash.split('/');
-      // console.log('hashElements', hashElements);
       var baseHashElements = baseHash.split('/');
-      // console.log('baseHashElements', baseHashElements);
 
       hash = baseHash;
       if (baseHashElements.length === 4 &&
           hashElements.length === 4) {
         baseHashElements[3] = hashElements[3];
         hash = baseHashElements.join('/');
-        // console.log('newHash', hash);
       }
     }
     var search = window.location.search;
@@ -290,7 +309,6 @@ function starter(basePrefix, doneHandler) {
     if (argsPos >= 0) {
       args = hash.slice(argsPos + 1);
       hash = hash.slice(0, argsPos);
-      // console.log('loadHome hashargs', hash, args, window.location.search);
       if (args.indexOf('theme=') === 0) {
         themeName = args.slice('theme='.length);
       }
@@ -406,7 +424,7 @@ function starter(basePrefix, doneHandler) {
   ];
 
   function locationHashChanged() {
-    // console.log('locationHashChanged', window.location.hash, window.location.pathname, inhibitHash);
+    // console.log('locationHashChanged', window.location.hash, window.location.pathname, rootHash);
     var hash = window.location.hash;
     var args = '';
     var argsPos = hash.indexOf('?');
@@ -419,11 +437,11 @@ function starter(basePrefix, doneHandler) {
       }
     }
 
-    if (inhibitHash === hash) {
-      // console.log('...locationHashChanged INHIBIT', window.location.hash, hash, inhibitHash);
+    if (rootHash === hash) {
+      // console.log('...locationHashChanged INHIBIT', window.location.hash, hash, rootHash);
     }
     else {
-      // console.log('...locationHashChanged', window.location.hash, hash, inhibitHash);
+      // console.log('...locationHashChanged', window.location.hash, hash, rootHash);
       var cardKey = hash.slice(1);
       if (cardKey.indexOf('/') === -1) {
         gistOrg = '';
@@ -434,6 +452,9 @@ function starter(basePrefix, doneHandler) {
         cardKey = defaultHome;
       }
 
+      if (cardKey.indexOf('SD_') === 0) {
+        cardKey = rootHash + '#' + cardKey;
+      }
       relativeCardLoader(cardKey, document.querySelectorAll(outputDivSelector)[0].id);
     }
 

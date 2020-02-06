@@ -216,6 +216,8 @@ const escape = entityEscape;
 
 var markedOpts = {
   renderer: 'crashNoRenderer',
+  headerIds: true,
+  headerPrefix: 'SD_',
   gfm: true,
   tables: true,
   breaks: true,
@@ -310,17 +312,6 @@ function createEscaper(translationMap) {
   };
 }
 const decodeInlineScript = createEscaper(unescapeMap);
-
-
-function getServiceOrigin() {
-  var result = window.location.origin;
-  if (window.location.protocol === 'file:') {
-    result = 'http://127.0.0.1:3000';
-  }
-
-  return result;
-}
-
 
 const youtubeDimensions = {
   thumbnail: 'width="426" height="240"',
@@ -1310,10 +1301,6 @@ function renderLink(href, title, text) {
   else if (href.indexOf(smartdownTag) === 0) {
     // x
   }
-  else if ((href.indexOf('http://') === -1) &&
-           (href.indexOf('https://') === -1)) {
-    href = getServiceOrigin() + href;
-  }
 
   const titleAttr = title ? `title="${title}" ` : '';
   var linkHead = '<a ' + titleAttr +
@@ -1739,8 +1726,11 @@ function renderHeading(text, level, raw, slugger) {
     }
   }
   else {
-    result = markedOpts.renderer.baseHeadingRenderer(text, level, raw, slugger);
+    const headingId = markedOpts.headerPrefix + slugger.slug(raw);
+    const anchor = `<a class="smartdown-h-anchor" href="#${headingId}">&#x1F517;</a>`;
+    result = `<h${level} id="${headingId}">${text}${anchor}</h${level}>`;
   }
+
   return result;
 }
 
@@ -4885,7 +4875,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.39',
+  version: '1.0.40',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,
