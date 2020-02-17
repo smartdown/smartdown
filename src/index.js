@@ -1282,20 +1282,23 @@ function renderLink(href, title, text) {
   const smartdownTag = ':';
 
   var useNewWindow = true;
-  var handled = false;
-  for (var i = 0; i < linkRules.length; ++i) {
-    const rule = linkRules[i];
-    if (href.indexOf(rule.prefix) === 0) {
-      const newHRef = rule.replace + href.slice(rule.prefix.length);
-      // console.log('linkRule', href, newHRef, rule);
-      href = newHRef;
-      handled = true;
-      useNewWindow = false;
-      break;
-    }
-  }
+  const expanded = expandHrefWithLinkRules(href);
+  var handled = expanded !== href;
+  // for (var i = 0; i < linkRules.length; ++i) {
+  //   const rule = linkRules[i];
+  //   if (href.indexOf(rule.prefix) === 0) {
+  //     const newHRef = rule.replace + href.slice(rule.prefix.length);
+  //     const expanded = expandHrefWithLinkRules(href);
+  //     console.log('linkRule', href, newHRef, rule, expanded);
+  //     href = newHRef;
+  //     handled = true;
+  //     useNewWindow = false;
+  //     break;
+  //   }
+  // }
 
   if (handled) {
+    href = expanded;
     //
   }
   else if (href.indexOf(smartdownTag) === 0) {

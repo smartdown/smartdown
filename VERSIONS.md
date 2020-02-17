@@ -41,3 +41,8 @@
 - **1.0.38** - Gallery 0.0.63. Improves behavior of consoleWrite() so that the size adjusts to about 10 lines and then begins scrolling. Adds experimental (and not yet working) ability to import ES6 modules and to declare a playable as a type=module script. Updates Mermaid config to use new sequence diagram config. Removes unnecessary script element used to hold source code.
 - **1.0.39** - Gallery 0.0.64. Improves .setVariables() syntax to allow an object to be used to set multiple variables. Adds .set() as a preferred alias for .setVariables() and .setVariable(). Adds Typescript playable support for ES6 modules. Adds preliminary idea of 'flavors', which are annotations that can be used to decorate cells (currently only output cells) with CSS classes; more to come on this front.
 - **1.0.40** - Gallery 0.0.65. Fix bug where relative URLs without a prefixing slash are appended to window.location.origin, resulting in an invalid URL. Add id attributes to generated h1-h6 headings. Add hover links for headings.
+- **1.0.41** - Gallery 0.0.66. Fix bug in relative links. Adjust smartdown-theme-blog to have better inter-paragraph spacing. Refactor renderLink to use linkRules via expandHrefViaLinkRules().
+
+
+
+

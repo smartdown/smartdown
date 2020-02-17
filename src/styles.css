@@ -1942,12 +1942,6 @@ img.media-image path {
   padding: 2px 4px;
 }
 
-.smartdown-theme-blog p.smartdown_p {
-  margin: 4px 0;
-  padding: 0 0 0 4px;
-}
-
-
 
 @media (min-width: 800px) {
   .smartdown-theme-blog .smartdown-container {
