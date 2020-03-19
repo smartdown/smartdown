@@ -50,6 +50,10 @@ if (useP5JS) {
           import(/* webpackChunkName: "p5Sound" */ 'p5/lib/addons/p5.sound.min.js')
             .then(p5Sound => {
 
+              // for (const f in P5.Loader.prototype) {
+              //   console.log(f, typeof P5.Loader.prototype[f]);
+              // }
+
               const callThese = window.smartdownJSModules.p5js.loadedCallbacks;
               window.smartdownJSModules.p5js.loadedCallbacks = [];
               callThese.forEach(loadedCb => {
@@ -91,9 +95,7 @@ if (useP5JS) {
   };
 
   var implicitP5VarDefs = [];
-  // console.log('P5.Loader.prototype');
-  // for (let f in P5.Loader.prototype) {
-  //   console.log(f, typeof P5.Loader.prototype[f]);
+
   for (const f in P5LoaderPrototypeInfo) {
     if (f.indexOf('_') !== 0) {
       if (P5SystemVars.indexOf(f) !== -1) {
@@ -127,6 +129,7 @@ if (useP5JS) {
             implicitP5VarDefs.push(createCanvasWrapper);
           }
           else {
+            // console.log('...', f);
             // implicitP5VarDefs.push(`console.log('p5.${f}', p5.${f}, typeof p5.${f});const ${f} = p5.${f}.bind(p5);`);
             implicitP5VarDefs.push(`const ${f} = p5.${f}.bind(p5);`);
           }

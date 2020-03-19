@@ -4700,8 +4700,14 @@ function computeExpression(entry, done) {
 
 
 function goToCard(cardKey, event, outputDivId) {
-  event.preventDefault();
-  event.stopPropagation();
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  if (!outputDivId) {
+    outputDivId = 'smartdown-output';
+  }
+
   cardLoading = true;
   if (cardLoader) {
     cardLoader(cardKey, outputDivId);
@@ -4802,7 +4808,6 @@ function setupYouTubePlayer(div, varName) {
 
 
 module.exports = {
-  tweek: null,
   initialize: initialize,
   configure: configure,
   perPageState: perPageState,

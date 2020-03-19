@@ -42,7 +42,4 @@
 - **1.0.39** - Gallery 0.0.64. Improves .setVariables() syntax to allow an object to be used to set multiple variables. Adds .set() as a preferred alias for .setVariables() and .setVariable(). Adds Typescript playable support for ES6 modules. Adds preliminary idea of 'flavors', which are annotations that can be used to decorate cells (currently only output cells) with CSS classes; more to come on this front.
 - **1.0.40** - Gallery 0.0.65. Fix bug where relative URLs without a prefixing slash are appended to window.location.origin, resulting in an invalid URL. Add id attributes to generated h1-h6 headings. Add hover links for headings.
 - **1.0.41** - Gallery 0.0.66. Fix bug in relative links. Adjust smartdown-theme-blog to have better inter-paragraph spacing. Refactor renderLink to use linkRules via expandHrefViaLinkRules().
-
-
-
-
+- **1.0.42** - Gallery 0.0.67. Update dependencies, including P5JS to 1.0. Make goToCard() more flexible by allowing the 'event' and 'outputDivId' to have defaults.

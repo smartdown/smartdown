@@ -9,7 +9,7 @@ export default function registerLeaflet() {
       'https://unpkg.com/leaflet/dist/leaflet.js',
       'https://unpkg.com/leaflet/dist/leaflet.css',
       function() {
-        console.log('leaflet', window.Leaflet, window.L);
+        // console.log('leaflet', window.Leaflet, window.L);
         window.Leaflet = window.L;
         //delete Leaflet.Icon.Default.prototype._getIconUrl;
 //

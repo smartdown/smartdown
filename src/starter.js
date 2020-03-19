@@ -143,7 +143,9 @@ function starter(basePrefix, doneHandler) {
       if (cardKeySubhash) {
         const target = document.getElementById(cardKeySubhash);
         if (target) {
-          target.scrollIntoView();
+          window.setTimeout(() => {
+            target.scrollIntoView();
+          }, 500);
         }
       }
 
