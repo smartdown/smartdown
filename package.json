@@ -1,6 +1,6 @@
 {
   "name": "smartdown",
-  "version": "1.0.42",
+  "version": "1.0.43",
   "description": "A library for translating, rendering and interacting with Smartdown documents. Smartdown is an extension of Markdown that provides richer media support and reactive programming capability.",
   "main": "dist/lib/smartdown.js",
   "scripts": {

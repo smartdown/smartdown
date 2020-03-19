@@ -43,3 +43,4 @@
 - **1.0.40** - Gallery 0.0.65. Fix bug where relative URLs without a prefixing slash are appended to window.location.origin, resulting in an invalid URL. Add id attributes to generated h1-h6 headings. Add hover links for headings.
 - **1.0.41** - Gallery 0.0.66. Fix bug in relative links. Adjust smartdown-theme-blog to have better inter-paragraph spacing. Refactor renderLink to use linkRules via expandHrefViaLinkRules().
 - **1.0.42** - Gallery 0.0.67. Update dependencies, including P5JS to 1.0. Make goToCard() more flexible by allowing the 'event' and 'outputDivId' to have defaults.
+- **1.0.43** - Fix smartdown.version variable to reflect current version.
