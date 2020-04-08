@@ -15,6 +15,31 @@
 
 var themeName = '';
 
+
+function scrollToSubHash(cardKeySubhash) {
+  let scrollToTop = true;
+
+  if (cardKeySubhash) {
+    const target = document.getElementById(cardKeySubhash);
+    if (target) {
+      scrollToTop = false;
+      window.setTimeout(() => {
+        target.scrollIntoView({
+          behavior: 'smooth',
+        });
+      }, 300);
+    }
+  }
+
+  if (scrollToTop) {
+    window.scrollTo({top: 0, behavior: 'smooth'});
+
+    // document.body.scrollTop = 0; // For Chrome, Safari and Opera
+    // document.documentElement.scrollTop = 0; // For IE and Firefox
+  }
+}
+
+
 /**
  * A convenient way to initialize Smartdown with common defaults.
  *
@@ -35,6 +60,7 @@ var themeName = '';
  *   window.smartdownStarter();
  * < /script>
  */
+
 
 function starter(basePrefix, doneHandler) {
   var defaultHome = 'Home';
@@ -111,16 +137,17 @@ function starter(basePrefix, doneHandler) {
       rootHash = '#' + cardURL;
       // console.log('rootHash', rootHash);
     }
-    // if (rootHash !== window.location.hash) {
-    if (adjustHash &&
-        window.location.hash.indexOf(rootHash) !== 0) {
-      if (window.location.hash.indexOf('#SD_') === 0) {
-        window.location.hash = `${rootHash}${window.location.hash}`;
-      }
-      else {
-        window.location.hash = rootHash;
-      }
-    }
+
+    // if (adjustHash &&
+    //     window.location.hash.indexOf(rootHash) !== 0) {
+    //   if (window.location.hash.indexOf('#SD_') === 0) {
+    //     window.location.hash = `${rootHash}${window.location.hash}`;
+    //   }
+    //   else {
+    //     window.location.hash = rootHash;
+    //   }
+    // }
+
     if (themeName !== '') {
       window.location.search = `?theme=${themeName}`;
     }
@@ -137,17 +164,14 @@ function starter(basePrefix, doneHandler) {
     // console.log('defaultPart', defaultPart);
     // console.log(JSON.stringify(multiparts, null, 2));
     smartdown.setHome(multiparts[defaultPart], output, function() {
-      document.body.scrollTop = 0; // For Chrome, Safari and Opera
-      document.documentElement.scrollTop = 0; // For IE and Firefox
+      let newHash = '#' + cardKey;
 
-      if (cardKeySubhash) {
-        const target = document.getElementById(cardKeySubhash);
-        if (target) {
-          window.setTimeout(() => {
-            target.scrollIntoView();
-          }, 500);
-        }
+      if (cardKeySubhash && cardKeySubhash !== 'undefined') {
+        newHash += '#' + cardKeySubhash;
       }
+
+      history.pushState({}, '', newHash);
+      scrollToSubHash(cardKeySubhash);
 
       if (!output.id) {
         output.id = 'smartdown-output-' + String(Math.random()).slice(2);
@@ -157,7 +181,7 @@ function starter(basePrefix, doneHandler) {
   }
 
   function loadAsyncCard(cardKey, cardURL, outputDivId, cardKeySubhash) {
-    // console.log('loadAsyncCard', cardKey, cardURL, outputDivId);
+    // console.log('loadAsyncCard', cardKey, cardURL, cardKeySubhash, rootHash, outputDivId);
 
     var oReq = new XMLHttpRequest();
     oReq.addEventListener('load', function() {
@@ -169,17 +193,33 @@ function starter(basePrefix, doneHandler) {
 
 
   function relativeCardLoader(cardKeyWithHash, outputDivId) {
-    // console.log('relativeCardLoader', cardKeyWithHash, outputDivId, window.location.hash, window.location.pathname);
+    // console.log('relativeCardLoader', rootHash, cardKeyWithHash);
 
-    let cardKey = cardKeyWithHash.replace(/^#+/, '');
-    const cardKeyHashParts = cardKey.split('#');
+    let cardKey = null;
     let cardKeySubhash = null;
-    if (cardKeyHashParts.length > 1) {
-      cardKey = cardKeyHashParts[0];
-      cardKeySubhash = cardKeyHashParts[1];
+    if (cardKeyWithHash.indexOf('#') !== 0) {
+      cardKeyWithHash = '#' + cardKeyWithHash;
     }
 
-    // console.log('cardKey', cardKeyWithHash, cardKey, cardKeySubhash);
+    const cardKeyHashParts = cardKeyWithHash.split('#');
+
+    if (cardKeyHashParts.length > 1) {
+      cardKey = cardKeyHashParts[1];
+      cardKeySubhash = cardKeyHashParts[2];
+
+      if (rootHash !== '' && ('#' + cardKey) === rootHash) {
+        history.replaceState({}, '', cardKeyWithHash);
+        scrollToSubHash(cardKeySubhash);
+
+        return;
+      }
+      else {
+        // console.log('empty roothash', cardKeyWithHash, cardKey, rootHash, cardKeySubhash);
+      }
+    }
+    else {
+      console.log('... illformatted cardKeyWithHash', cardKeyWithHash);
+    }
 
     // console.log('# cardKey', cardKey);
     // console.log('# lastLoadedRawPrefix', lastLoadedRawPrefix);
@@ -216,7 +256,6 @@ function starter(basePrefix, doneHandler) {
       var endOfPath = cardKey.lastIndexOf('/');
       if (endOfPath > 0) {
         lastLoadedRawPrefix = cardKey.slice(0, endOfPath + 1);
-        // console.log('...lastLoadedRawPrefix1', lastLoadedRawPrefix);
       }
       loadAsyncCard(cardKey, cardKey, outputDivId, cardKeySubhash);
     }
@@ -425,8 +464,11 @@ function starter(basePrefix, doneHandler) {
     },
   ];
 
-  function locationHashChanged() {
-    // console.log('locationHashChanged', window.location.hash, window.location.pathname, rootHash);
+  function locationHashChanged(event) {
+    // console.log('#locationHashChanged', event, window.location.href, window.location.hash, window.location.pathname, rootHash);
+    event.preventDefault();
+    event.stopImmediatePropagation();
+
     var hash = window.location.hash;
     var args = '';
     var argsPos = hash.indexOf('?');
@@ -441,22 +483,34 @@ function starter(basePrefix, doneHandler) {
 
     if (rootHash === hash) {
       // console.log('...locationHashChanged INHIBIT', window.location.hash, hash, rootHash);
+      scrollToSubHash();
     }
     else {
-      // console.log('...locationHashChanged', window.location.hash, hash, rootHash);
       var cardKey = hash.slice(1);
-      if (cardKey.indexOf('/') === -1) {
-        gistOrg = '';
-        gistID = '';
-      }
 
       if (cardKey === '') {
         cardKey = defaultHome;
       }
-
-      if (cardKey.indexOf('SD_') === 0) {
-        cardKey = rootHash + '#' + cardKey;
+      else if (cardKey.indexOf('/') === -1) {
+        gistOrg = '';
+        gistID = '';
+        cardKey = '#' + cardKey;
       }
+
+      let cardKeySubhash = null;
+      const cardKeyHashParts = cardKey.split('#');
+
+      if (cardKeyHashParts.length > 1) {
+        cardKey = cardKeyHashParts[1];
+        cardKeySubhash = cardKeyHashParts[2];
+
+        if (cardKey === '') {
+          cardKey = rootHash;
+        }
+
+        cardKey = cardKey + '#' + cardKeySubhash;
+      }
+
       relativeCardLoader(cardKey, document.querySelectorAll(outputDivSelector)[0].id);
     }
 

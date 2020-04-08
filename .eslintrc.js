@@ -52,6 +52,7 @@ module.exports = {
     "max-len": 0,
     "quotes": ["error", "single", { "allowTemplateLiterals": true }],
     "import/prefer-default-export": "off",
-    "arrow-parens": ["error", "as-needed"]
+    "arrow-parens": ["error", "as-needed"],
+    // "complexity": ["warn", { "max": 20 }],
   }
 };

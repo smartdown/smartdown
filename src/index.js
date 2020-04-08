@@ -21,6 +21,7 @@ import emoji from 'emojiJS';
 const emojiInstance = new emoji();
 const emojiReplacer = match => emojiInstance.replace_colons(match);
 import axios from 'axios';
+import smoothscroll from 'smoothscroll-polyfill';
 
 import {importScriptUrl, importModuleUrl, importTextUrl, importCssCode, importCssUrl} from 'importers';
 
@@ -217,7 +218,6 @@ const escape = entityEscape;
 var markedOpts = {
   renderer: 'crashNoRenderer',
   headerIds: true,
-  headerPrefix: 'SD_',
   gfm: true,
   tables: true,
   breaks: true,
@@ -1281,25 +1281,30 @@ function renderImage(href, title, text) {
 function renderLink(href, title, text) {
   const smartdownTag = ':';
 
-  var useNewWindow = true;
-  const expanded = expandHrefWithLinkRules(href);
-  var handled = expanded !== href;
-  // for (var i = 0; i < linkRules.length; ++i) {
-  //   const rule = linkRules[i];
-  //   if (href.indexOf(rule.prefix) === 0) {
-  //     const newHRef = rule.replace + href.slice(rule.prefix.length);
-  //     const expanded = expandHrefWithLinkRules(href);
-  //     console.log('linkRule', href, newHRef, rule, expanded);
-  //     href = newHRef;
-  //     handled = true;
-  //     useNewWindow = false;
-  //     break;
-  //   }
-  // }
+  let useNewWindow = true;
+  let expanded = expandHrefWithLinkRules(href);
 
-  if (handled) {
+  let forceNewWindow = false;
+  const attrsIndex = expanded.lastIndexOf('#-');
+
+  let attrs = '';
+  if (attrsIndex >= 0) {
+    attrs = expanded.slice(attrsIndex + '#-'.length);
+    expanded = expanded.slice(0, attrsIndex);
+    forceNewWindow = attrs === 'blank';
+    // console.log('attrs', href, attrs, expanded, forceNewWindow);
+  }
+
+  if (expanded !== href) {
     href = expanded;
+    useNewWindow = false || forceNewWindow;
     //
+  }
+  else if (href.indexOf('#') === 0) {
+    useNewWindow = false || forceNewWindow;
+  }
+  else if (href.indexOf('http') !== 0) {
+    useNewWindow = false || forceNewWindow;
   }
   else if (href.indexOf(smartdownTag) === 0) {
     // x
@@ -1729,9 +1734,9 @@ function renderHeading(text, level, raw, slugger) {
     }
   }
   else {
-    const headingId = markedOpts.headerPrefix + slugger.slug(raw);
-    const anchor = `<a class="smartdown-h-anchor" href="#${headingId}">&#x1F517;</a>`;
-    result = `<h${level} id="${headingId}">${text}${anchor}</h${level}>`;
+    const slug = slugger.slug(raw);
+    const anchor = `<a class="smartdown-h-anchor" href="##${slug}">&#x1F517;</a>`;
+    result = `<h${level} id="${slug}">${text}${anchor}</h${level}>`;
   }
 
   return result;
@@ -4883,7 +4888,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.43',
+  version: '1.0.44',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,
@@ -4900,5 +4905,8 @@ module.exports = {
   ensureExtension: ensureExtension,
   es6Playables: es6Playables,
 };
+
+// kick off the polyfill!
+smoothscroll.polyfill();
 
 window.smartdown = module.exports;

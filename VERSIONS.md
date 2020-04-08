@@ -44,3 +44,5 @@
 - **1.0.41** - Gallery 0.0.66. Fix bug in relative links. Adjust smartdown-theme-blog to have better inter-paragraph spacing. Refactor renderLink to use linkRules via expandHrefViaLinkRules().
 - **1.0.42** - Gallery 0.0.67. Update dependencies, including P5JS to 1.0. Make goToCard() more flexible by allowing the 'event' and 'outputDivId' to have defaults.
 - **1.0.43** - Fix smartdown.version variable to reflect current version.
+- **1.0.44** - Gallery 0.0.68. Adds ability to control whether a link opens in a new browser window or the current window. Adds smoothscroll-polyfill package to support cross-browser smooth-scrolling to anchors. Improves starter.js to more efficiently handle intra-page links by not re-loading content for the current page.
+
