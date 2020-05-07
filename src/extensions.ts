@@ -67,7 +67,7 @@ export function registerExtension(
  *
  */
 
-function loadResourceList(thisModule: any) {
+function loadResourceList(thisModule: any): void {
   if (thisModule.resources.length <= thisModule.resourceToLoad) {
     // console.log('loadResourceList all resources loaded for ', thisModule.name, thisModule.resourceToLoad, thisModule.resources.length);
     const callThese = thisModule.loadedCallbacks;
@@ -80,7 +80,7 @@ function loadResourceList(thisModule: any) {
   else {
     const resource = thisModule.resources[thisModule.resourceToLoad];
     if (typeof resource === 'string') {
-      let url: string = resource;
+      const url: string = resource;
 
       if (url.endsWith('.css')) {
         importCssUrl(

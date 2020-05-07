@@ -1,6 +1,6 @@
 {
   "name": "smartdown",
-  "version": "1.0.44",
+  "version": "1.0.45",
   "description": "A library for translating, rendering and interacting with Smartdown documents. Smartdown is an extension of Markdown that provides richer media support and reactive programming capability.",
   "main": "dist/lib/smartdown.js",
   "scripts": {
@@ -18,7 +18,7 @@
     "ghpublish": "./publish.sh",
     "watch": "BUILD=development node_modules/.bin/webpack --devtool=source-map --watch --verbose --progress --colors",
     "dev": "(npm run serve &) && npm run watch",
-    "lint": "node_modules/.bin/eslint src/*.js src/extensions/*.js",
+    "lint": "node_modules/.bin/eslint src/*.ts src/*.js src/extensions/*.js",
     "test": "npm run test:unit && npm run test:e2e",
     "test:e2e": "node_modules/.bin/nightwatch",
     "test:unit": "BUILD=test node_modules/.bin/mocha-webpack --timeout 25000 -r test/mocha-setup.js test/mocha/*.spec.js"
@@ -110,7 +110,7 @@
     "lodash": "^4.17.15",
     "marked": "^0.8.2",
     "p5": "^1.0.0",
-    "smartdown-gallery": "0.0.68",
+    "smartdown-gallery": "0.0.69",
     "smoothscroll-polyfill": "^0.4.4",
     "stacktrace-js": "^2.0.2",
     "vdom-to-html": "^2.3.1",

@@ -1,5 +1,3 @@
-/* global window */
-
 const each = window.lodashEach = require('lodash/forEach');
 
 // https://github.com/mdaines/viz.js/wiki/API#render-options

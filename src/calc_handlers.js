@@ -1,6 +1,3 @@
-/* global window */
-/* global XMLHttpRequest */
-
 const smartdown = window.smartdown;
 
 /**

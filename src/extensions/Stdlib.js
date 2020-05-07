@@ -1,3 +1,5 @@
+/* global smartdown */
+
 import {registerExtension} from 'extensions';
 import {importScriptUrl} from 'importers';
 
@@ -13,7 +15,6 @@ Stdlib.register = function register() {
         Stdlib.vdomToHtml = smartdown.vdomToHtml;
         window.Stdlib = Stdlib;
         smartdown.Stdlib = Stdlib;
-        Stdlib.vdomToHtml = smartdown.vdomToHtml;
         Stdlib.datasets = {};
         const stdlibData = window.stdlib_datasets_exclude.datasets;
         Object.keys(stdlibData).forEach(slot => {
@@ -46,7 +47,6 @@ Stdlib.loadSOTU = function loadSOTU(loaded) {
   }
 };
 
-Stdlib.vdomToHtml = Stdlib.vdomToHtml;
 Stdlib.datasets = {};
 
 export default Stdlib;

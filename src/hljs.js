@@ -1,4 +1,3 @@
-/* global window */
 /* global useLeaflet */
 
 require('highlight.js/styles/default.css');

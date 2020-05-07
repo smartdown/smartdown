@@ -21,7 +21,7 @@ function expandSrc(sSrc: string): string {
 
 
 function importScriptUrlWithModule(sSrc: string, isModule: boolean, fOnload: Function, fOnerror: Function): void {
-  var oHead = document.head || document.getElementsByTagName('head')[0];
+  const oHead = document.head || document.getElementsByTagName('head')[0];
   const expandedSrc = expandSrc(sSrc);
 
   function loadError(oError: Event | string): void {
@@ -34,7 +34,7 @@ function importScriptUrlWithModule(sSrc: string, isModule: boolean, fOnload: Fun
     }
   }
 
-  var oScript = document.createElement('script');
+  const oScript = document.createElement('script');
   oScript.type = isModule ? 'module' : 'text\/javascript';
   oScript.onerror = loadError;
   oScript.async = false;
@@ -77,7 +77,7 @@ export function importModuleUrl(sSrc: string, fOnload: Function, fOnerror: Funct
 export function importTextUrl(sSrc: string, fOnload: (error: string) => void, fOnerror: Function): void {
   const expandedSrc = expandSrc(sSrc);
 
-  var xhr = new XMLHttpRequest();
+  const xhr = new XMLHttpRequest();
   xhr.onreadystatechange = function (): void {
     if (this.readyState === 4) {
       if (this.status === 200) {
@@ -88,7 +88,7 @@ export function importTextUrl(sSrc: string, fOnload: (error: string) => void, fO
       }
     }
   };
-  xhr.open('GET', sSrc);
+  xhr.open('GET', expandedSrc);
   xhr.send();
 }
 

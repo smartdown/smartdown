@@ -1,5 +1,3 @@
-/* global window */
-/* global document */
 /* global useP5JS */
 /* global isTesting */
 

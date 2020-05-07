@@ -1,6 +1,4 @@
 /* global smartdown */
-/* global window */
-/* global document */
 /* global smartdownBaseURL */
 /* global smartdownDefaultHome */
 /* global smartdownGistPathPrefix */
@@ -9,8 +7,8 @@
 /* global smartdownRawPrefix */
 /* global smartdownOutputDivSelector */
 /* global smartdownPostLoadMutator */
+/* global smartdownAdjustHash */
 /* global smartdownMedia */
-/* global XMLHttpRequest */
 /* eslint no-var: 0 */
 
 var themeName = '';
@@ -138,16 +136,6 @@ function starter(basePrefix, doneHandler) {
       // console.log('rootHash', rootHash);
     }
 
-    // if (adjustHash &&
-    //     window.location.hash.indexOf(rootHash) !== 0) {
-    //   if (window.location.hash.indexOf('#SD_') === 0) {
-    //     window.location.hash = `${rootHash}${window.location.hash}`;
-    //   }
-    //   else {
-    //     window.location.hash = rootHash;
-    //   }
-    // }
-
     if (themeName !== '') {
       window.location.search = `?theme=${themeName}`;
     }
@@ -170,7 +158,8 @@ function starter(basePrefix, doneHandler) {
         newHash += '#' + cardKeySubhash;
       }
 
-      history.pushState({}, '', newHash);
+      // console.log('newHash ignored', newHash, cardKeySubhash, window.location.pathname);
+      history.pushState({}, '', window.location.pathname + newHash);
       scrollToSubHash(cardKeySubhash);
 
       if (!output.id) {
@@ -208,7 +197,7 @@ function starter(basePrefix, doneHandler) {
       cardKeySubhash = cardKeyHashParts[2];
 
       if (rootHash !== '' && ('#' + cardKey) === rootHash) {
-        history.replaceState({}, '', cardKeyWithHash);
+        history.replaceState({}, '', window.location.pathname + cardKeyWithHash);
         scrollToSubHash(cardKeySubhash);
 
         return;

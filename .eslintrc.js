@@ -2,15 +2,20 @@ module.exports = {
   parser: "@typescript-eslint/parser", // Specifies the ESLint parser
   // "parser": "babel-eslint",
   extends: [
-    "plugin:@typescript-eslint/recommended" // Uses the recommended rules from the @typescript-eslint/eslint-plugin
+    "eslint:recommended",
   ],
   parserOptions: {
     ecmaVersion: 2018, // Allows for the parsing of modern ECMAScript features
     sourceType: "module" // Allows for the use of imports
   },
+  "env": {
+      "browser": true,
+      "node": true
+  },
   rules: {
     // Place to specify ESLint rules. Can be used to overwrite rules specified from the extended configs
     // e.g. "@typescript-eslint/explicit-function-return-type": "off",
+    // 'no-undef': 0,
     'no-var': 0,
     'prefer-arrow-callback': 0,
     'no-restricted-syntax': 0,
@@ -54,5 +59,22 @@ module.exports = {
     "import/prefer-default-export": "off",
     "arrow-parens": ["error", "as-needed"],
     // "complexity": ["warn", { "max": 20 }],
-  }
+  },
+  overrides: [
+    // typescript
+    {
+      files: ["*.ts", "*.tsx"],
+      plugins: ['@typescript-eslint'],
+      extends: [
+        'plugin:@typescript-eslint/eslint-recommended',
+        'plugin:@typescript-eslint/recommended',
+      ],
+      rules: {
+        '@typescript-eslint/no-explicit-any': 0,
+        '@typescript-eslint/member-delimiter-style': 0,
+        '@typescript-eslint/interface-name-prefix': 0,
+        '@typescript-eslint/no-use-before-define': 0,
+      },
+    },
+  ]
 };

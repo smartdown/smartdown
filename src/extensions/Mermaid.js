@@ -1,7 +1,5 @@
 import {registerExtension} from 'extensions';
 
-/* global window */
-
 const Mermaid = {
   mermaid: null,
   mermaidRender: null

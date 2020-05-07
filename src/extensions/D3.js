@@ -1,3 +1,5 @@
+/* global d3 */
+
 import {registerExtension} from 'extensions';
 
 export default function registerD3() {

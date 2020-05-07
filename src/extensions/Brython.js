@@ -1,4 +1,3 @@
-/* global window */
 /* global useBrython */
 
 var Brython;

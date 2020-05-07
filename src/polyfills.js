@@ -1,6 +1,3 @@
-/* global document */
-/* global window */
-
 var Element = window.Element;
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/endsWith#Polyfill
 if (!String.prototype.endsWith) {
@@ -13,7 +10,7 @@ if (!String.prototype.endsWith) {
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/removeEventListener#Polyfill_to_support_older_browsers
-/* global Element */
+
 if (!Element.prototype.addEventListener) {
   var oListeners = {};
   function runListeners(oEvent) {

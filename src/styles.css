@@ -30,8 +30,8 @@
   line-height: 1.4; /* 1.42857143; */
   overflow-x: visible;
   overflow-y: visible;
-  resize:vertical;
-  width: auto;
+  resize: vertical;
+  width: 100%;
   height: auto;
   max-width: 100%;
   max-height: 100%;
@@ -335,6 +335,11 @@ smartdown-checkbox
   width: 100%;
 }
 
+
+.smartdown-container .infocell-output.smartdown-markdown {
+  width: 100%;
+}
+
 .smartdown-container .abc-wrapper,
 .smartdown-container .infocell-output .abc-wrapper {
   background: ivory;
@@ -343,7 +348,7 @@ smartdown-checkbox
 }
 
 .smartdown-container .smartdown-abc,
-.smartdown-container .infocell-output .smartdown-abc {
+.smartdown-container .infocell-output.smartdown-abc {
   width: 100%;
 }
 .smartdown-container .smartdown-abcsheet,
@@ -987,7 +992,7 @@ fieldset[disabled] .smartdown-container .btn-infocell.focus {
 .smartdown-container .infocell-output {
   display: inline-block;
   user-select: text;
-  margin:0;
+  margin: 0;
   padding: 1px 6px;
 }
 

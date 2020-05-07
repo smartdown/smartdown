@@ -5,14 +5,10 @@
 // Copyright 2015, Daniel B Keith
 //
 
-/* global document */
-/* global window */
-
 /* global useFileSaver */
 /* global useLocalForage */
 /* global useGifffer */
 /* global useMathJax */
-/* global XMLHttpRequest */
 
 import './polyfills';
 import createDOMPurify from 'dompurify';
@@ -326,110 +322,97 @@ const youtubeClasses = {
 
 var uniqueYouTubeId = 0;
 
-function convertYoutubeFragmentToEmbed(href, title) {
-  // console.log('convertYoutubeFragmentToEmbed', href, title);
+function convertYoutubeFragmentToEmbed(href, title, text) {
+  // console.log('convertYoutubeFragmentToEmbed', href, title, text);
   var result = null;
-  var titleParts = title.split('|');
-  title = titleParts[0];
-  var shortPrefixes = ['http://youtu.be/', 'https://youtu.be/'];
-  var longPrefixes = ['http://www.youtube.com/watch?v=', 'https://www.youtube.com/watch?v='];
+  var textParts = text.split('|');
+  text = textParts[0];
 
-  const sizing = youtubeDimensions[title] || '';
-  const classList = youtubeClasses[title] || '';
+  const hrefNoProtocol = href.replace(/^https?:\/\//, '');
 
-  shortPrefixes.every(prefix => {
-    if (href.indexOf(prefix) === 0) {
-      var suffix = href.substr(prefix.length);
-      ++uniqueYouTubeId;
+  const sizing = youtubeDimensions[text] || '';
+  const classList = youtubeClasses[text] || '';
+  let suffix;
 
-      let enablejsapi = '';
-      let apiButton = '';
-      let apiPlayerKey = `player_${uniqueYouTubeId}`;
-      if (titleParts.length > 1) {
-        const apiParts = titleParts[1].split('=');
-        if (apiParts[0] === 'api') {
-          if (apiParts.length > 1) {
-            apiPlayerKey = apiParts[1];
-          }
-          enablejsapi = '&enablejsapi=1';
-          apiButton =
-            `
-            <button
-              type="button"
-              id="youtube-api-${uniqueYouTubeId}"
-              href="#"
-              onclick="smartdown.setupYouTubePlayer('youtube-iframe-${uniqueYouTubeId}', '${apiPlayerKey}')"
-              class="api-button">
-              Enable API for player <b>${apiPlayerKey}</b>
-            </button>
-            `;
+  if (hrefNoProtocol.indexOf('youtu.be/') === 0) {
+    suffix = hrefNoProtocol.slice('youtu.be/'.length);
+  }
+  else if (hrefNoProtocol.indexOf('www.youtube.com/watch?v=') === 0) {
+    suffix = hrefNoProtocol.slice('www.youtube.com/watch?v='.length);
+    suffix = suffix.replace(/&/, '?'); // onlu replace first one
+  }
+
+  if (suffix) {
+    ++uniqueYouTubeId;
+    let args = '?html5=1&ecver=2&modestbranding=1';
+    const argsIndex = suffix.indexOf('?');
+    if (argsIndex >= 0) {
+      args += '&' + suffix.slice(argsIndex + 1);
+      suffix = suffix.slice(0, argsIndex);
+    }
+
+    let enablejsapi = '';
+    let apiButton = '';
+    let apiPlayerKey = `player_${uniqueYouTubeId}`;
+    if (textParts.length > 1) {
+      const apiParts = textParts[1].split('=');
+      if (apiParts[0] === 'api') {
+        if (apiParts.length > 1) {
+          apiPlayerKey = apiParts[1];
         }
+        enablejsapi = '&enablejsapi=1';
+        apiButton =
+          `
+          <button
+            type="button"
+            id="youtube-api-${uniqueYouTubeId}"
+            href="#"
+            onclick="smartdown.setupYouTubePlayer('youtube-iframe-${uniqueYouTubeId}', '${apiPlayerKey}')"
+            class="api-button">
+            Enable API for player <b>${apiPlayerKey}</b>
+          </button>
+          `;
       }
-
-      result =
-        `<div class="video-container youtube ${classList}">
-          <iframe
-            id="youtube-iframe-${uniqueYouTubeId}"
-            ${sizing}
-            src="https://www.youtube.com/embed/${suffix}?html5=1&ecver=2&modestbranding=1${enablejsapi}"
-            frameborder="0"
-            allow="camera;microphone;autoplay;encrypted-media;picture-in-picture"
-            allowfullscreen>
-          </iframe>
-        </div>
-        ${apiButton}
-        `;
-
-      return false;
     }
-    else {
-      return true;
-    }
-  });
 
-  if (!result) {
-    longPrefixes.every(prefix => {
-      if (href.indexOf(prefix) === 0) {
-        var suffix = href.substr(prefix.length);
-        result =
-`<div
-  class="video-container youtube c2 ${classList}">
-  <iframe
-    ${sizing}
-    class="cc2"
-    src="https://www.youtube.com/embed/${suffix}"
-    frameborder="0"
-    allow="camera;microphone;autoplay;encrypted-media;picture-in-picture"
-    allowfullscreen>
-  </iframe>
-</div>
-`;
-        return false;
-      }
-      else {
-        return true;
-      }
-    });
+    result =
+      `<div class="video-container youtube ${classList}">
+        <iframe
+          id="youtube-iframe-${uniqueYouTubeId}"
+          ${sizing}
+          src="https://www.youtube.com/embed/${suffix}${args}${enablejsapi}"
+          frameborder="0"
+          allow="camera;microphone;autoplay;encrypted-media;picture-in-picture"
+          allowfullscreen>
+        </iframe>
+      </div>
+      ${apiButton}
+      `;
   }
 
   return result;
 }
 
-
-function convertVimeoFragmentToEmbed(href, title) {
+function convertVimeoFragmentToEmbed(href, title, text) {
   var result = null;
-  var shortPrefixes = ['http://vimeo.com/', 'https://vimeo.com/'];
-  var classList = (title === 'thumbnail') ? 'thumbnail' : 'fullwidth';
+  const hrefNoProtocol = href.replace(/^https?:\/\//, '');
+  var classList = (text === 'thumbnail') ? 'thumbnail' : 'fullwidth';
 
-  shortPrefixes.every(prefix => {
-    if (href.indexOf(prefix) === 0) {
-      var suffix = href.substr(prefix.length);
-      var opts = '?title=0&byline=0&portrait=0&badge=0';
+  if (hrefNoProtocol.indexOf('vimeo.com/') === 0) {
+    let suffix = hrefNoProtocol.slice('vimeo.com/'.length);
+    let args = '?title=0&byline=0&portrait=0&badge=0';
 
-      result =
+    const argsIndex = suffix.indexOf('?');
+    if (argsIndex >= 0) {
+      args += '&' + suffix.slice(argsIndex + 1);
+      suffix = suffix.slice(0, argsIndex);
+      console.log('args', args, suffix);
+    }
+
+    result =
 `<div class="video-container vimeo ${classList}">
   <iframe
-    src="https://player.vimeo.com/video/${suffix}${opts}"
+    src="https://player.vimeo.com/video/${suffix}${args}"
     width="640"
     height="360"
     frameborder="0"
@@ -440,13 +423,7 @@ function convertVimeoFragmentToEmbed(href, title) {
   </iframe>
 </div>
 `;
-
-      return false;
-    }
-    else {
-      return true;
-    }
-  });
+  }
 
   return result;
 }
@@ -677,7 +654,7 @@ function renderCodeInternal(renderDivId, code, language, languageOpts, prelude) 
 
     var kioskClass = kiosk ? 'smartdown-playable-kiosk' : '';
     var kioskToggle = !(kiosk || kioskable) ? '' :
-`
+      `
   <button type="button"
     href="#"
     id="${kioskId}"
@@ -1247,8 +1224,8 @@ function renderImage(href, title, text) {
     queueContentLoad(contentType, abcBaseId, href, title, text);
   }
   else {
-    var youtubeEmbed = convertYoutubeFragmentToEmbed(href, text);
-    var vimeoEmbed = convertVimeoFragmentToEmbed(href, text);
+    var youtubeEmbed = convertYoutubeFragmentToEmbed(href, title, text);
+    var vimeoEmbed = convertVimeoFragmentToEmbed(href, title, text);
 
     if (youtubeEmbed) {
       out += youtubeEmbed;
@@ -1735,7 +1712,8 @@ function renderHeading(text, level, raw, slugger) {
   }
   else {
     const slug = slugger.slug(raw);
-    const anchor = `<a class="smartdown-h-anchor" href="##${slug}">&#x1F517;</a>`;
+    const prefix = window.location.pathname;
+    const anchor = `<a class="smartdown-h-anchor" href="${prefix}##${slug}">&#x1F517;</a>`;
     result = `<h${level} id="${slug}">${text}${anchor}</h${level}>`;
   }
 
@@ -2297,7 +2275,7 @@ async function runFunction(code, embedThis, argValues, language, div) {
 ${e}
 </code></pre>
 `;
-    };
+    }
   }
 
   return embedResult;
@@ -2791,7 +2769,7 @@ function toggleConsole(divId) {
 
 function consoleWrite(playable, args) {
   let msg = '';
-  args.forEach((arg) => {
+  args.forEach(arg => {
     if (typeof arg === 'object') {
       arg = JSON.stringify(arg, null, 2);
     }
@@ -3020,7 +2998,7 @@ function parseDisclosureSettings(settingsStr) {
   let options = settingsStr.split(',');
 
   if (options.includes('transparent')) {
-
+    // pass
   }
   else {
     options.push('shadow');
@@ -3132,11 +3110,11 @@ function showDisclosure(divId, triggerId, settingsStr) {
     contentDiv.classList.add('disclosable-scrollable-content');
   }
 
-  for (var i = 0; i < settings.decorations.length; i++) {
+  for (let i = 0; i < settings.decorations.length; i++) {
     div.classList.add(`disclosable-${settings.decorations[i]}`);
   }
 
-  for (var i = 0; i < settings.decorationsInner.length; i++) {
+  for (let i = 0; i < settings.decorationsInner.length; i++) {
     contentDiv.classList.add(`disclosable-${settings.decorationsInner[i]}`);
   }
 
@@ -3180,13 +3158,13 @@ function hideDisclosure(divId, settingsStr) {
     div.classList.remove('disclosable-attach');
   }
 
-  for (var i = 0; i < settings.decorations.length; i++) {
+  for (let i = 0; i < settings.decorations.length; i++) {
     if (div.classList.contains(`disclosable-${settings.decorations[i]}`)) {
       div.classList.remove(`disclosable-${settings.decorations[i]}`);
     }
   }
 
-  for (var i = 0; i < settings.decorationsInner.length; i++) {
+  for (let i = 0; i < settings.decorationsInner.length; i++) {
     if (contentDiv.classList.contains(`disclosable-${settings.decorationsInner[i]}`)) {
       contentDiv.classList.remove(`disclosable-${settings.decorationsInner[i]}`);
     }
@@ -3212,11 +3190,14 @@ function openFullscreen() {
   var elem = document.documentElement;
   if (elem.requestFullscreen) {
     elem.requestFullscreen();
-  } else if (elem.mozRequestFullScreen) { /* Firefox */
+  }
+  else if (elem.mozRequestFullScreen) { /* Firefox */
     elem.mozRequestFullScreen();
-  } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+  }
+  else if (elem.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
     elem.webkitRequestFullscreen();
-  } else if (elem.msRequestFullscreen) { /* IE/Edge */
+  }
+  else if (elem.msRequestFullscreen) { /* IE/Edge */
     elem.msRequestFullscreen();
   }
 }
@@ -3226,11 +3207,14 @@ function closeFullscreen() {
   var elem = document.documentElement;
   if (document.exitFullscreen) {
     document.exitFullscreen();
-  } else if (document.mozCancelFullScreen) { /* Firefox */
+  }
+  else if (document.mozCancelFullScreen) { /* Firefox */
     document.mozCancelFullScreen();
-  } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+  }
+  else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
     document.webkitExitFullscreen();
-  } else if (document.msExitFullscreen) { /* IE/Edge */
+  }
+  else if (document.msExitFullscreen) { /* IE/Edge */
     document.msExitFullscreen();
   }
 }
@@ -3543,7 +3527,6 @@ function configure(options, loadedHandler) {
 
   document.addEventListener('visibilitychange', handleVisibilityChange);
 
-  /* global navigator */
   if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
     document.querySelector('meta[name=viewport]')
       .setAttribute(
@@ -4395,7 +4378,7 @@ function setSmartdown(md, outputDiv, setSmartdownCompleted) {
   var config = {
     FORCE_BODY: true,
     ADD_TAGS: ['script', 'iframe'],
-    ADD_ATTR: ['onblur', 'oninput', 'onchange', 'onclick', 'onmousedown', 'onmouseup', 'onmouseenter', 'onmouseleave', 'onkeydown', 'onkeyup', 'target', 'allow'],
+    ADD_ATTR: ['onblur', 'oninput', 'onchange', 'onclick', 'onmousedown', 'onmouseup', 'onmouseenter', 'onmouseleave', 'onkeydown', 'onkeyup', 'target', 'allow', 'allowfullscreen'],
   };
 
   var sanitized = createDOMPurify.sanitize(result, config);
@@ -4888,7 +4871,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.44',
+  version: '1.0.45',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,

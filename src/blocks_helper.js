@@ -1,6 +1,4 @@
 /* global smartdownBaseURL */
-/* global document */
-/* global window */
 
 var baseURL = 'https://smartdown.site/';
 if (typeof smartdownBaseURL === 'string') {

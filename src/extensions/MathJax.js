@@ -1,4 +1,3 @@
-/* global window */
 /* global MathJax */
 
 function mathjaxConfigure() {
