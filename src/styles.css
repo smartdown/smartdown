@@ -796,11 +796,12 @@ fieldset[disabled] .smartdown-container .btn-infocell.focus {
     /*border: none;*/
 
     .disclosable-header {
-      background: lightgray;
+      background: #CCC;
       margin: 0;
       padding: 0 0 1px 0;
       line-height: 0;
-      border-radius: 2px;
+      border-radius: 5px;
+      border: 1px solid #AAA;
       display: none;
 
       &.disclosable-header-position {
@@ -808,13 +809,19 @@ fieldset[disabled] .smartdown-container .btn-infocell.focus {
         min-width: 200px;
       }
       button.disclosable-button-close {
-        height: 16px;
+        background: #CCC;
+        border-radius: 2px;
+        border: none;
+        height: 18px;
         line-height: 0;
         cursor: pointer;
         font-size: 16px;
         font-weight: 600;
-        margin: 0 0 0 2px;
-        padding: 0 0 2px 0;
+        margin: 4px 0px 4px 8px;
+        padding: 0 4px 3px 4px;
+      }
+      button.disclosable-button-close:hover {
+        background: #AAA;
       }
     }
 
