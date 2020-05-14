@@ -2905,8 +2905,10 @@ function setDisclosureLocation(div, contentDiv, triggerId, settings) {
     const bound = baseContainer.getBoundingClientRect();
     const viewportHeight = window.innerHeight;
     const viewportWidth = window.innerWidth;
-    const visibleHeight = Math.min(bound.height, viewportHeight);
-    const visibleWidth = Math.min(bound.width, viewportWidth);
+    // const visibleHeight = Math.min(bound.height, viewportHeight);
+    // const visibleWidth = Math.min(bound.width, viewportWidth);
+    const visibleHeight = window.innerHeight;
+    const visibleWidth = window.innerWidth;
     const padding = 25;
 
     switch (settings.location) {
@@ -3120,6 +3122,7 @@ function showDisclosure(divId, triggerId, settingsStr) {
 
   var headerDiv = document.getElementById(`${divId}_header`);
   headerDiv.classList.remove('disclosable-header-position');
+  headerDiv.innerHTML = '';
 
   if (settings.draggable) {
     headerDiv.classList.add('disclosable-header-position');

@@ -793,6 +793,9 @@ fieldset[disabled] .smartdown-container .btn-infocell.focus {
     position: fixed;
     padding: 0;
     z-index: 1050;
+    max-width: 90%;
+    max-height: 90%;
+    
     /*border: none;*/
 
     .disclosable-header {
