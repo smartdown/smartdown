@@ -2907,8 +2907,8 @@ function setDisclosureLocation(div, contentDiv, triggerId, settings) {
     const viewportWidth = window.innerWidth;
     // const visibleHeight = Math.min(bound.height, viewportHeight);
     // const visibleWidth = Math.min(bound.width, viewportWidth);
-    const visibleHeight = window.innerHeight;
-    const visibleWidth = window.innerWidth;
+    const visibleHeight = viewportHeight;
+    const visibleWidth = viewportWidth;
     const padding = 25;
 
     switch (settings.location) {
@@ -4874,7 +4874,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.45.1',
+  version: '1.0.46',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,

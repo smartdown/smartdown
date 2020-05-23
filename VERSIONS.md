@@ -46,4 +46,7 @@
 - **1.0.43** - Fix smartdown.version variable to reflect current version.
 - **1.0.44** - Gallery 0.0.68. Adds ability to control whether a link opens in a new browser window or the current window. Adds smoothscroll-polyfill package to support cross-browser smooth-scrolling to anchors. Improves starter.js to more efficiently handle intra-page links by not re-loading content for the current page.
 - **1.0.45** - Gallery 0.0.69. Fix issue where a page located in a subdirectory (e.g., /lib/) doesn't handle intra-page links properly. Fix issue with video sizing. Enable fullscreen capability for videos. Fix video link parsing so that user-supplied args are applied correctly. Fixed eslint config so that typescript rules are only applied to .ts files. Fix all eslint errors.
-- **1.0.45.1** - Gallery 0.0.69.1. Adding css styling.
+- **1.0.46** - Fix issues with centering of movable discloasables. Adding css styling to improve look of disclosables. Increased height of draggable disclosable header.
+
+
+
