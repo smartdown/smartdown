@@ -103,7 +103,7 @@
     "emoji-js": "^3.5.0",
     "file-saver": "^2.0.2",
     "gifffer": "^1.5.4",
-    "highlight.js": "^9.18.1",
+    "highlight.js": "^10.4.1",
     "ieee754": "^1.1.13",
     "js-yaml": "^3.13.1",
     "localforage": "^1.7.3",
