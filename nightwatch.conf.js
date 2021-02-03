@@ -8,7 +8,13 @@ var config = {
   'test_settings': {
     'default': {
       'desiredCapabilities': {
-        'browserName': 'chrome'
+        'browserName': 'chrome',
+        chromeOptions: {
+          args: [
+            '--ignore-ssl-errors=yes',
+            '--ignore-certificate-errors',
+            '--allow-running-insecure-content']
+        }
       }
     }
   }

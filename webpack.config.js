@@ -64,15 +64,13 @@ var galleryIgnores = [
   'hide/*',
   'LICENSE',
   'package.json',
-  'index.html'];
+  '**/index.html'];
 const baseURL = development ? '/' : '/smartdown/';
 
 var config = {
   bail: true,
+
   stats: {
-    // Examine all modules
-    maxModules: Infinity,
-    // Display bailout reasons
     optimizationBailout: true
   },
 
@@ -160,7 +158,8 @@ var config = {
       useMathJax: useMathJax,
     }),
 
-    new CopyWebpackPlugin([
+    new CopyWebpackPlugin({
+      patterns: [
         { from: '../distdoc/', to: '../doc/' },
         { from: 'SimpleSiteExample/index_unpkg.html', to: '../index_unpkg.html' },
         { from: 'favicons', to: '../' },
@@ -177,9 +176,9 @@ var config = {
         { from: path.join(webcomponentsJS, 'webcomponents-loader.js') },
         { from: path.join(webcomponentsJS, 'bundles/'), to: './bundles/' },
         { from: vizJS },
-        { from: path.join(stdlibRoot, 'stdlib/dist/stdlib-tree.min.js') },
-        { from: path.join(stdlibRoot, 'stdlib/dist/stdlib-datasets-tree-exclude.min.js') },
-        { from: path.join(stdlibRoot, 'stdlib/dist/stdlib-datasets-sotu.min.js') },
+        { from: path.join(stdlibRoot, 'dist-tree/build/bundle.min.js'), to: './stdlib-tree.min.js' },
+        { from: path.join(stdlibRoot, 'dist-datasets-tree-exclude/build/bundle.min.js'), to: './stdlib-datasets-tree-exclude.min.js' },
+        { from: path.join(stdlibRoot, 'dist-datasets-sotu/build/bundle.min.js'), to: './stdlib-datasets-sotu.min.js' },
 
         { from: vizLiteJS },
         { from: path.join(app, 'external/ldf-client-browser.js') },
@@ -191,7 +190,8 @@ var config = {
         { from: 'xypic.js' },
 
         // { from: galleryResourcesRoot, to: './resources/' },
-        { from: galleryRoot, to: '../gallery/', ignore: galleryIgnores },
+        { from: galleryRoot, to: '../gallery/', globOptions: {dot: true, ignore: galleryIgnores} },
+
         { from: '../CODE_OF_CONDUCT.md', to: '../gallery/' },
         { from: '../CONTRIBUTING.md', to: '../gallery/' },
         { from: '../LICENSE.md', to: '../gallery/' },
@@ -215,31 +215,32 @@ var config = {
         // { from: '../README.md', to: '../gist/gallery/' },
 
         // { from: galleryResourcesRoot, to: '../resources/' },
-    ],
-    {
+      ],
       // By default, we only copy modified files during
       // a watch or webpack-dev-server build. Setting this
       // to `true` copies all files.
-      copyUnmodified: true,
-      debug: 'warning' // 'warning', 'info', 'debug'
+      // copyUnmodified: true,
+      // debug: 'warning' // 'warning', 'info', 'debug'
     }),
 
     new FileManagerPlugin({
-      verbose: false,
-      onEnd: {
-        copy: [
-          { source: outputPath + 'smartdown.js', destination: outputPath + '../gist/' },
-          { source: outputPath + 'smartdown.css', destination: outputPath + '../gist/' },
+      events: {
+        onEnd: {
+          copy: [
+            { source: outputPath + 'smartdown.js', destination: outputPath + '../gist/' },
+            { source: outputPath + 'smartdown.css', destination: outputPath + '../gist/' },
 
-          { source: outputPath + 'smartdown.js.map', destination: outputPath + '../gist/' },
-          { source: outputPath + 'smartdown.css.map', destination: outputPath + '../gist/' },
+            { source: outputPath + 'smartdown.js.map', destination: outputPath + '../gist/' },
+            { source: outputPath + 'smartdown.css.map', destination: outputPath + '../gist/' },
 
-          { source: outputPath + 'smartdown_vendors~p5Sound.js', destination: outputPath + '../gist/' },
+            { source: outputPath + 'smartdown_p5Sound.js', destination: outputPath + '../gist/' },
 
-          { source: outputPath + 'smartdown_vendors~p5Sound.js.map', destination: outputPath + '../gist/' },
-        ]
+            { source: outputPath + 'smartdown_p5Sound.js.map', destination: outputPath + '../gist/' },
+          ]
+        }
       }
     })
+
   ],
 
   module: {
@@ -311,8 +312,9 @@ var config = {
   },
 
   node: {
-    fs: 'empty'
+    // fs: 'empty'
   },
+
 
   devServer: {
     inline: false,

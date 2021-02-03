@@ -2,7 +2,7 @@
 
 require('highlight.js/styles/default.css');
 
-import hljs from 'highlight.js/lib/highlight';
+import hljs from 'highlight.js/lib/core';
 global.hljs = hljs;
 window.hljs = hljs;
 

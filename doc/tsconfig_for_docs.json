@@ -10,8 +10,10 @@
     "noEmitOnError": true,
     "lib": ["dom", "es6"],
     "strictFunctionTypes": false,
+    "moduleResolution": "node",
   },
   "include": [
+    "../src/*.ts",
     "../src/**/*.ts",
     "../node_modules/eventemitter3/*.ts"
   ]

@@ -15,8 +15,8 @@ const buildConfig = {
 
     // ungrouped js files will be merged under default route
     './src/index.js',                   // ?api or ?api=_def_
-    './distdocts/src/extensions.js',                   // ?api or ?api=_def_
-    './distdocts/src/importers.js',                   // ?api or ?api=_def_
+    './src/extensions.js',                   // ?api or ?api=_def_
+    './src/importers.js',                   // ?api or ?api=_def_
 
     // including markdown ('content') files
     './README.md',

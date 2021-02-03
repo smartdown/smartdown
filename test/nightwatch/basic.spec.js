@@ -29,7 +29,7 @@ this.testSmartdownClickREADME = function (browser) {
     .click('//*[.=\'Readme\']')
     .pause(5000)
     .useCss()
-    .assert.containsText('#smartdown-output', 'Smartdown is intended for teacher and student alike')
+    .assert.containsText('#smartdown-output', 'Example Smartdown documents and associated resources')
     .end();
   browser.end();
 };

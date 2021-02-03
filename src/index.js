@@ -2558,7 +2558,7 @@ ${e}
     }
   }
   else if (language === 'graphviz') {
-    div.innerHTML = '<i>...rendering graphviz...</i>';
+    div.innerHTML = '';
     window.smartdownJSModules.graphviz.loader(function () {
       var options = {
         images: graphvizImages
@@ -2875,6 +2875,7 @@ function activateDraggableDisclosure(divId) {
 
 }
 
+
 function deactivateOnMouseLeave(divId, overrideLocked) {
   var div = document.getElementById(divId);
 
@@ -3102,82 +3103,91 @@ function showDisclosure(divId, triggerId, settingsStr) {
   const settings = parseDisclosureSettings(settingsStr);
 
   var div = document.getElementById(divId);
-  div.classList.remove('disclosable-draggable', 'disclosable-scrollable', 'disclosable-shadow', 'disclosable-lightbox', 'disclosable-outline', 'disclosable-transparent');
+  if (div) {
+    div.classList.remove('disclosable-draggable', 'disclosable-scrollable', 'disclosable-shadow', 'disclosable-lightbox', 'disclosable-outline', 'disclosable-transparent');
 
-  var contentDiv = div.querySelector('.disclosable-content');
-  contentDiv.classList.remove('disclosable-scrollable-content', 'disclosable-shadow-content', 'disclosable-lightbox-content', 'disclosable-outline-content', 'disclosable-transparent-content');
-  div.classList.add('disclosable-open');
-  if (settings.scrollable) {
-    div.classList.add('disclosable-scrollable');
-    contentDiv.classList.add('disclosable-scrollable-content');
-  }
-
-  for (let i = 0; i < settings.decorations.length; i++) {
-    div.classList.add(`disclosable-${settings.decorations[i]}`);
-  }
-
-  for (let i = 0; i < settings.decorationsInner.length; i++) {
-    contentDiv.classList.add(`disclosable-${settings.decorationsInner[i]}`);
-  }
-
-  var headerDiv = document.getElementById(`${divId}_header`);
-  headerDiv.classList.remove('disclosable-header-position');
-  headerDiv.innerHTML = '';
-
-  if (settings.draggable) {
-    headerDiv.classList.add('disclosable-header-position');
-    if (settings.hideTrigger === 'closeable') {
-      headerDiv.innerHTML = `<button class="disclosable-button-close" onclick="smartdown.hideDisclosure('${divId}','${settingsStr}')">&times;</button>`;
-    }
-    else {
-      headerDiv.innerHTML = '&#9673;';
+    var contentDiv = div.querySelector('.disclosable-content');
+    contentDiv.classList.remove('disclosable-scrollable-content', 'disclosable-shadow-content', 'disclosable-lightbox-content', 'disclosable-outline-content', 'disclosable-transparent-content');
+    div.classList.add('disclosable-open');
+    if (settings.scrollable) {
+      div.classList.add('disclosable-scrollable');
+      contentDiv.classList.add('disclosable-scrollable-content');
     }
 
-    activateDraggableDisclosure(divId);
+    for (let i = 0; i < settings.decorations.length; i++) {
+      div.classList.add(`disclosable-${settings.decorations[i]}`);
+    }
+
+    for (let i = 0; i < settings.decorationsInner.length; i++) {
+      contentDiv.classList.add(`disclosable-${settings.decorationsInner[i]}`);
+    }
+
+    var headerDiv = document.getElementById(`${divId}_header`);
+    headerDiv.classList.remove('disclosable-header-position');
+    headerDiv.innerHTML = '';
+
+    if (settings.draggable) {
+      headerDiv.classList.add('disclosable-header-position');
+      if (settings.hideTrigger === 'closeable') {
+        headerDiv.innerHTML = `<button class="disclosable-button-close" onclick="smartdown.hideDisclosure('${divId}','${settingsStr}')">&times;</button>`;
+      }
+      else {
+        headerDiv.innerHTML = '&#9673;';
+      }
+
+      activateDraggableDisclosure(divId);
+    }
+
+    setDisclosureLocation(div, contentDiv, triggerId, settings);
+
+    if (settings.hideTrigger === 'onmouseleave') {
+      /* eslint-disable no-use-before-define */
+      activateOnMouseLeave(divId, settingsStr);
+      /* eslint-enable no-use-before-define */
+    }
   }
 
-  setDisclosureLocation(div, contentDiv, triggerId, settings);
-
-  if (settings.hideTrigger === 'onmouseleave') {
-    /* eslint-disable no-use-before-define */
-    activateOnMouseLeave(divId, settingsStr);
-    /* eslint-enable no-use-before-define */
-  }
+  setVariable(divId, true, 'boolean');
 }
 
 
 function hideDisclosure(divId, settingsStr) {
   const settings = parseDisclosureSettings(settingsStr);
   var div = document.getElementById(divId);
-  var contentDiv = div.querySelector('.disclosable-content');
 
-  div.classList.remove('disclosable-open');
+  if (div) {
+    var contentDiv = div.querySelector('.disclosable-content');
 
-  if (div.classList.contains('disclosable-position')) {
-    div.classList.remove('disclosable-position');
-  }
+    div.classList.remove('disclosable-open');
 
-  if (div.classList.contains('disclosable-attach')) {
-    div.classList.remove('disclosable-attach');
-  }
+    if (div.classList.contains('disclosable-position')) {
+      div.classList.remove('disclosable-position');
+    }
 
-  for (let i = 0; i < settings.decorations.length; i++) {
-    if (div.classList.contains(`disclosable-${settings.decorations[i]}`)) {
-      div.classList.remove(`disclosable-${settings.decorations[i]}`);
+    if (div.classList.contains('disclosable-attach')) {
+      div.classList.remove('disclosable-attach');
+    }
+
+    for (let i = 0; i < settings.decorations.length; i++) {
+      if (div.classList.contains(`disclosable-${settings.decorations[i]}`)) {
+        div.classList.remove(`disclosable-${settings.decorations[i]}`);
+      }
+    }
+
+    for (let i = 0; i < settings.decorationsInner.length; i++) {
+      if (contentDiv.classList.contains(`disclosable-${settings.decorationsInner[i]}`)) {
+        contentDiv.classList.remove(`disclosable-${settings.decorationsInner[i]}`);
+      }
+    }
+
+    if (settings.hideTrigger === 'onmouseleave') {
+      div.disclosableTimer = window.setTimeout(_ => {
+        deactivateOnMouseLeave(divId);
+      }, 500);
     }
   }
 
-  for (let i = 0; i < settings.decorationsInner.length; i++) {
-    if (contentDiv.classList.contains(`disclosable-${settings.decorationsInner[i]}`)) {
-      contentDiv.classList.remove(`disclosable-${settings.decorationsInner[i]}`);
-    }
-  }
-
-  if (settings.hideTrigger === 'onmouseleave') {
-    div.disclosableTimer = window.setTimeout(_ => {
-      deactivateOnMouseLeave(divId);
-    }, 500);
-  }
+  setVariable(divId, false, 'boolean');
 }
 
 function isFullscreen() {
@@ -3240,71 +3250,89 @@ function toggleKiosk(divId, event) {
 
 
 function toggleDisclosure(divId, triggerId, settingsStr) {
-  var div = document.getElementById(divId);
-  const willBeOpen = !div.classList.contains('disclosable-open');
+  const div = document.getElementById(divId);
+  const isOpen = !!smartdownVariables[divId];
 
-  if (willBeOpen) {
-    showDisclosure(divId, triggerId, settingsStr);
+  if (div) {
+    const isOpenClass = div.classList.contains('disclosable-open');
+
+    if (isOpenClass !== isOpen) {
+      console.log('toggleDisclosure inconsistency', isOpenClass, isOpen);
+    }
+
+    // this will need to be added when we have a datastructure for
+    // disclosables.  A list of triggers to update.
+    // maybe we could make an updateTriggerButton function
+    // var openedSpan = document.getElementById(`span_${divId}_opened`);
+    // if (openedSpan) {
+    //   openedSpan.style.display = willBeOpen ? 'inline' : 'none';
+    // }
+    // var closedSpan = document.getElementById(`span_${divId}_closed`);
+    // if (closedSpan) {
+    //   closedSpan.style.display = willBeOpen ? 'none' : 'inline';
+    // }
   }
-  else {
+
+  if (isOpen) {
     hideDisclosure(divId, settingsStr);
   }
-
-
-  // this will need to be added when we have a datastructure for
-  // disclosables.  A list of triggers to update.
-  // maybe we could make an updateTriggerButton function
-  // var openedSpan = document.getElementById(`span_${divId}_opened`);
-  // if (openedSpan) {
-  //   openedSpan.style.display = willBeOpen ? 'inline' : 'none';
-  // }
-  // var closedSpan = document.getElementById(`span_${divId}_closed`);
-  // if (closedSpan) {
-  //   closedSpan.style.display = willBeOpen ? 'none' : 'inline';
-  // }
-
+  else {
+    showDisclosure(divId, triggerId, settingsStr);
+  }
 }
 
 
 function activateOnMouseLeave(divId, settingsStr) {
   var div = document.getElementById(divId);
-  window.clearTimeout(div.disclosableTimer);
-  div.disclosableTimer = null;
-  div.disclosableLocked = false;
-
-  div.onmouseenter = e => {
-    div.disclosableLocked = true;
+  if (div) {
     window.clearTimeout(div.disclosableTimer);
     div.disclosableTimer = null;
-  };
+    div.disclosableLocked = false;
 
-  div.onmouseleave = e => {
-    if (
-      (e.pageX <= div.offsetLeft) ||
-      (e.pageX >= div.offsetLeft + div.offsetWidth) ||
-      (e.pageY <= div.offsetTop) ||
-      (e.pageY >= div.offsetTop + div.offsetHeight)) {
-      // console.log('nonbogus mouseleave', e.clientY, e.pageY, div.offsetTop, div.offsetHeight, e);
-      div.disclosableLocked = false;
-      div.disclosableTimer = window.setTimeout(_ => {
-        hideDisclosure(divId, settingsStr);
-      }, 200);
-    }
-    else {
-      // Scrolling induces mouseLeave events even thought the mouse
-      // is within its element. The above code verifies that it is
-      // an authentic mouseleave.
-      // console.log('ignoring bogus mouseleave', e.clientY, e.pageY, div.offsetTop, div.offsetHeight, e);
-    }
-  };
+    div.onmouseenter = e => {
+      div.disclosableLocked = true;
+      window.clearTimeout(div.disclosableTimer);
+      div.disclosableTimer = null;
+    };
+
+    div.onmouseleave = e => {
+      if (
+        (e.pageX <= div.offsetLeft) ||
+        (e.pageX >= div.offsetLeft + div.offsetWidth) ||
+        (e.pageY <= div.offsetTop) ||
+        (e.pageY >= div.offsetTop + div.offsetHeight)) {
+        // console.log('nonbogus mouseleave', e.clientY, e.pageY, div.offsetTop, div.offsetHeight, e);
+        div.disclosableLocked = false;
+        div.disclosableTimer = window.setTimeout(_ => {
+          hideDisclosure(divId, settingsStr);
+        }, 200);
+      }
+      else {
+        // Scrolling induces mouseLeave events even thought the mouse
+        // is within its element. The above code verifies that it is
+        // an authentic mouseleave.
+        // console.log('ignoring bogus mouseleave', e.clientY, e.pageY, div.offsetTop, div.offsetHeight, e);
+      }
+    };
+  }
 }
 
 
 function linkWrapperExit(divId, settingsStr) {
-  var div = document.getElementById(divId);
-  div.disclosableTimer = window.setTimeout(_ => {
+  const div = document.getElementById(divId);
+
+  if (div) {
+    // The 500ms timer gives the user a chance to move their mouse from
+    // the trigger area into the disclosable, without the disclosable disappearing
+    // due to the mouse leaving the trigger area.
+    //
+    div.disclosableTimer = window.setTimeout(_ => {
+      this.hideDisclosure(divId, settingsStr);
+    }, 500);
+  }
+  else {
     this.hideDisclosure(divId, settingsStr);
-  }, 500);
+  }
 }
 
 
@@ -3876,7 +3904,7 @@ function renderCell(cellID, variableId, newValue) {
     }
   }
   else if (cellInfo.datatype === 'graphviz') {
-    element.innerHTML = '<i>...rendering graphviz...</i>';
+    element.innerHTML = '';
     if (typeof newValue === 'string' && newValue.length > 0) {
       window.smartdownJSModules.graphviz.loader(function () {
         var options = {
@@ -4874,7 +4902,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.46',
+  version: '1.0.47',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,

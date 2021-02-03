@@ -61,6 +61,7 @@ if (useP5JS) {
             .catch(error => {
               console.log('loadP5Sound error', error);
             });
+
           // import(/* webpackChunkName: "p5DOM" */ 'p5/lib/addons/p5.dom.min.js')
           //   .then(p5DOM => {
           //     import(/* webpackChunkName: "p5Sound" */ 'p5/lib/addons/p5.sound.min.js')
