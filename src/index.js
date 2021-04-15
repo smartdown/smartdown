@@ -23,7 +23,7 @@ import {importScriptUrl, importModuleUrl, importTextUrl, importCssCode, importCs
 
 require('./styles.css');
 
-const markedModule = require('marked');
+const marked = require('marked');
 
 const each = window.lodashEach = require('lodash/forEach');
 const map = window.lodashMap = require('lodash/map');
@@ -209,33 +209,6 @@ function entityEscape(html, encode) {
     .replace(/'/g, '&#39;');
 }
 
-const escape = entityEscape;
-
-var markedOpts = {
-  renderer: 'crashNoRenderer',
-  headerIds: true,
-  gfm: true,
-  tables: true,
-  breaks: true,
-  pedantic: false,
-  sanitize: false,
-  smartLists: true,
-  smartypants: false,
-  langPrefix: 'hljs ',
-  highlight: function (code, lang) {    // , callback)
-    var playableType = playableTypes[lang];
-    var result;
-    if (lang && playableType) {
-      var mappedLanguage = playableType ? playableType.highlight : lang;
-      result = hljs.highlightAuto(code, [mappedLanguage]);
-    }
-    else {
-      result = hljs.highlightAuto(code, [lang]);
-    }
-
-    return result.value;
-  }
-};
 
 function registerDefaultExtensions() {
   registerABC();
@@ -799,10 +772,7 @@ ${highlightedAugmentedCode}
     }
   }
   else {
-    // console.log('renderCode2', code, language);
-
-    const renderedCode = markedOpts.renderer.baseCodeRenderer(code, language);
-    return renderedCode;
+    return false;
   }
 }
 
@@ -883,190 +853,6 @@ function edit(regex, opt) {
   };
 }
 
-
-function smartdownLexer(src) {
-  let out = '';
-  let link;
-  let text;
-  let href;
-  let title;
-  let cap;
-  let prevCapZero;
-
-  const mathRules = /^(\$+)[^$]*\1/;
-  const kludgeGFMURLRules =
-    edit(/^((?:ftp|https?):\/\/|www\.)(?:[a-zA-Z0-9\-]+\.?)+[^\s<]*/)
-    // .replace('email', inline._email)
-      .getRegex();
-
-  const renderer = markedOpts.renderer;
-  /* eslint-disable no-cond-assign, brace-style */
-
-  while (src) {
-    // math
-    if (cap = mathRules.exec(src)) {
-      src = src.substring(cap[0].length);
-      var escaped = cap[0].replace(/</g, '< ');
-      out += escaped;
-      continue;
-    }
-
-    // escape
-    if (cap = this.rules.escape.exec(src)) {
-      src = src.substring(cap[0].length);
-      out += cap[1];
-      continue;
-    }
-
-    // autolink
-    if (cap = this.rules.autolink.exec(src)) {
-      src = src.substring(cap[0].length);
-      if (cap[2] === '@') {
-        text = escape(this.mangle(cap[1]));
-        href = 'mailto:' + text;
-      } else {
-        text = escape(cap[1]);
-        href = text;
-      }
-      out += renderer.link(href, null, text);
-      continue;
-    }
-
-    // // url (gfm)
-    // if (!this.inLink && (cap = this.rules.url.exec(src))) {
-    if (!this.inLink && (cap = kludgeGFMURLRules.exec(src))) {
-      do {
-        prevCapZero = cap[0];
-        cap[0] = this.rules._backpedal.exec(cap[0])[0];
-      } while (prevCapZero !== cap[0]);
-      src = src.substring(cap[0].length);
-      if (cap[2] === '@') {
-        text = escape(cap[0]);
-        href = 'mailto:' + text;
-      } else {
-        text = escape(cap[0]);
-        if (cap[1] === 'www.') {
-          href = 'http://' + text;
-        } else {
-          href = text;
-        }
-      }
-      out += renderer.link(href, null, text);
-      continue;
-    }
-
-    // tag
-    if (cap = this.rules.tag.exec(src)) {
-      if (!this.inLink && /^<a /i.test(cap[0])) {
-        this.inLink = true;
-      } else if (this.inLink && /^<\/a>/i.test(cap[0])) {
-        this.inLink = false;
-      }
-      src = src.substring(cap[0].length);
-      out += this.options.sanitize
-        ? this.options.sanitizer
-          ? this.options.sanitizer(cap[0])
-          : escape(cap[0])
-        : cap[0];
-      continue;
-    }
-
-    // link
-    if (cap = this.rules.link.exec(src)) {
-      src = src.substring(cap[0].length);
-      this.inLink = true;
-      href = cap[2];
-      if (this.options.pedantic) {
-        link = /^([^'"]*[^\s])\s+(['"])(.*)\2/.exec(href);
-
-        if (link) {
-          href = link[1];
-          title = link[3];
-        } else {
-          title = '';
-        }
-      } else {
-        title = cap[3] ? cap[3].slice(1, -1) : '';
-      }
-      href = href.trim().replace(/^<([\s\S]*)>$/, '$1');
-      out += this.outputLink(cap, {
-        href: markedModule.InlineLexer.escapes(href),
-        title: markedModule.InlineLexer.escapes(title)
-      });
-      this.inLink = false;
-      continue;
-    }
-
-    // reflink, nolink
-    if ((cap = this.rules.reflink.exec(src))
-        || (cap = this.rules.nolink.exec(src))) {
-      src = src.substring(cap[0].length);
-      link = (cap[2] || cap[1]).replace(/\s+/g, ' ');
-      link = this.links[link.toLowerCase()];
-      if (!link || !link.href) {
-        out += cap[0].charAt(0);
-        src = cap[0].substring(1) + src;
-        continue;
-      }
-      this.inLink = true;
-      out += this.outputLink(cap, link);
-      this.inLink = false;
-      continue;
-    }
-
-    // strong
-    if (cap = this.rules.strong.exec(src)) {
-      src = src.substring(cap[0].length);
-      out += renderer.strong(this.output(cap[4] || cap[3] || cap[2] || cap[1]));
-      continue;
-    }
-
-    // em
-    if (cap = this.rules.em.exec(src)) {
-      src = src.substring(cap[0].length);
-      out += renderer.em(this.output(cap[6] || cap[5] || cap[4] || cap[3] || cap[2] || cap[1]));
-      continue;
-    }
-
-    // code
-    if (cap = this.rules.code.exec(src)) {
-      src = src.substring(cap[0].length);
-      out += renderer.codespan(cap[2].trim());
-      continue;
-    }
-
-    // br
-    if (cap = this.rules.br.exec(src)) {
-      src = src.substring(cap[0].length);
-      out += renderer.br();
-      continue;
-    }
-
-    // del (gfm)
-    if (cap = this.rules.del.exec(src)) {
-      src = src.substring(cap[0].length);
-      out += renderer.del(this.output(cap[1]));
-      continue;
-    }
-
-    // text
-    if (cap = this.rules.text.exec(src)) {
-      src = src.substring(cap[0].length);
-      cap[0] = cap[0].replace(/:([A-Za-z0-9_\-\+]+?):/g, emojiReplacer);
-      out += renderer.text(escape(this.smartypants(cap[0])));
-
-      continue;
-    }
-
-    if (src) {
-      throw new Error('Infinite loop on byte: ' + src.charCodeAt(0));
-    }
-  }
-
-  /* eslint-enable no-cond-assign, brace-style */
-
-  return out;
-}
 
 function isGIF(href) {
   return (href.endsWith('.gif') || href.indexOf('data:image/gif;base64') === 0);
@@ -1720,81 +1506,86 @@ function renderHeading(text, level, raw, slugger) {
   return result;
 }
 
+// Override function
+const renderer = {
+  link: renderLink,
+  image: renderImage,
+  paragraph: renderParagraph,
+  br: renderBr,
+  heading: renderHeading,
+  code: renderCode,
+  // codespan: function(text) {
+  //   const result = hljs.highlightAuto(text).value; // '<code>' + text + '</code>';
+  //   return `<code class="hljs-inline">${result}</code>`;
+  // },
+  text(src) {
 
-// function renderList(body, ordered, start) {
-//   var result = markedModule.Renderer.prototype.list(body, ordered, start);
-//   return result.trim();
-// }
+    return entityEscape(src.replace(/:([A-Za-z0-9_\-\+]+?):/g, emojiReplacer));
+  },
+};
+
+const tokenizer = {
+  escape(src) {
+    const mathRules = /^(\$+)[^$]*\1/;
+    const cap = mathRules.exec(src);
+    // math
+    if (cap) {
+      const escaped = cap[0].replace(/</g, '< ');
+
+      const result = {
+        type: 'text',
+        raw: cap[0],
+        text: escaped
+      };
+
+      return result;
+      // src = src.substring(cap[0].length);
+      // var escaped = cap[0].replace(/</g, '< ');
+      // out += escaped;
+      // continue;
+    }
+
+    return false;
+  },
+};
+
+const walkTokens = token => {
+  const nChildren = token.tokens ? token.tokens.length : 0;
+  // console.log('walkTokens', token.type, nChildren, token.text, token.raw);
+};
 
 
-// function renderListItem(text) {
-//   var result = markedModule.Renderer.prototype.listitem(text);
-//   return result.trim();
-// }
 
+const markedOpts = {
+  headerIds: true,
+  gfm: true,
+  tables: true,
+  breaks: true,
+  pedantic: false,
+  sanitize: false,
+  smartLists: true,
+  smartypants: false,
+  langPrefix: 'hljs ',
+  highlight: function (code, lang) {    // , callback)
+    var playableType = playableTypes[lang];
+    var result;
+    if (lang && playableType) {
+      var mappedLanguage = playableType ? playableType.highlight : lang;
+      result = hljs.highlightAuto(code, [mappedLanguage]);
+    }
+    else {
+      result = hljs.highlightAuto(code, [lang]);
+    }
 
-// function renderTableCell(content, flags) {
-//   console.log('renderTableCell', content, flags);
-//   var type = flags.header ? 'th' : 'td';
-//   var tag = flags.align
-//     ? '<' + type + ' style="text-align:' + flags.align + '">'
-//     : '<' + type + '>';
-//   return tag + content + '</' + type + '>\n';
-// }
-
+    return result.value;
+  },
+  renderer,
+  tokenizer,
+  walkTokens
+};
 
 function enhanceMarkedAndOpts() {
-  markedModule.InlineLexer.prototype.output = smartdownLexer;
-  markedModule.InlineLexer.prototype.output.bind(markedModule.InlineLexer.prototype);
-
-  var renderer = new markedModule.Renderer();
-
-  function replace(regex, opt) {
-    regex = regex.source;
-    opt = opt || '';
-    return function self(name, val) {
-      if (!name) {
-        return new RegExp(regex, opt);
-      }
-      val = val.source || val;
-      val = val.replace(/(^|[^\[])\^/g, '$1');
-      regex = regex.replace(name, val);
-      return self;
-    };
-  }
-
-  /* eslint no-spaced-func: 0 */
-  /* eslint no-unexpected-multiline: 0 */
-
-  markedOpts.renderer = renderer;
-  // var aLexer = new markedModule.Lexer(markedOpts);
-  // aLexer.rules.paragraph = replace(aLexer.rules.paragraph)
-  //   ('*(#{1,6}) +', '*(#{1,6}) *')
-  //   ();
-  // aLexer.rules.heading = replace(aLexer.rules.heading)
-  //   ('*(#{1,6}) +', '*(#{1,6}) *')
-  //   ();
-
-  // renderer.$compile = null;
-  // renderer.$scope = null;
-
-  renderer.baseCodeRenderer = renderer.code;
-  renderer.code = renderCode;
-  renderer.codespan = function(text) {
-    const result = hljs.highlightAuto(text).value; // '<code>' + text + '</code>';
-    return `<code class="hljs-inline">${result}</code>`;
-  };
-
-  renderer.link = renderLink;
-  renderer.image = renderImage;
-  renderer.paragraph = renderParagraph;
-  renderer.br = renderBr;
-  renderer.baseHeadingRenderer = renderer.heading;
-  renderer.heading = renderHeading;
-  // renderer.list = renderList;
-  // renderer.listitem = renderListItem;
-
-  // renderer.tablecell = renderTableCell;
+  marked.use(markedOpts);
 }
 
 //
@@ -4365,13 +4156,32 @@ function setSmartdown(md, outputDiv, setSmartdownCompleted) {
     }
   }
 
-  const tokens = markedModule.lexer(md, markedOpts);
+  // let result = marked(md);
+
+  // Inline Playables need their tokens adjusted before
+  // rendering, or else they will act as paragraphs and
+  // not use the inline styling.
+  // I wonder if WalkTokens would be easier...
+  //  https://marked.js.org/using_pro#walk-tokens
+
+  const lexer = new marked.Lexer();
+  const tokens = lexer.lex(md);
+
   let precedingParagraph = null;
   let precedingInlinedCodeblock = null; // This is a code block with /inline
   tokens.forEach((t) => {
     if (t.type === 'paragraph') {
       if (precedingInlinedCodeblock) {
-        t.text = inlinePrefix + t.text;
+        const firstChild = t.tokens[0];
+        if (firstChild && firstChild.type === 'text') {
+          firstChild.text = inlinePrefix + firstChild.text;
+          if (firstChild.text.indexOf(inlinePrefix) === 0) {
+            // console.log(' WEIRD1 already inline prefixed', firstChild.text, firstChild.raw, firstChild);
+          }
+          else {
+            firstChild.text = inlinePrefix + firstChild.text;
+          }
+        }
       }
       precedingParagraph = t;
       precedingInlinedCodeblock = null;
@@ -4381,7 +4191,15 @@ function setSmartdown(md, outputDiv, setSmartdownCompleted) {
       if (precedingParagraph &&
           inlineCode &&
           precedingParagraph.text.indexOf(inlinePrefix) !== 0) {
-        precedingParagraph.text = inlinePrefix + precedingParagraph.text;
+        const firstChild = precedingParagraph.tokens[0];
+        if (firstChild && firstChild.type === 'text') {
+          if (firstChild.text.indexOf(inlinePrefix) === 0) {
+            // console.log(' WEIRD2 already inline prefixed', firstChild.text, firstChild.raw, firstChild);
+          }
+          else {
+            firstChild.text = inlinePrefix + firstChild.text;
+          }
+        }
       }
       if (inlineCode) {
         precedingInlinedCodeblock = t;
@@ -4401,9 +4219,7 @@ function setSmartdown(md, outputDiv, setSmartdownCompleted) {
     }
   });
 
-  let result = markedModule.parser(tokens, markedOpts);
-
-  // let result = markedModule(md, markedOpts);
+  let result = marked.parser(tokens);
 
   // https://github.com/cure53/DOMPurify/tree/master/demos#advanced-config-demo-link
   var config = {
@@ -4504,6 +4320,7 @@ function setSmartdown(md, outputDiv, setSmartdownCompleted) {
       function finishIt() {
         completeTypeset();
       }
+
       outputDiv.innerHTML = result;
       MathJax.Hub.Typeset(outputDiv, finishIt);
       // MathJax.Hub.Queue(['Typeset', MathJax.Hub, outputDiv, finishIt]);
@@ -4884,8 +4701,7 @@ module.exports = {
   resetPerPageState: resetPerPageState,
   decodeInlineScript: decodeInlineScript,
   hljs: hljs,
-  marked: markedModule,
-  markedOpts: markedOpts,
+  marked: marked,
   Stdlib: null,
   P5Loader: P5.Loader,
   d3: null,
@@ -4902,7 +4718,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.47',
+  version: '1.0.48',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,

@@ -48,3 +48,4 @@
 - **1.0.45** - Gallery 0.0.69. Fix issue where a page located in a subdirectory (e.g., /lib/) doesn't handle intra-page links properly. Fix issue with video sizing. Enable fullscreen capability for videos. Fix video link parsing so that user-supplied args are applied correctly. Fixed eslint config so that typescript rules are only applied to .ts files. Fix all eslint errors.
 - **1.0.46** - Fix issues with centering of movable discloasables. Adding css styling to improve look of disclosables. Increased height of draggable disclosable header.
 - **1.0.47** - Remove 'rendering graphviz' message prior to rendering graphviz. Update dependencies. Remove non-working Mocha unit tests. Improve disclosables so that they have an associated boolean smartdown variable that can be reacted with. Implement phantom disclosables to enable triggering dependent playables.
+- **1.0.48** - Updates dependencies. Updates marked.js to 2.x. Fixes an e2e test to work with new README.md text.

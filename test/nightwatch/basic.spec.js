@@ -27,9 +27,9 @@ this.testSmartdownClickREADME = function (browser) {
     .pause(2000)
     .useXpath()
     .click('//*[.=\'Readme\']')
-    .pause(5000)
+    .pause(500)
     .useCss()
-    .assert.containsText('#smartdown-output', 'Example Smartdown documents and associated resources')
+    .assert.containsText('#smartdown-output', 'Smartdown extends Markdown')
     .end();
   browser.end();
 };

@@ -1,3 +1,5 @@
+/* eslint @typescript-eslint/ban-types: 0 */
+
 /**
  * Load a script URL into the DOM by adding a script element
  *

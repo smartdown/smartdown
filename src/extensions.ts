@@ -1,4 +1,5 @@
 /* eslint @typescript-eslint/no-explicit-any: 0 */
+/* eslint @typescript-eslint/ban-types: 0 */
 
 import {importScriptUrl, importModuleUrl, importCssUrl} from './importers';
 
