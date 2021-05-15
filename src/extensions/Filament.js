@@ -8,8 +8,8 @@ Filament.register = function register() {
   registerExtension(
     'filament',
     [
-      // 'https://unpkg.com/filament-lang@0.4.3/dist/filament.js',
-      'smartdownBase:lib/filament.js',
+      'https://unpkg.com/filament-lang/dist/filament.js',
+      // 'smartdownBase:lib/filament.js',
     ]);
 };
 
