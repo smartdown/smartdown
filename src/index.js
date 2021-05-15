@@ -47,12 +47,13 @@ import registerThree from './extensions/Three';
 import registerPlotly from './extensions/Plotly';
 import registerOpenJSCAD from './extensions/OpenJSCAD';
 import registerLeaflet from './extensions/Leaflet';
+import Brython from './extensions/Brython';
+import FilamentExtension from './extensions/Filament';
 import React from './extensions/React';
 import Typescript from './extensions/Typescript';
 import Mermaid from './extensions/Mermaid';
 import Stdlib from './extensions/Stdlib';
 
-const Brython = require('./extensions/Brython');
 const graphvizImages = require('./extensions/Graphviz');
 
 var P5 = require('./extensions/P5.js');
@@ -84,6 +85,10 @@ var currentHomeDiv = null;
 var currentMD = null;
 const playableTypes = {
   'brython': {
+    highlight: 'python',
+    javascript: true
+  },
+  'filament': {
     highlight: 'python',
     javascript: true
   },
@@ -217,6 +222,8 @@ function registerDefaultExtensions() {
   registerPlotly();
   registerLeaflet();
   registerOpenJSCAD();
+  Brython.register();
+  FilamentExtension.register();
   React.register();
   Typescript.register();
   Mermaid.register();
@@ -508,6 +515,7 @@ function getPrelude(language, code) {
   const loadableLanguages = [
     'd3',
     'brython',
+    'filament',
     'stdlib',
     'p5js',
     'P5JS',
@@ -1750,77 +1758,10 @@ eval(playable.transformedCode);
       augmentedCode = Typescript.generateAugmentedPlayable(divId, isModule);
     }
     else if (language === 'brython') {
-      const brythonScriptId = divId + '_brython';
-      augmentedCode =
-`
-const pythonSource =
-\`${code}\`;
-
-
-let s = document.getElementById('${brythonScriptId}');
-if (!s) {
-  s = document.createElement('script');
-  s.type = 'text/python3';
-  s.id = '${brythonScriptId}';
-}
-
-s.innerHTML = '';
-
-try {
-  s.appendChild(document.createTextNode(pythonSource));
-  document.body.appendChild(s);
-} catch (e) {
-  s.text = code;
-  document.body.appendChild(s);
-}
-
-const div = document.getElementById("${divId}");
-const smartdownPlayableContext = {
-  smartdown: smartdown,
-  divId: "${divId}",
-  div: div,
-  this: this,
-  env: env
-};
-
-if (typeof __BRYTHON__ === 'object') {
-  if (!__BRYTHON__.isConfiguredForSmartdown) {
-    window.$locals___main__ = {};
-    const brythonResult = brython({
-     debug: 1,
-     static_stdlib_import: false,
-     ipy_id: []});
-    __BRYTHON__.isConfiguredForSmartdown = true;
-  }
-
-  const moduleName = '${brythonScriptId}'; // '__main__';
-  const localsId = '${brythonScriptId}';
-  const lineInfo = null;
-
-  // https://github.com/brython-dev/brython/wiki/How-Brython-works
-  __BRYTHON__.$options = {
-    debug: 1
-  };
-
-  window['$locals_' + moduleName] = {};
-  const tree = __BRYTHON__.py2js(
-                pythonSource,
-                moduleName,
-                moduleName, // localsId,
-                lineInfo); // .to_js();
-  let js = tree.to_js();
-  var ns = __BRYTHON__.$call(__BRYTHON__.builtins.dict)();
-  __BRYTHON__.smartdown = smartdownPlayableContext;
-  __BRYTHON__.__ARGV = [smartdownPlayableContext];
-
-  eval(js, ns);
-}
-else {
-  const errorMsg = '__BRYTHON__ is not defined. Probably due to debugging or some failure to load the Brython library';
-  console.log(errorMsg);
-  div.innerHTML = '<h4>' + errorMsg + '</h4>';
-}
-`;
+      augmentedCode = Brython.generateAugmentedPlayable(divId, isModule, code);
+    }
+    else if (language === 'filament') {
+      augmentedCode = FilamentExtension.generateAugmentedPlayable(divId, isModule, code);
     }
     else if (language.toLowerCase() === 'p5js') {
       if (language === 'P5JS') {
@@ -2406,11 +2347,6 @@ function recursivelyLoadImports(language, divId, importsRemaining, done) {
 
     if (isExtensionRegistered(nextImport)) {
       ensureExtension(nextImport, function() {
-        recursivelyLoadImports(language, divId, importsRemaining, done);
-      });
-    }
-    else if (nextImport === 'brython') {
-      window.smartdownJSModules.brython.loader(function () {
         recursivelyLoadImports(language, divId, importsRemaining, done);
       });
     }
@@ -4718,7 +4654,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.48',
+  version: '1.0.49',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,

@@ -159,7 +159,7 @@ function starter(basePrefix, doneHandler) {
       }
 
       // console.log('newHash ignored', newHash, cardKeySubhash, window.location.pathname);
-      history.pushState({}, '', window.location.pathname + newHash);
+      history.pushState({}, '', window.location.pathname + newHash + window.location.search);
       scrollToSubHash(cardKeySubhash);
 
       if (!output.id) {

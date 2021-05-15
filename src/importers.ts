@@ -39,17 +39,17 @@ function importScriptUrlWithModule(sSrc: string, isModule: boolean, fOnload: Fun
   const oScript = document.createElement('script');
   oScript.type = isModule ? 'module' : 'text\/javascript';
   oScript.onerror = loadError;
-  oScript.async = false;
+  oScript.async = true;
   oScript.src = expandedSrc; // Do this last
-
-  (oHead as any).appendChild(oScript);
 
   if (fOnload) {
     oScript.onload = function (evt: Event): void {
-      // console.log('onload', evt);
       fOnload(evt);
     };
   }
+
+  (oHead as any).appendChild(oScript);
+
 }
 
 export function importScriptUrl(sSrc: string, fOnload: Function, fOnerror: Function): void {
