@@ -170,16 +170,16 @@ const playableTypes = {
 const playableArgNames = [
   'playable',
   'env',
-  'P5',
-  'd3',
-  'fc',
-  'dc',
-  'topojson',
-  'Plotly',
-  'L',
-  'stdlib',
-  'THREE',
-  'smartdown',
+  'xP5',
+  'xd3',
+  'xfc',
+  'xdc',
+  'xtopojson',
+  'xPlotly',
+  'x',
+  'xstdlib',
+  'xTHREE',
+  'xsmartdown',
   'p5'
 ];
 const playableArgNamesQuoted = playableArgNames.map(n => `'${n}'`).join(',');
@@ -1761,7 +1761,7 @@ eval(playable.transformedCode);
       augmentedCode = Brython.generateAugmentedPlayable(divId, isModule, code);
     }
     else if (language === 'filament') {
-      augmentedCode = FilamentExtension.generateAugmentedPlayable(divId, isModule, code);
+      augmentedCode = FilamentExtension.generateAugmentedPlayable(isModule, code);
     }
     else if (language.toLowerCase() === 'p5js') {
       if (language === 'P5JS') {
@@ -2093,8 +2093,13 @@ async function playPlayableInternal(language, divId) {
       module.exports, // smartdown
       {}    // This will be a p5 obj in the case of using P5.Loader
     ];
+
+    //
+    // It seems like there is some duplication between a playable's
+    // 'this' value, and the value of the 'playable' argument.
+    //
     playable.embedThis = {
-      // env: smartdownVariables,
+      env: smartdownVariables,
       div: div,
       progress: progress,
       dependOn: {},
@@ -2514,9 +2519,9 @@ function consoleWrite(playable, args) {
     const nLinesClipped = Math.min(nLines, maxLinesClip);
     const lineHeight = 25;
     const newHeight = nLinesClipped * lineHeight;
-    if (newHeight > div.scrollHeight) {
-      div.style.height = `${newHeight}px`;
-    }
+    // if (true || newHeight > div.scrollHeight) {
+    div.style.height = `${newHeight}px`;
+    // }
   }
   const toggle = document.getElementById(playable.consoleToggleId);
   if (toggle) {
@@ -4654,7 +4659,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.49',
+  version: '1.0.50',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,

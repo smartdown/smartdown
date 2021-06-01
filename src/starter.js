@@ -136,8 +136,9 @@ function starter(basePrefix, doneHandler) {
       // console.log('rootHash', rootHash);
     }
 
+    let search = window.location.search;
     if (themeName !== '') {
-      window.location.search = `?theme=${themeName}`;
+      search = `?theme=${themeName}`;
     }
 
     let defaultPart = '_default_';
@@ -159,7 +160,7 @@ function starter(basePrefix, doneHandler) {
       }
 
       // console.log('newHash ignored', newHash, cardKeySubhash, window.location.pathname);
-      history.pushState({}, '', window.location.pathname + newHash + window.location.search);
+      history.pushState({}, '', window.location.pathname + newHash + search);
       scrollToSubHash(cardKeySubhash);
 
       if (!output.id) {
@@ -454,9 +455,24 @@ function starter(basePrefix, doneHandler) {
   ];
 
   function locationHashChanged(event) {
-    // console.log('#locationHashChanged', event, window.location.href, window.location.hash, window.location.pathname, rootHash);
+    // console.log('#locationHashChanged', event, window.location.href, window.location.hash, JSON.stringify(window.location.search), window.location.pathname, rootHash);
     event.preventDefault();
     event.stopImmediatePropagation();
+
+    const oldURL = event.oldURL;
+    const oldHashPos = oldURL.indexOf('#');
+    const oldSearchPos = oldURL.indexOf('?');
+    let oldSearch = '';
+    if (oldSearchPos >= 0) {
+      if (oldHashPos > oldSearchPos) {
+        oldSearch = oldURL.slice(oldSearchPos, oldHashPos - 1);
+      }
+      else {
+        oldSearch = oldURL.slice(oldSearchPos);
+      }
+
+      // console.log('oldURL', oldURL, oldSearch, oldHashPos, oldSearchPos);
+    }
 
     var hash = window.location.hash;
     var args = '';
@@ -497,7 +513,7 @@ function starter(basePrefix, doneHandler) {
           cardKey = rootHash;
         }
 
-        cardKey = cardKey + '#' + cardKeySubhash;
+        cardKey = cardKey + '#' + cardKeySubhash + oldSearch;
       }
 
       relativeCardLoader(cardKey, document.querySelectorAll(outputDivSelector)[0].id);

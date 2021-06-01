@@ -43,6 +43,7 @@ if (useP5JS) {
           P5.Loader = p5js.default;
 
           window.p5js = p5js;
+          window.P5 = P5.Loader;
           window.p5 = P5.Loader;
 
           import(/* webpackChunkName: "p5Sound" */ 'p5/lib/addons/p5.sound.min.js')

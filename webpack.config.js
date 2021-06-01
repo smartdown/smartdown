@@ -38,7 +38,7 @@ var stacktraceJS = path.join(nm, 'stacktrace-js/dist/stacktrace.min.js');
 var p5JS = path.join(nm, '/p5/lib/p5.min.js');
 // var p5JS = path.join(nm, '/p5/lib/p5.js');
 // var brythonJS = path.join(nm, '/brython/brython.js');
-// var filamentJS = path.join(app, 'external/filament.js');
+var filamentJS = path.join(app, 'external/filament.js');
 var brythonJS = path.join(app, 'external/brython.js');
 var brythonStdlibJS = path.join(nm, '/brython/brython_stdlib.js');
 var vizJS = path.join(nm, '/viz.js/viz.js');
@@ -187,7 +187,7 @@ var config = {
         { from: abcJS },
         { from: abcCSS },
         { from: openjscadJS },
-        // { from: filamentJS },
+        { from: filamentJS },
         { from: brythonJS },
         { from: brythonStdlibJS },
         { from: 'xypic.js' },
