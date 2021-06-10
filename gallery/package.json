@@ -1,0 +1,23 @@
+{
+  "name": "smartdown-gallery",
+  "version": "0.0.75",
+  "description": "Example Smartdown documents and associated resources that demonstrate various Smartdown features and serve as raw material for other Smartdown demos.",
+  "main": "index.js",
+  "scripts": {
+    "rmdsstore": "find . -name '.DS_Store' -print -delete"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smartdown/gallery.git"
+  },
+  "keywords": [
+    "smartdown",
+    "gallery"
+  ],
+  "author": "Daniel Keith <dan@quantumclay.com> (https://doctorbud.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/smartdown/gallery/issues"
+  },
+  "homepage": "https://github.com/smartdown/gallery#readme"
+}

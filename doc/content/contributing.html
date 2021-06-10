@@ -1,0 +1,39 @@
+
+<html><head></head><body><h1 id="state-of-the-project--construction-">State of the project <img class="docma emoji" src="https://twemoji.maxcdn.com/svg/1f6a7.svg" /></h1>
+<hr />
+<p>Although Smartdown has been in use for years, it has primarily been tended by
+myself (Dan Keith), and is in need of better documentation, unit testing, and refactoring.
+Thanks for your contribution, feedback and patience.</p>
+<h1 id="contributing-to-smartdown">Contributing to Smartdown</h1>
+<hr />
+<p>Contributions are always welcome. Before contributing, please read the
+<a href="CODE_OF_CONDUCT.md">CODE_OF_CONDUCT</a> and consult the <a href="">Issue Tracker</a>; your issue
+may have already been discussed or fixed. To contribute,
+<a href="https://help.github.com/articles/fork-a-repo/">fork</a> Smartdown, commit your changes,
+and <a href="https://help.github.com/articles/using-pull-requests/">Submit a Pull Request</a>.</p>
+<h2 id="development">Development</h2>
+<hr />
+<h3 id="local-development">Local development</h3>
+<p>Run <code>webpack</code> in <em>watch</em> mode to enable auto-building of the Smartdown <code>dist/</code> contents. This command does not handle the serving of these contents via <code>http-server</code>.</p>
+<p><code>npm run dev</code></p>
+<h3 id="local-build-of-simple-site-example">Local build of Simple Site Example</h3>
+<ul>
+<li><code>npm run build</code></li>
+<li><code>http-server docs/</code> <em>Or any other local web server</em>/</li>
+</ul>
+<h3 id="local-build-of-smartdown-viewer-site">Local build of Smartdown Viewer site</h3>
+<ul>
+<li>Either <code>build</code> or <code>dev</code> in the <code>smartdown/</code> directory to ensure that the Smartdown library is updated.</li>
+<li><code>cd site/</code></li>
+<li><code>npm run build</code> or <code>npm run dev</code></li>
+</ul>
+<h3 id="how-to-npm-publish-a-new-version">How to <code>npm publish</code> a new version</h3>
+<p>For publishing and distribution of this open source code, I've adapted the NPM structure described in via <a href="https://quickleft.com/blog/creating-and-publishing-a-node-js-module/">Creating and Publishing a Node.js Module</a>.</p>
+<ul>
+<li>Ensure master has the latest code for version <code>x.y.z</code></li>
+<li>Ensure <code>package.json</code> has version <code>x.y.z</code></li>
+<li><code>git tag x.y.z</code></li>
+<li><code>git push --force origin master --tags</code></li>
+<li><code>npm publish</code></li>
+</ul>
+</body></html>
