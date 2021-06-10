@@ -5641,6 +5641,18 @@
 
 	        return result;
 	    }
+	    lookupOrNull(name) {
+	        let result = this.funs[name];
+	        if(!result) {
+	            if(this.parent) {
+	                result = this.parent.lookupOrNull(name);
+	            } else {
+	                result = null;
+	            }
+	        }
+
+	        return result;
+	    }
 	    install(...funs) {
 	        funs.forEach(fun => {
 	            this.funs[fun.name] = fun;
@@ -7982,6 +7994,31 @@
 	    },
 	    function (scope, data, width, height, fill) {
 	        return new CanvasResult((canvas) => {
+	            const mouseEventHandler = async (name, e) => {
+	              // console.log('####', name, e.offsetX, e.offsetY);
+	              const fun = scope.lookupOrNull(name);
+	              let newResult = null;
+	              if (fun) {
+	                await fun.do_apply(scope, [scalar(e.offsetX), scalar(e.offsetY)]);
+	                // console.log('newResult', newResult)
+	              }
+	              return newResult
+	            };
+
+	            // Add the event listeners for mousedown, mousemove, and mouseup
+	            canvas.addEventListener('mousedown', async e => {
+	              return await mouseEventHandler('mousedown', e);
+	            });
+
+
+	            canvas.addEventListener('mouseup', async e => {
+	              return await mouseEventHandler('mouseup', e);
+	            });
+
+	            canvas.addEventListener('mousemove', async e => {
+	              return await mouseEventHandler('mousemove', e);
+	            });
+
 	            let ctx = canvas.getContext('2d');
 	            ctx.save();
 	            canvas.width = to_px(width);
