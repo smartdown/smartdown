@@ -54,7 +54,7 @@ else {
     playable,
     smartdown.smartdownVariables,
     smartdown.P5Loader,
-    window.d3v5,
+    window.d3,
     window.d3fc,
     window.d3dc,
     window.topojson,

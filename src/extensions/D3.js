@@ -8,8 +8,7 @@ export default function registerD3() {
     [
       'https://unpkg.com/d3/dist/d3.min.js',
       function() {
-        window.d3v5 = window.d3 = d3;
-        window.smartdown.d3v5 = window.smartdown.d3 = window.d3v5;
+        window.smartdown.d3 = window.d3 = d3;
       },
       'https://cdn.jsdelivr.net/npm/d3-cloud/build/d3.layout.cloud.min.js',
       function() {
@@ -27,12 +26,12 @@ export default function registerD3() {
         window.d3fc = window.fc;
         window.smartdown.d3fc = window.d3fc;
       },
-      'https://unpkg.com/dc@3.1.9/dc.js',
-      'https://unpkg.com/dc@3.1.9/dc.min.css',
+      'https://unpkg.com/dc/dist/dc.min.js',
+      'https://unpkg.com/dc/dist/style/dc.min.css',
       function() {
         window.d3dc = window.dc;
         window.smartdown.d3dc = window.d3dc;
-        window.d3dc.config.defaultColors(window.d3v5.schemeAccent);
+        window.d3dc.config.defaultColors(window.d3.schemeCategory10);
       },
       'https://unpkg.com/d3-sankey/dist/d3-sankey.min.js',
     ]);

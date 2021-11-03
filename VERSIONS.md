@@ -52,4 +52,4 @@
 - **1.0.49** - Update dependencies. Fix issue with Brython 3.9.2 and Safari with respect to very long library loading times. Upgrade Brython module to be conformant with latest Smartdown extension spec. Mystical change to the loading of external scripts to ensure that the onload event doesn't fire twice. Added preliminary support for Filament.
 - **1.0.50** - Improved Filament plugin to support reactivity and better sizing of Canvas. Simplified and refactored how playables are invoked, possibly breaking something somewhere. Instead of passing D3, P5JS, and other 'legacy' playable types through the playable argument list, we just rely on them being globally scoped. Tried to improve the behavior of this.log() to ensure that the div was big enough for multiline messages. Fixed starter.js to better respect the URL query parameter '?theme=...' and preserve it even when scrolling to subhashes.
 - **1.0.51** - Updates Filament extension. Update deps.
- 
+- **1.0.52** - Update .nvmrc to v16.8.0. Update version to 1.0.52. Eliminate use of d3v5. Update dc.js to latest version. Center Filament diagram backgrounds when translate() is used.

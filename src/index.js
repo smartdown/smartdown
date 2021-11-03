@@ -2082,7 +2082,7 @@ async function playPlayableInternal(language, divId) {
       playable,
       smartdownVariables,
       P5.Loader,
-      window.d3v5,
+      window.d3,
       window.d3fc,
       window.d3dc,
       window.topojson,
@@ -4066,7 +4066,7 @@ function setSmartdown(md, outputDiv, setSmartdownCompleted) {
     // window.onresize = resizeThrottler;
     window.addEventListener('resize', resizeThrottler);
 
-    const firstTweetIndex = md.search(/\!\[[^\]]*\]\(https\:\/\/twitter\.com\//);
+    const firstTweetIndex = md.search(/[^`]\!\[[^\]]*\]\(https\:\/\/twitter\.com\/[^`]/);
 
     if (firstTweetIndex >= 0) {
       if (!twitterLoading) {
@@ -4646,7 +4646,6 @@ module.exports = {
   Stdlib: null,
   P5Loader: P5.Loader,
   d3: null,
-  d3v5: null,
   d3fc: null,
   d3cloud: null,
   topojson: null,
@@ -4659,7 +4658,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.51',
+  version: '1.0.52',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,

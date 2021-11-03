@@ -8185,9 +8185,9 @@
 	            // console.log('drawing the turtle with state',state.commands)
 	            let ctx = canvas.getContext('2d');
 	            ctx.save();
-	            ctx.translate(canvas.width/2,canvas.height/2);
 	            ctx.fillStyle = 'white';
 	            ctx.fillRect(0,0,canvas.width,canvas.height);
+	            ctx.translate(canvas.width/2,canvas.height/2);
 	            let x = 0;
 	            let y = 0;
 	            let a = -90;
