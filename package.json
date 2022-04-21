@@ -73,7 +73,7 @@
     "mini-css-extract-plugin": "^2.6.0",
     "mkcert": "^1.5.0",
     "nightwatch": "^1.7.11",
-    "node-sass": "^6.0.1",
+    "node-sass": "^7.0.0",
     "null-loader": "^4.0.1",
     "postcss-loader": "6.2.1",
     "postcss-smart-import": "^0.7.6",
