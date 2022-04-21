@@ -9314,7 +9314,7 @@ exports.install = function (t) {
      * @alias extend
      * @category Objects
      * @param {Object} object The destination object.
-     * @param {...Object} [source] The source objects.
+     * @param {Object} [source] The source objects.
      * @param {Function} [callback] The function to customize assigning values.
      * @param {*} [thisArg] The `this` binding of `callback`.
      * @returns {Object} Returns the destination object.
@@ -9500,7 +9500,7 @@ exports.install = function (t) {
      * @type Function
      * @category Objects
      * @param {Object} object The destination object.
-     * @param {...Object} [source] The source objects.
+     * @param {Object} [source] The source objects.
      * @param- {Object} [guard] Allows working with `_.reduce` without using its
      *  `key` and `object` arguments as sources.
      * @returns {Object} Returns the destination object.

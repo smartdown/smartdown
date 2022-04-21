@@ -70,7 +70,7 @@ var galleryIgnores = [
 const baseURL = development ? '/' : '/smartdown/';
 
 var config = {
-  bail: true,
+  // bail: true,
 
   stats: {
     optimizationBailout: true
@@ -319,12 +319,15 @@ var config = {
   },
 
 
-  devServer: {
-    inline: false,
-    contentBase: outputPath,
-    historyApiFallback: true,
-    watchContentBase: true
-  },
+  // We don't actually use webpack dev server in this project. Weird
+  // devServer: {
+  //   host: '0.0.0.0',//your ip address
+  //   disableHostCheck: true,
+  //   inline: false,
+  //   contentBase: outputPath,
+  //   historyApiFallback: true,
+  //   watchContentBase: true
+  // },
 };
 
 

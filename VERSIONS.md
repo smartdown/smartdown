@@ -53,3 +53,4 @@
 - **1.0.50** - Improved Filament plugin to support reactivity and better sizing of Canvas. Simplified and refactored how playables are invoked, possibly breaking something somewhere. Instead of passing D3, P5JS, and other 'legacy' playable types through the playable argument list, we just rely on them being globally scoped. Tried to improve the behavior of this.log() to ensure that the div was big enough for multiline messages. Fixed starter.js to better respect the URL query parameter '?theme=...' and preserve it even when scrolling to subhashes.
 - **1.0.51** - Updates Filament extension. Update deps.
 - **1.0.52** - Update .nvmrc to v16.8.0. Update version to 1.0.52. Eliminate use of d3v5. Update dc.js to latest version. Center Filament diagram backgrounds when translate() is used.
+- **1.0.53** - Update deps. Update P5JS global translation names. Deleted local SSL certificates and added ssl/makeCert.sh script to generate SSL CA and certificates.
