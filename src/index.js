@@ -2025,22 +2025,33 @@ async function runModule(playable, argValues, language) {
   if (smartdown.es6Playables[divId]) {
     console.log('runModule error: smartdown.es6Playables[divId] exists', divId, smartdown.es6Playables[divId]);
   }
+
+  const glueStart = () => {
+    if (smartdown.es6Playables[divId].start) {
+      smartdown.es6Playables[divId].start.call(embedThis, ...argValues);
+    }
+  };
+
   smartdown.es6Playables[divId] = {
     script: s,
     start: null,
+    glueStart,
   }
   s.type = 'module';
-  s.onload = function (evt) {
-    // console.log('...onload', evt, divId, smartdown.es6Playables[divId]);
-    if (smartdown.es6Playables[divId].start) {
-      smartdown.es6Playables[divId].start(embedThis, ...argValues);
-    }
-  };
+
   s.onerror = function (error) {
     console.log('runModule...onerror', error);
   };
   s.async = false;
-  s.text = code;
+  const augmentedCode =
+`
+${code}
+
+const augmentedDivId = '${divId}';
+smartdown.es6Playables[augmentedDivId].glueStart();
+`;
+
+  s.text = augmentedCode;
 
   document.head.appendChild(s);
   const embedResult = null;
@@ -4658,7 +4669,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.53',
+  version: '1.0.54',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,
