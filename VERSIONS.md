@@ -55,3 +55,4 @@
 - **1.0.52** - Update .nvmrc to v16.8.0. Update version to 1.0.52. Eliminate use of d3v5. Update dc.js to latest version. Center Filament diagram backgrounds when translate() is used.
 - **1.0.53** - Update deps. Update P5JS global translation names. Deleted local SSL certificates and added ssl/makeCert.sh script to generate SSL CA and certificates.
 - **1.0.54** - Update deps. Improve Kiosk mode.
+- **1.0.55** - Update deps. Replace usage of the now-deprecated 'jsyaml.safeLoad()' to use 'jsyaml.load()', which is safe by default now.

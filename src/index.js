@@ -3904,7 +3904,7 @@ function getFrontmatter(md) {
     if (frontMatterEndIndex >= 0) {
       let frontMatterText = frontMatterBegin.slice(0, frontMatterEndIndex);
       resultFMText = frontMatterText; // frontMatterBegin.slice(frontMatterEndIndex + fmSuffix.length);
-      resultFM = frontMatterText === '' ? {} : jsyaml.safeLoad(resultFMText);
+      resultFM = frontMatterText === '' ? {} : jsyaml.load(resultFMText);
       resultMD = frontMatterBegin.slice(frontMatterEndIndex + fmSuffix.length);
     }
   }
@@ -4669,7 +4669,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.54',
+  version: '1.0.55',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,
