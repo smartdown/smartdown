@@ -15,7 +15,7 @@ function calcWikidataImageUtil(thumb, key, body, done) {
     var parsedResult = JSON.parse(lookupResult).query.pages;
 
     var thumbs = [];
-    parsedResult.forEach(function(val, idx) {
+    parsedResult.forEach(function(val) {
       if (thumb && val.thumbnail) {
         thumbs.push(val.thumbnail.source);
       }
@@ -83,7 +83,7 @@ function calcWikidata(key, body, done) {
     // console.log('calcWikidata parsedResult', parsedResult);
 
     var info = [];
-    window.lodashEach(parsedResult, function(val, idx) {
+    window.lodashEach(parsedResult, function(val) {
       // console.log('...val', val);
       info.push({
         title: val.displaytitle,

@@ -21,7 +21,6 @@ function expandSrc(sSrc: string): string {
   return expandedSrc;
 }
 
-
 function importScriptUrlWithModule(sSrc: string, isModule: boolean, fOnload: Function, fOnerror: Function): void {
   const oHead = document.head || document.getElementsByTagName('head')[0];
   const expandedSrc = expandSrc(sSrc);
@@ -37,7 +36,7 @@ function importScriptUrlWithModule(sSrc: string, isModule: boolean, fOnload: Fun
   }
 
   const oScript = document.createElement('script');
-  oScript.type = isModule ? 'module' : 'text\/javascript';
+  oScript.type = isModule ? 'module' : 'text/javascript';
   oScript.onerror = loadError;
   oScript.async = true;
   oScript.src = expandedSrc; // Do this last

@@ -3,7 +3,7 @@ const each = window.lodashEach = require('lodash/forEach');
 // https://github.com/mdaines/viz.js/wiki/API#render-options
 var graphvizImages = [];
 function registerMediaWithGraphviz() {
-  each(window.mediaRegistry, function (data, _key) {
+  each(window.mediaRegistry, function (data,) {
     //     graphvizFiles.push({
     //       path: data.url,
     //       data:
@@ -39,10 +39,10 @@ function loadGraphviz(loaded) {
     window.smartdownJSModules.graphviz.loadedCallbacks.push(loaded);
     window.smartdown.importScriptUrl(
       'smartdownBase:lib/viz.js',
-      function(script1) {
+      function() {
         window.smartdown.importScriptUrl(
           'smartdownBase:lib/lite.render.js',
-          function(script2) {
+          function() {
             registerMediaWithGraphviz();
             const callThese = window.smartdownJSModules.graphviz.loadedCallbacks;
             window.smartdownJSModules.graphviz.loadedCallbacks = [];

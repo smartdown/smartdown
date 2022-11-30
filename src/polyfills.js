@@ -11,29 +11,31 @@ if (!String.prototype.endsWith) {
 
 // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/removeEventListener#Polyfill_to_support_older_browsers
 
-if (!Element.prototype.addEventListener) {
-  var oListeners = {};
-  function runListeners(oEvent) {
-    if (!oEvent) {
-      oEvent = window.event;
-    }
-    for (
-      var iLstId = 0, iElId = 0, oEvtListeners = oListeners[oEvent.type];
-      iElId < oEvtListeners.aEls.length;
-      iElId++) {
-      if (oEvtListeners.aEls[iElId] === this) {
-        for (
-          iLstId;
-          iLstId < oEvtListeners.aEvts[iElId].length;
-          iLstId++) {
-          oEvtListeners.aEvts[iElId][iLstId].call(this, oEvent);
-        }
-        break;
+function runListeners(oEvent) {
+  if (!oEvent) {
+    oEvent = window.event;
+  }
+  for (
+    var iLstId = 0, iElId = 0, oEvtListeners = oListeners[oEvent.type];
+    iElId < oEvtListeners.aEls.length;
+    iElId++) {
+    if (oEvtListeners.aEls[iElId] === this) {
+      for (
+        iLstId;
+        iLstId < oEvtListeners.aEvts[iElId].length;
+        iLstId++) {
+        oEvtListeners.aEvts[iElId][iLstId].call(this, oEvent);
       }
+      break;
     }
   }
+}
+
+if (!Element.prototype.addEventListener) {
+  var oListeners = {};
+
   Element.prototype.addEventListener = function (sEventType, fListener /* , useCapture (will be ignored!) */) {
-    if (oListeners.hasOwnProperty(sEventType)) {
+    if (Object.hasOwn(oListeners, sEventType)) {
       var oEvtListeners = oListeners[sEventType];
       var nElIdx;
       var iElId;
@@ -68,7 +70,7 @@ if (!Element.prototype.addEventListener) {
     }
   };
   Element.prototype.removeEventListener = function (sEventType, fListener /* , useCapture (will be ignored!) */) {
-    if (!oListeners.hasOwnProperty(sEventType)) {
+    if (!Object.hasOwn(oListeners, sEventType)) {
       return;
     }
     var oEvtListeners = oListeners[sEventType];

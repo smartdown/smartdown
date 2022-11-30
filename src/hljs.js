@@ -1,5 +1,3 @@
-/* global useLeaflet */
-
 require('highlight.js/styles/default.css');
 
 import hljs from 'highlight.js/lib/core';

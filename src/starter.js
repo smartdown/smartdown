@@ -7,7 +7,6 @@
 /* global smartdownRawPrefix */
 /* global smartdownOutputDivSelector */
 /* global smartdownPostLoadMutator */
-/* global smartdownAdjustHash */
 /* global smartdownMedia */
 /* eslint no-var: 0 */
 
@@ -70,7 +69,6 @@ function starter(basePrefix, doneHandler) {
   var gistHashPrefix = 'gist/';
   var outputDivSelector = '#smartdown-output';
   var postLoadMutator = null;
-  var adjustHash = true;
   var media = {
     cloud: '/gallery/resources/cloud.jpg',
     badge: '/gallery/resources/badge.svg',
@@ -110,9 +108,6 @@ function starter(basePrefix, doneHandler) {
   }
   if (typeof smartdownPostLoadMutator === 'function') {
     postLoadMutator = smartdownPostLoadMutator;
-  }
-  if (typeof smartdownAdjustHash === 'boolean') {
-    adjustHash = smartdownAdjustHash;
   }
 
   if (typeof smartdownMedia === 'object') {
@@ -365,10 +360,10 @@ function starter(basePrefix, doneHandler) {
   function gistPrefix() {
     var result = lastLoadedRawPrefix;
     var hash = window.location.hash;
-    var args = '';
+    // var args = '';
     var argsPos = hash.indexOf('?');
     if (argsPos >= 0) {
-      args = hash.slice(argsPos);
+      // args = hash.slice(argsPos);
       hash = hash.slice(0, argsPos);
       // console.log('gistPrefix hashargs', hash, args, window.location.search);
     }

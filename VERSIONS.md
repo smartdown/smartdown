@@ -56,3 +56,15 @@
 - **1.0.53** - Update deps. Update P5JS global translation names. Deleted local SSL certificates and added ssl/makeCert.sh script to generate SSL CA and certificates.
 - **1.0.54** - Update deps. Improve Kiosk mode.
 - **1.0.55** - Update deps. Replace usage of the now-deprecated 'jsyaml.safeLoad()' to use 'jsyaml.load()', which is safe by default now.
+- **1.0.56** -
+- Update deps.
+- Fixed 'draggable-but-no-closeable' disclosable so that it has a drag bar of the same size as a 'closeable' disclosable.
+- Use a bolder X icon for the close box.
+- Ensure that 'swatch' cells can be inlined into paragraphs.
+- Fix bug in reactivity involving async/await playables. Previously, 'await' would result in the playable returning prematurely, causing the reactivity data to be incorrect.
+- Ensure that 'markdown' type cells can be inlined.
+- Fix bug where unclosed 'decoration' caused cells to not be interactive.
+- Hide a THEAD when all of its TH are empty.
+- Remove padding from '<code>' elements so that they align properly in lists.
+- Enhanced ESLint rules and tech to better detect issues and guide code modernization.
+
