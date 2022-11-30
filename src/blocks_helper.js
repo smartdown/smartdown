@@ -13,7 +13,7 @@ script.src = starterScript;
 script.onerror = function loadError(error) {
   throw new URIError('The script ' + error.target.src + ' is not accessible.');
 };
-script.onload = function (x) {
+script.onload = function () {
   window.smartdownStarter();
 };
 head.appendChild(script);

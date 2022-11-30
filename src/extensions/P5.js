@@ -1,5 +1,4 @@
 /* global useP5JS */
-/* global isTesting */
 
 const P5UserFunctions = require('./P5UserFunctions');
 const P5SystemVars = require('./P5SystemVars');
@@ -14,6 +13,71 @@ var P5 = {
   SystemVarDefs: null,
 };
 
+function loadP5JS(loaded) {
+  // console.log('loadP5JS...', loaded, JSON.stringify(window.smartdownJSModules.p5js.loadedCallbacks, null, 2));
+  if (window.smartdownJSModules.p5js.loaded) {
+    loaded();
+  }
+  else if (window.smartdownJSModules.p5js.loadedCallbacks.length > 0) {
+    window.smartdownJSModules.p5js.loadedCallbacks.push(loaded);
+    // console.log('loadP5JS...p5js is still loading', JSON.stringify(window.smartdownJSModules.p5js.loadedCallbacks, null, 2));
+  }
+  else {
+    window.smartdownJSModules.p5js.loadedCallbacks.push(loaded);
+    // console.log('loadP5JS...p5js initiate load', window.smartdownJSModules.p5js.loadedCallbacks[0]);
+
+    import(/* webpackChunkName: "p5js" */ 'p5JS')
+      .then(p5js => {
+        window.smartdownJSModules.p5js.loaded = p5js;
+        P5.Loader = p5js.default;
+
+        window.p5js = p5js;
+        window.P5 = P5.Loader;
+        window.p5 = P5.Loader;
+
+        import(/* webpackChunkName: "p5Sound" */ 'p5/lib/addons/p5.sound.min.js')
+          .then(() => {
+
+            // for (const f in P5.Loader.prototype) {
+            //   console.log(f, typeof P5.Loader.prototype[f]);
+            // }
+
+            const callThese = window.smartdownJSModules.p5js.loadedCallbacks;
+            window.smartdownJSModules.p5js.loadedCallbacks = [];
+            callThese.forEach(loadedCb => {
+              loadedCb();
+            });
+          })
+          .catch(error => {
+            console.log('loadP5Sound error', error);
+          });
+
+        // import(/* webpackChunkName: "p5DOM" */ 'p5/lib/addons/p5.dom.min.js')
+        //   .then(p5DOM => {
+        //     import(/* webpackChunkName: "p5Sound" */ 'p5/lib/addons/p5.sound.min.js')
+        //       .then(p5Sound => {
+
+        //         const callThese = window.smartdownJSModules.p5js.loadedCallbacks;
+        //         window.smartdownJSModules.p5js.loadedCallbacks = [];
+        //         callThese.forEach(loadedCb => {
+        //           loadedCb();
+        //         });
+        //       })
+        //       .catch(error => {
+        //         console.log('loadP5Sound error', error);
+        //       });
+        //   })
+        //   .catch(error => {
+        //     console.log('loadP5DOM error', error);
+        //   });
+      })
+      .catch(error => {
+        console.log('loadP5JSerror', error);
+      });
+  }
+}
+
+
 if (useP5JS) {
   var isTesting = (typeof process === 'object' && process.env.TEST_RUN);
   if (isTesting) {
@@ -22,70 +86,6 @@ if (useP5JS) {
         return false;
       };
     // require('./webaudio-mocks.js');
-  }
-
-  function loadP5JS(loaded) {
-    // console.log('loadP5JS...', loaded, JSON.stringify(window.smartdownJSModules.p5js.loadedCallbacks, null, 2));
-    if (window.smartdownJSModules.p5js.loaded) {
-      loaded();
-    }
-    else if (window.smartdownJSModules.p5js.loadedCallbacks.length > 0) {
-      window.smartdownJSModules.p5js.loadedCallbacks.push(loaded);
-      // console.log('loadP5JS...p5js is still loading', JSON.stringify(window.smartdownJSModules.p5js.loadedCallbacks, null, 2));
-    }
-    else {
-      window.smartdownJSModules.p5js.loadedCallbacks.push(loaded);
-      // console.log('loadP5JS...p5js initiate load', window.smartdownJSModules.p5js.loadedCallbacks[0]);
-
-      import(/* webpackChunkName: "p5js" */ 'p5JS')
-        .then(p5js => {
-          window.smartdownJSModules.p5js.loaded = p5js;
-          P5.Loader = p5js.default;
-
-          window.p5js = p5js;
-          window.P5 = P5.Loader;
-          window.p5 = P5.Loader;
-
-          import(/* webpackChunkName: "p5Sound" */ 'p5/lib/addons/p5.sound.min.js')
-            .then(p5Sound => {
-
-              // for (const f in P5.Loader.prototype) {
-              //   console.log(f, typeof P5.Loader.prototype[f]);
-              // }
-
-              const callThese = window.smartdownJSModules.p5js.loadedCallbacks;
-              window.smartdownJSModules.p5js.loadedCallbacks = [];
-              callThese.forEach(loadedCb => {
-                loadedCb();
-              });
-            })
-            .catch(error => {
-              console.log('loadP5Sound error', error);
-            });
-
-          // import(/* webpackChunkName: "p5DOM" */ 'p5/lib/addons/p5.dom.min.js')
-          //   .then(p5DOM => {
-          //     import(/* webpackChunkName: "p5Sound" */ 'p5/lib/addons/p5.sound.min.js')
-          //       .then(p5Sound => {
-
-          //         const callThese = window.smartdownJSModules.p5js.loadedCallbacks;
-          //         window.smartdownJSModules.p5js.loadedCallbacks = [];
-          //         callThese.forEach(loadedCb => {
-          //           loadedCb();
-          //         });
-          //       })
-          //       .catch(error => {
-          //         console.log('loadP5Sound error', error);
-          //       });
-          //   })
-          //   .catch(error => {
-          //     console.log('loadP5DOM error', error);
-          //   });
-        })
-        .catch(error => {
-          console.log('loadP5JSerror', error);
-        });
-    }
   }
 
   window.smartdownJSModules.p5js = {

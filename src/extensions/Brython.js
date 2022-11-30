@@ -58,7 +58,7 @@ const smartdownPlayableContext = {
 
 if (typeof __BRYTHON__ === 'object') {
   if (!__BRYTHON__.isConfiguredForSmartdown) {
-    window.\$locals___main__ = {};
+    window.$locals___main__ = {};
     // https://github.com/brython-dev/brython/blob/master/www/doc/en/options.md
     const options = {
       debug: 1,
@@ -76,7 +76,7 @@ if (typeof __BRYTHON__ === 'object') {
   const lineInfo = null;
 
   // https://github.com/brython-dev/brython/wiki/How-Brython-works
-  __BRYTHON__.\$options = {
+  __BRYTHON__.$options = {
     debug: 1
   };
 

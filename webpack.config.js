@@ -61,11 +61,13 @@ var useMathJax = true;
 var mode = (nodeEnvironment === 'production' || nodeEnvironment === 'development') ?
             nodeEnvironment : 'production';
 var galleryIgnores = [
-  '.git/**',
-  '.gitignore',
-  'hide/*',
-  'LICENSE',
-  'package.json',
+  '**/.DS_Store',
+  '**/.git',
+  '**/.git/**',
+  '**/.gitignore',
+  '**/hide',
+  '**/LICENSE',
+  '**/package.json',
   '**/index.html'];
 const baseURL = development ? '/' : '/smartdown/';
 

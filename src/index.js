@@ -25,8 +25,8 @@ require('./styles.css');
 
 const marked = require('marked');
 
-const each = window.lodashEach = require('lodash/forEach');
-const map = window.lodashMap = require('lodash/map');
+const lodashEach = window.lodashEach = require('lodash/forEach');
+const lodashMap = window.lodashMap = require('lodash/map');
 const isEqual = window.lodashIsEqual = require('lodash/isEqual');
 
 const hljs = require('hljs');
@@ -37,7 +37,7 @@ window.jsyaml = require('js-yaml');
 const StackTrace = require('stacktraceJS');
 
 
-import {isExtensionRegistered, loadExternal, registerExtension, ensureExtension} from 'extensions';
+import {isExtensionRegistered, loadExternal, ensureExtension} from 'extensions';
 
 const mathjaxConfigure = require('./extensions/MathJax');
 
@@ -182,7 +182,6 @@ const playableArgNames = [
   'xsmartdown',
   'p5'
 ];
-const playableArgNamesQuoted = playableArgNames.map(n => `'${n}'`).join(',');
 
 var perPageState = {
   expressionsRegistered: {},
@@ -844,6 +843,8 @@ function renderCode(code, languageString) {
   }
 }
 
+/*
+  I don't know when this was ever used.
 
 function edit(regex, opt) {
   regex = regex.source || regex;
@@ -860,6 +861,7 @@ function edit(regex, opt) {
     }
   };
 }
+*/
 
 
 function isGIF(href) {
@@ -921,7 +923,7 @@ function renderImage(href, title, text) {
     }
   }
   else if (href.indexOf('https://twitter.com') === 0) {
-    var showCards = (/\&amp\;showmedia$/i.test(href));
+    var showCards = (/&amp;showmedia$/i.test(href));
     out = '<blockquote class="twitter-tweet"';
     out += ' data-width="250"';
     out += ' align="center"';
@@ -1029,7 +1031,7 @@ function renderImage(href, title, text) {
     }
     else if (text === 'swatch') {
       const bgColor = href || 'pink';
-      out += `<div class="smartdown-swatch" style="background:${bgColor}"></div>`;
+      out += `<span class="smartdown-swatch" style="background:${bgColor}"></span>`;
     }
     else {
       var className = imageStyles[text] || imageStyles.default;
@@ -1171,7 +1173,7 @@ function renderLink(href, title, text) {
     if (op === 'INPUT') {
       uniqueCellIndex++;
       var inputCellId = 'INPUT' + uniqueCellIndex;
-      const inputCellIdParts = lhs.split(/[\|\!]/g);
+      const inputCellIdParts = lhs.split(/[|!]/g);
       var inputType = 'text';
       var liveBlur = false;
       if (inputCellIdParts.length > 1) {
@@ -1340,7 +1342,7 @@ function renderLink(href, title, text) {
       uniqueCellIndex++;
       var outputCellId = 'OUTPUT_' + uniqueCellIndex;
 
-      const outputCellIdParts = lhs.split(/[\|\!]/g);
+      const outputCellIdParts = lhs.split(/[|!]/g);
       var outputType = 'text';
       let flavors = '';
       if (outputCellIdParts.length > 1) {
@@ -1368,13 +1370,18 @@ function renderLink(href, title, text) {
         }
       }
 
+      const smartdownClass = 'smartdown-' + outputType;
+
       // DRY this up. It's stupidly repetitive
-      if (outputType !== '' && outputType !== 'text' && outputType !== 'url') {
-        var smartdownClass = 'smartdown-' + outputType;
+      if (
+        outputType !== '' &&
+        outputType !== 'text' &&
+        outputType !== 'markdown' &&
+        outputType !== 'url') {
         newHTML += `<div class="infocell-output ${smartdownClass} ${flavors}" id="${outputCellId}"></div>`;
       }
       else {
-        newHTML += `<span class="infocell-output ${flavors}" id="${outputCellId}"></span>`;
+        newHTML += `<span class="infocell-output ${smartdownClass} ${flavors}" id="${outputCellId}"></span>`;
       }
       if (hasLabel) {
         newHTML += '</span>';
@@ -1452,56 +1459,60 @@ let decorationDivsOpened = 0;
 
 function renderHeading(text, level, raw, slugger) {
   let result = ``;
+
   const disclosableI = text.lastIndexOf('::::');
   const decorationI = text.lastIndexOf('--');
 
-  if (disclosableI >= 0 || decorationI >= 0) {
-    if (disclosableI >= 0) {
-      const disclosableDeclaration = text.slice(disclosableI + 4).trim();
-      text = text.slice(0, disclosableI);
+  if (disclosableI >= 0) {
+    const disclosableDeclaration = text.slice(disclosableI + 4).trim();
+    text = text.slice(0, disclosableI);
 
-      if (disclosableDivsOpened > 0 && disclosableDeclaration.length === 0) {
-        disclosableDivsOpened -= 1;
-        result += `</div></div>`;
-      }
-      else {
-
-        disclosableDivsOpened += 1;
-
-        result += `
-                <div
-                  id="${disclosableDeclaration}"
-                  class="disclosable-wrapper"
-                >
-                  <div
-                    id="${disclosableDeclaration}_header"
-                    class="disclosable-header"></div>
-                  <div
-                    class="disclosable-content">`;
-      }
-    }
-    else if (decorationI >= 0) {
-      text = text.slice(decorationI + 2);
-      const parts = text.split(' ');
-      const decorationType = parts[0];
-      let id = '';
-      if (parts.length > 1) {
-        id = parts[1];
-      }
-
-      if (decorationDivsOpened > 0 && id === '') {
-        decorationDivsOpened -= 1;
+    if (disclosableDivsOpened > 0 && disclosableDeclaration.length === 0) {
+      for (let decorationIndex = 0; decorationIndex < decorationDivsOpened; decorationIndex++) {
         result += `</div>`;
       }
-      else {
-        decorationDivsOpened += 1;
+      decorationDivsOpened = 0;
 
-        result += `
+      disclosableDivsOpened -= 1;
+      result += `</div></div>`;
+    }
+    else {
+
+      disclosableDivsOpened += 1;
+
+      result += `
+              <div
+                id="${disclosableDeclaration}"
+                class="disclosable-wrapper"
+              >
                 <div
-                  id="${id}"
-                  class="decoration-${decorationType}"
-                > `;
-      }
+                  id="${disclosableDeclaration}_header"
+                  class="disclosable-header"></div>
+                <div
+                  class="disclosable-content">`;
+    }
+  }
+  else if (decorationI >= 0) {
+    text = text.slice(decorationI + 2);
+    const parts = text.split(' ');
+    const decorationType = parts[0];
+    let id = '';
+    if (parts.length > 1) {
+      id = parts[1];
+    }
+
+    if (decorationDivsOpened > 0 && id === '') {
+      decorationDivsOpened -= 1;
+      result += `</div>`;
+    }
+    else {
+      decorationDivsOpened += 1;
+
+      result += `
+              <div
+                id="${id}"
+                class="decoration-${decorationType}"
+              > `;
     }
   }
   else {
@@ -1514,6 +1525,22 @@ function renderHeading(text, level, raw, slugger) {
   return result;
 }
 
+function renderTable(header, body) {
+  if (body) body = '<tbody>' + body + '</tbody>';
+
+  const emptyTH = header.split('></th>').length;
+  const allTH = header.split('</th>').length;
+
+  const style = emptyTH === allTH ? ' style="display: none;"' : '';
+  return `<table>
+<thead${style}>
+${header}
+</thead>
+${body}
+</table>`;
+}
+
+
 // Override function
 const renderer = {
   link: renderLink,
@@ -1521,6 +1548,7 @@ const renderer = {
   paragraph: renderParagraph,
   br: renderBr,
   heading: renderHeading,
+  table: renderTable,
   code: renderCode,
   // codespan: function(text) {
   //   const result = hljs.highlightAuto(text).value; // '<code>' + text + '</code>';
@@ -1528,7 +1556,7 @@ const renderer = {
   // },
   text(src) {
 
-    return entityEscape(src.replace(/:([A-Za-z0-9_\-\+]+?):/g, emojiReplacer));
+    return entityEscape(src.replace(/:([A-Za-z0-9_\-+]+?):/g, emojiReplacer));
   },
 };
 
@@ -1557,12 +1585,11 @@ const tokenizer = {
   },
 };
 
+/* eslint-disable-next-line */
 const walkTokens = token => {
-  const nChildren = token.tokens ? token.tokens.length : 0;
+  // const nChildren = token.tokens ? token.tokens.length : 0;
   // console.log('walkTokens', token.type, nChildren, token.text, token.raw);
 };
-
-
 
 const markedOpts = {
   headerIds: true,
@@ -1603,7 +1630,7 @@ function enhanceMarkedAndOpts() {
 
 function partitionMultipart(markdown) {
   markdown = '\n' + markdown; // deal with lack of leading \n
-  var splits = markdown.split(/\n# ([a-zA-Z0-9_]+)\n\-\-\-\n/);
+  var splits = markdown.split(/\n# ([a-zA-Z0-9_]+)\n---\n/);
   var result = {
   };
   var firstKey = null;
@@ -1641,7 +1668,7 @@ function registerExpression(cellIndex, labelText, lhss, rhss, manual) {
 
   for (let i = 0; i < lhss.length; ++i) {
     let lhs = lhss[i];
-    const calcCellIdParts = lhs.split(/[\|\!]/g);
+    const calcCellIdParts = lhs.split(/[|!]/g);
     var calcType = 'text';
     if (calcCellIdParts.length > 1) {
       lhs = calcCellIdParts[0];
@@ -1710,7 +1737,7 @@ function computeExpressions() {
     else if (entry.manual) {
       // console.log('compute manual', entry, entry.labelId);
       if (entry.labelId) {
-        var rootDiv = document.getElementById(entry.rootDivId);
+        // var rootDiv = document.getElementById(entry.rootDivId);
         var labelElement = document.getElementById(entry.labelId);
         if (!labelElement) {
           // console.log('computeExpressions NO LABEL', entry, entry.labelId, entry.rootDivId, rootDiv);
@@ -1945,7 +1972,7 @@ if (typeof start !== 'undefined') {
     else {
       augmentedCode =
 `
-(async () => {
+return (async () => {
 
   ${code}
 
@@ -1991,12 +2018,17 @@ if (typeof start !== 'undefined') {
 }
 
 async function runFunction(code, embedThis, argValues, language, div) {
-  const func = new Function(...playableArgNames, code);
+  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/AsyncFunction#examples
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  const AsyncFunction = (async function () {}).constructor;
+  const func = new AsyncFunction(...playableArgNames, code);
+
   let embedResult = null;
   try {
     embedResult = await func.apply(embedThis, argValues);
   }
   catch (e) {
+    console.log('###runFunction catch func.apply()', e);
     embedThis.log(`# Error playing ${language} playable: ${e}`);
     if (div) {
       div.innerHTML =
@@ -2014,7 +2046,7 @@ ${e}
 }
 
 
-async function runModule(playable, argValues, language) {
+async function runModule(playable, argValues) {
   const divId = playable.divId;
   const code = playable.augmentedCode;
   const embedThis = playable.embedThis;
@@ -2111,8 +2143,8 @@ async function playPlayableInternal(language, divId) {
     //
     playable.embedThis = {
       env: smartdownVariables,
-      div: div,
-      progress: progress,
+      div,
+      progress,
       dependOn: {},
       depend: null,
       log: function(...args) {
@@ -2128,10 +2160,10 @@ async function playPlayableInternal(language, divId) {
     if (language.toLowerCase() !== 'p5js') {
       if (playable.isModule) {
         if (playable.language === 'typescript') {
-          const embedResult = await smartdown.runFunction(playable.augmentedCode, playable.embedThis, argValues, language, div);
+          await smartdown.runFunction(playable.augmentedCode, playable.embedThis, argValues, language, div);
         }
         else {
-          const embedResult = await smartdown.runModule(playable, argValues, language);
+          await smartdown.runModule(playable, argValues, language);
         }
       }
       else {
@@ -2259,7 +2291,7 @@ ${e}
         }
         else {
           let atLeastOneUndefined = false;
-          dependOn.forEach(varname => {
+          dependOn.forEach((varname) => {
             const newValue = smartdownVariables[varname];
             if (newValue === undefined) {
               atLeastOneUndefined = true;
@@ -2275,7 +2307,7 @@ ${e}
       }
       else if (dependOn) {
         let atLeastOneEvaluated = false;
-        for (const varname in dependOn) {
+        Object.keys(dependOn).forEach((varname) => {
           atLeastOneEvaluated = true;
           const newValue = smartdownVariables[varname];
           playable.dependLastValues[varname] = newValue;
@@ -2284,7 +2316,7 @@ ${e}
             atLeastOneDefined = true;
             dependOn[varname].apply(playable.embedThis);
           }
-        }
+        });
 
         if (!atLeastOneEvaluated) {
           atLeastOneDefined = true; // To drop the progress bar
@@ -2543,7 +2575,7 @@ function consoleWrite(playable, args) {
 
 function activateDraggableDisclosure(divId) {
   var div = document.getElementById(divId);
-  const body = document.getElementsByTagName('body')[0];
+  // const body = document.getElementsByTagName('body')[0];
   const baseContainer = div.parentElement;
   var divHeader = document.getElementById(divId + '_header');
   var offsetX = 0;
@@ -2575,8 +2607,6 @@ function activateDraggableDisclosure(divId) {
   //  the window are vertically scrolled and the contents are not in their scrollTop==0 state.
   //
   function elementDrag(e) {
-    const x = 0;
-
     e = e || window.event;
     e.preventDefault();
     // calculate the new cursor position:
@@ -2643,10 +2673,10 @@ function setDisclosureLocation(div, contentDiv, triggerId, settings) {
     let left = 0;
     const height = div.offsetHeight;  // height is max 50%
     const width = div.offsetWidth;    // width is max 50%
-    const divBound = div.getBoundingClientRect();
+    // const divBound = div.getBoundingClientRect();
 
     const baseContainer = div.parentElement;
-    const bound = baseContainer.getBoundingClientRect();
+    // const bound = baseContainer.getBoundingClientRect();
     const viewportHeight = window.innerHeight;
     const viewportWidth = window.innerWidth;
     // const visibleHeight = Math.min(bound.height, viewportHeight);
@@ -2869,16 +2899,16 @@ function showDisclosure(divId, triggerId, settingsStr) {
     headerDiv.classList.remove('disclosable-header-position');
     headerDiv.innerHTML = '';
 
-    if (settings.draggable) {
+    const closeable = settings.hideTrigger === 'closeable';
+    if (settings.draggable || closeable) {
       headerDiv.classList.add('disclosable-header-position');
-      if (settings.hideTrigger === 'closeable') {
-        headerDiv.innerHTML = `<button class="disclosable-button-close" onclick="smartdown.hideDisclosure('${divId}','${settingsStr}')">&times;</button>`;
-      }
-      else {
-        headerDiv.innerHTML = '&#9673;';
+      if (closeable) {
+        headerDiv.innerHTML = `<button class="disclosable-button-close" onclick="smartdown.hideDisclosure('${divId}','${settingsStr}')">&#10006;</button>`;
       }
 
-      activateDraggableDisclosure(divId);
+      if (settings.draggable) {
+        activateDraggableDisclosure(divId);
+      }
     }
 
     setDisclosureLocation(div, contentDiv, triggerId, settings);
@@ -2924,7 +2954,7 @@ function hideDisclosure(divId, settingsStr) {
     }
 
     if (settings.hideTrigger === 'onmouseleave') {
-      div.disclosableTimer = window.setTimeout(_ => {
+      div.disclosableTimer = window.setTimeout(() => {
         deactivateOnMouseLeave(divId);
       }, 500);
     }
@@ -2960,7 +2990,7 @@ function openFullscreen() {
 
 /* Close fullscreen */
 function closeFullscreen() {
-  var elem = document.documentElement;
+  // var elem = document.documentElement;
   if (document.exitFullscreen) {
     document.exitFullscreen();
   }
@@ -3032,7 +3062,7 @@ function activateOnMouseLeave(divId, settingsStr) {
     div.disclosableTimer = null;
     div.disclosableLocked = false;
 
-    div.onmouseenter = e => {
+    div.onmouseenter = () => {
       div.disclosableLocked = true;
       window.clearTimeout(div.disclosableTimer);
       div.disclosableTimer = null;
@@ -3046,7 +3076,7 @@ function activateOnMouseLeave(divId, settingsStr) {
         (e.pageY >= div.offsetTop + div.offsetHeight)) {
         // console.log('nonbogus mouseleave', e.clientY, e.pageY, div.offsetTop, div.offsetHeight, e);
         div.disclosableLocked = false;
-        div.disclosableTimer = window.setTimeout(_ => {
+        div.disclosableTimer = window.setTimeout(() => {
           hideDisclosure(divId, settingsStr);
         }, 200);
       }
@@ -3069,7 +3099,7 @@ function linkWrapperExit(divId, settingsStr) {
     // the trigger area into the disclosable, without the disclosable disappearing
     // due to the mouse leaving the trigger area.
     //
-    div.disclosableTimer = window.setTimeout(_ => {
+    div.disclosableTimer = window.setTimeout(() => {
       this.hideDisclosure(divId, settingsStr);
     }, 500);
   }
@@ -3080,7 +3110,7 @@ function linkWrapperExit(divId, settingsStr) {
 
 
 function pause() {
-  each(perPageState.playablesRegisteredOrder, function (playable) {
+  lodashEach(perPageState.playablesRegisteredOrder, function (playable) {
     if (playable && playable.p5) {
       playable.p5.getAudioContext().suspend();
     }
@@ -3089,7 +3119,7 @@ function pause() {
 
 
 function resume() {
-  each(perPageState.playablesRegisteredOrder, function (playable) {
+  lodashEach(perPageState.playablesRegisteredOrder, function (playable) {
     if (playable && playable.p5) {
       playable.p5.getAudioContext().resume();
     }
@@ -3110,7 +3140,7 @@ function handleVisibilityChange() {
 function startAutoplay(outputDiv) {
   // console.log('startAutoplay', outputDiv);
   if (outputDiv && outputDiv.id) {
-    each(perPageState.playablesRegisteredOrder, function(playable) {
+    lodashEach(perPageState.playablesRegisteredOrder, function(playable) {
       // console.log('startAutoplay', outputDiv, outputDiv.id, playable);
       if (playable.autoplay && !playable.playing) {
         var sel = '#' + outputDiv.id + ' #' + playable.divId;
@@ -3163,7 +3193,7 @@ function cleanupOrphanedStuff() {
   const newPRO = [];
   const newPR = {};
 
-  each(perPageState.playablesRegisteredOrder, function (playable) {
+  lodashEach(perPageState.playablesRegisteredOrder, function (playable) {
     // console.log('cleanupOrphanedStuff/playable', playable.divId, playable);
     var element1 = document.getElementById(playable.divId);
 
@@ -3186,7 +3216,7 @@ function cleanupOrphanedStuff() {
 
 function resetAllPlayables(outputDiv, throwAway) {
   // console.log('resetAllPlayables', perPageState.playablesRegisteredOrder);
-  each(perPageState.playablesRegisteredOrder, function (playable) {
+  lodashEach(perPageState.playablesRegisteredOrder, function (playable) {
     if ((outputDiv.id === playable.rootDivId) && playable.divId) {
       const playableElement = document.getElementById(playable.divId);
       if (playableElement) {
@@ -3210,7 +3240,7 @@ function resetAllPlayables(outputDiv, throwAway) {
 function transformPlayables(outputDiv, done) {
   var playablesToTransform = [];
   if (window.godownTranslate) {
-    each(perPageState.playablesRegisteredOrder, function (playable) {
+    lodashEach(perPageState.playablesRegisteredOrder, function (playable) {
       if (playable.transform) {
         if (outputDiv.id) {
           var sel = '#' + outputDiv.id + ' #' + playable.divId;
@@ -3320,11 +3350,11 @@ function configure(options, loadedHandler) {
   window.mediaRegistry = mediaRegistry;
 
   /* global MathJax */
-  /* eslint-disable */
   /* eslint new-cap: 0 */
   /* eslint no-native-reassign: 0 */
   /* eslint no-trailing-spaces: 0 */
   /* global smartdown */
+
   function svgLoaded() {
     /* eslint no-invalid-this: 0 */
     var sourceText = this.responseText;
@@ -3494,7 +3524,6 @@ function renderCell(cellID, variableId, newValue) {
     }
   }
   else if (cellInfo.datatype === 'url') {
-    // console.log('cellInfo', cellInfo);
     element.innerHTML = `<a target="_blank" rel="noreferrer noopener" href="${newValue}" style="word-break:break-all;font-size:0.9em;line-height:1.15em;">${newValue}</a>`;
   }
   else if (cellInfo.datatype === 'markdown') {
@@ -3590,7 +3619,7 @@ function renderCell(cellID, variableId, newValue) {
             viewerCanvas: viewerCanvas,
             viewerdiv: viewerDiv,
             parameterstable: parametersTable,
-            setStatus: (status, data) => {
+            setStatus: (/* status, data */) => {
             },
             instantUpdate: true,
             onUpdate: onUpdate,
@@ -3721,7 +3750,7 @@ function renderCell(cellID, variableId, newValue) {
 function propagateModel() {
   ensureCells();
   ensureVariables();
-  each(smartdownVariables, function (v, k) {
+  lodashEach(smartdownVariables, function (v, k) {
     propagateChangedVariable(k, v);
   });
 }
@@ -3731,10 +3760,10 @@ async function updateProcesses(id, newValue) {
   smartdown.computeExpressions();
 
   if (id) {
-    // each(smartdownCells, function(newCell, cellID) {
+    // lodashEach(smartdownCells, function(newCell, cellID) {
     //   console.log('........newCellCheck', id, newCell, newCell.cellBinding, cellID);
     // });
-    each(smartdownCells, function(newCell, cellID) {
+    lodashEach(smartdownCells, function(newCell, cellID) {
       // console.log('........newCell', id, newCell, newCell.cellBinding, cellID);
 
       if (id === newCell.cellBinding) {
@@ -3743,13 +3772,13 @@ async function updateProcesses(id, newValue) {
     });
   }
   else {
-    each(smartdownCells, function(newCell, cellID) {
+    lodashEach(smartdownCells, function(newCell, cellID) {
       const oldValue = smartdownVariables[newCell.cellBinding];
       renderCell(cellID, newCell.cellBinding, oldValue);
     });
   }
 
-  each(perPageState.playablesRegisteredOrder, async function (playable) {
+  lodashEach(perPageState.playablesRegisteredOrder, async function (playable) {
     if (playable) {
       let progress = document.getElementById(playable.progressId);
 
@@ -3841,7 +3870,7 @@ function propagateChangedVariable(id, newValue, force) {
 
 
 function ensureCells() {
-  each(smartdownCells, function(newCell, cellID) {
+  lodashEach(smartdownCells, function(newCell, cellID) {
     var element = document.getElementById(cellID);
     if (!element) {
       // console.log('...ensureCells element for cellID not found', cellID, smartdownCells[cellID]);
@@ -3852,7 +3881,7 @@ function ensureCells() {
 
 
 function ensureVariables() {
-  each(smartdownCells, function(newCell, cellID) {
+  lodashEach(smartdownCells, function(newCell /*, cellID */) {
     let oldValue = smartdownVariables[newCell.cellBinding];
     changeVariable(newCell.cellBinding, oldValue);
   });
@@ -3874,7 +3903,7 @@ function setupScrollHoverDisable() {
     scrollHoverDisableEnabled = true;
     // https://www.thecssninja.com/css/pointer-events-60fps
     var body = document.getElementsByTagName('body')[0];
-    window.addEventListener('scroll', function(e) {
+    window.addEventListener('scroll', function() {
       var currentY = window.scrollY;
       var delta = Math.abs(lastY - currentY);
 
@@ -3936,7 +3965,6 @@ function setSmartdown(md, outputDiv, setSmartdownCompleted) {
   // window.getSelection().removeAllRanges();
 
   function completeTypeset() {
-    var that = this;
     var resizeTimeout;
 
     function actualResizeHandler() {
@@ -3984,7 +4012,7 @@ function setSmartdown(md, outputDiv, setSmartdownCompleted) {
 
       // console.log('applyLocalStorage', useLocalForage, smartdown.persistence, fm.markdown);
       if (useLocalForage && smartdown.persistence) {
-        localForage.iterate(function(value, key, iterationNumber) {
+        localForage.iterate(function(value, key) {
           // Resulting key/value pair -- this callback
           // will be executed for every item in the
           // database.
@@ -4077,7 +4105,7 @@ function setSmartdown(md, outputDiv, setSmartdownCompleted) {
     // window.onresize = resizeThrottler;
     window.addEventListener('resize', resizeThrottler);
 
-    const firstTweetIndex = md.search(/[^`]\!\[[^\]]*\]\(https\:\/\/twitter\.com\/[^`]/);
+    const firstTweetIndex = md.search(/[^`]!\[[^\]]*\]\(https:\/\/twitter\.com\/[^`]/);
 
     if (firstTweetIndex >= 0) {
       if (!twitterLoading) {
@@ -4356,7 +4384,7 @@ function set(varnameOrAssignments, varValue, varType) {
 
 function setVariables(assignments) {
   if (Array.isArray(assignments)) {
-    each(assignments, assignment => {
+    lodashEach(assignments, assignment => {
       var newValue = assignment.rhs;
       if (assignment.type === 'number') {
         newValue = Number(newValue);
@@ -4406,7 +4434,7 @@ function computeStoredExpression(exprId) {
 
 
 function computeExpression(entry, done) {
-  var {lhss: lhss, rhss: rhss, types, labelId} = entry;
+  var {lhss: lhss, rhss: rhss, types /*, labelId */} = entry;
   // console.log('computeExpression', lhss, rhss, types, labelId, entry);
   // console.log(done);
 
@@ -4431,9 +4459,9 @@ function computeExpression(entry, done) {
       else if (rhs[0] === '/') {
         rhs = rhs.slice(1);
         if (calcHandlers) {
-          var calcParts = rhs.split(/[\./[]/);
-          var bracketIndex = rhs.indexOf('[');
-          var slashIndex = rhs.indexOf('/');
+          var calcParts = rhs.split(/[./[]/);
+          // var bracketIndex = rhs.indexOf('[');
+          // var slashIndex = rhs.indexOf('/');
 
           var calcKey = calcParts[0];
           var calcBody = rhs.slice(calcKey.length);
@@ -4455,11 +4483,11 @@ function computeExpression(entry, done) {
       }
       else {
         var vars = '';
-        each(smartdownVariables, function (v, k) {
+        lodashEach(smartdownVariables, function (v, k) {
           vars += ',' + k;
         });
         vars = vars.slice(1);
-        var vals = lodashMap(smartdownVariables, function (v, k) {
+        var vals = lodashMap(smartdownVariables, function (v) {
           return v;
         });
 
@@ -4501,7 +4529,6 @@ function goToCard(cardKey, event, outputDivId) {
     cardLoader(cardKey, outputDivId);
   }
   else {
-    var that = this;
     var modelAsMarkdown = null;
 
     if (!cardKey || cardKey === 'Home') {
@@ -4576,12 +4603,12 @@ function setupYouTubePlayer(div, varName) {
     // console.log('YT', Object.keys(YT), YT.Player);
     player = new YT.Player(playerDiv, {
         events: {
-          'onReady': function (event) {
+          'onReady': function (/* event */) {
               // console.log('onPlayerReady', event);
               // console.log(player);
               smartdown.setVariable(varName, player, 'json');
           },
-          'onStateChange': function (event) {
+          'onStateChange': function (/* event */) {
             // console.log('onPlayerStateChange', event);
           }
         }
@@ -4669,7 +4696,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.55',
+  version: '1.0.56',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,
@@ -4680,9 +4707,7 @@ module.exports = {
   vdomToHtml: vdomToHtml,
   runFunction: runFunction,
   runModule: runModule,
-  // isExtensionRegistered: isExtensionRegistered,
   loadExternal: loadExternal,
-  // registerExtension: registerExtension,
   ensureExtension: ensureExtension,
   es6Playables: es6Playables,
 };

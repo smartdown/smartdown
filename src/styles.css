@@ -42,12 +42,14 @@
 }
 
 
+.smartdown-container span.smartdown-swatch,
 .smartdown-container div.smartdown-swatch {
   vertical-align:middle;
   display:inline-block;
   height:1.3em;
   width:1.3em;
-  border:1px dotted gray;
+  xborder:1px dotted gray;
+  margin: 0 1px;
 }
 
 .smartdown-container br.smartdown_br {
@@ -231,7 +233,9 @@
   white-space: pre-wrap;
   font-size: inherit;
 
-  padding: 6px;
+  xborder: 1px solid red;
+  background: #EEEEEE;
+  padding: 3px 0;
   font-family: 'Ubuntu Mono', monospace;
   font-weight: 500;
 }
@@ -337,7 +341,8 @@ smartdown-checkbox
 
 
 .smartdown-container .infocell-output.smartdown-markdown {
-  width: 100%;
+  xwidth: 100%;
+  padding: 0;
 }
 
 .smartdown-container .abc-wrapper,
@@ -810,18 +815,20 @@ fieldset[disabled] .smartdown-container .btn-infocell.focus {
       &.disclosable-header-position {
         display: block;
         min-width: 200px;
+        min-height: 22px;
       }
+
       button.disclosable-button-close {
         background: #CCC;
         border-radius: 2px;
         border: none;
-        height: 18px;
+        height: 22px;
         line-height: 0;
         cursor: pointer;
         font-size: 16px;
         font-weight: 600;
-        margin: 4px 0px 4px 8px;
-        padding: 0 4px 3px 4px;
+        margin: 0 0 0 8px;
+        padding: 4px 4px 4px 4px;
       }
       button.disclosable-button-close:hover {
         background: #AAA;
@@ -1003,7 +1010,7 @@ fieldset[disabled] .smartdown-container .btn-infocell.focus {
   display: inline-block;
   user-select: text;
   margin: 0;
-  padding: 1px 6px;
+  padding: 1px 0;
 }
 
 .smartdown-container .infocell-output.smartdown-svg {
@@ -1024,36 +1031,35 @@ fieldset[disabled] .smartdown-container .btn-infocell.focus {
 .smartdown-container .infocell-output.smartdown-flavor-pill {
   padding: 0.1em 0.6em;
   border-radius: 5em;
+  border: 2px solid lightgray;
 }
 
 .smartdown-container .infocell-output.smartdown-flavor-red {
-  background: rgba(255,0,0,0.3);
+  background-color: rgba(red, 0.3);
 }
 
 .smartdown-container .infocell-output.smartdown-flavor-green {
-  background: rgba(50,205,50,0.3);
+  background-color: rgba(green, 0.3);
 }
 
 .smartdown-container .infocell-output.smartdown-flavor-blue {
-  background: rgba(80,80,255,0.3);
+  background-color: rgba(blue, 0.3);
 }
 
 .smartdown-container .infocell-output.smartdown-flavor-orange {
-  background: rgba(255,165,0,0.3);
+  background-color: rgba(orange, 0.3);
 }
 
 .smartdown-container .infocell-output.smartdown-flavor-gold {
-  background: rgba(255,215,0,0.3);
+  background-color: rgba(gold, 0.3);
 }
-
 
 .smartdown-container .infocell-group .infocell-output {
   display: table-cell;
   height: 100%;
   width: 100%;
-  border:none;
+  xborder:none;
 }
-
 
 .smartdown-container .infocell-output-pre {
   max-height: 40vh;
@@ -1120,6 +1126,9 @@ fieldset[disabled] .smartdown-container .btn-infocell.focus {
   pointer-events: initial;
 }
 
+.smartdown-container .infocell-output > .smartdown_p {
+  margin: 0;
+}
 
 .smartdown-container .smartdown_p > img,
 .smartdown-container .infocell-output td > img,
@@ -1759,11 +1768,14 @@ img.media-image path {
     color: #539ad7;
   }
 
+  code {
+    background: #444444;
+  }
 }
 
 .smartdown-outer-container.smartdown-theme-dark .smartdown-container .infocell-output,
 .smartdown-outer-container.smartdown-theme-dark .smartdown-container .infocell-output-pre {
-  background: #2E2E2E;
+  xbackground: #2E2E2E;
   color: #EBEBEB;
 }
 

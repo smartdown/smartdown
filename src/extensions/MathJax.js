@@ -1,5 +1,3 @@
-/* global MathJax */
-
 function mathjaxConfigure() {
   // https://github.com/mathjax/MathJax/blob/master/config/default.js
 

@@ -7,7 +7,6 @@
 /* global smartdownRawPrefix */
 /* global smartdownOutputDivSelector */
 /* global smartdownPostLoadMutator */
-/* global smartdownAdjustHash */
 /* global smartdownMedia */
 /* eslint no-var: 0 */
 
@@ -70,7 +69,6 @@ function starter(basePrefix, doneHandler) {
   var gistHashPrefix = 'gist/';
   var outputDivSelector = '#smartdown-output';
   var postLoadMutator = null;
-  var adjustHash = true;
   var media = {
     cloud: '/gallery/resources/cloud.jpg',
     badge: '/gallery/resources/badge.svg',
@@ -110,9 +108,6 @@ function starter(basePrefix, doneHandler) {
   }
   if (typeof smartdownPostLoadMutator === 'function') {
     postLoadMutator = smartdownPostLoadMutator;
-  }
-  if (typeof smartdownAdjustHash === 'boolean') {
-    adjustHash = smartdownAdjustHash;
   }
 
   if (typeof smartdownMedia === 'object') {
@@ -196,7 +191,10 @@ function starter(basePrefix, doneHandler) {
     if (cardKeyHashParts.length > 1) {
       cardKey = cardKeyHashParts[1];
       cardKeySubhash = cardKeyHashParts[2];
-
+      if (cardKeySubhash) {
+        cardKeySubhash = cardKeySubhash.split('?')[0];
+      }
+  
       if (rootHash !== '' && ('#' + cardKey) === rootHash) {
         history.replaceState({}, '', window.location.pathname + cardKeyWithHash);
         scrollToSubHash(cardKeySubhash);
@@ -333,22 +331,37 @@ function starter(basePrefix, doneHandler) {
         hash = baseHashElements.join('/');
       }
     }
-    var search = window.location.search;
-    // console.log('loadHome', hash, search);
+
+    // https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams
+    // https://localhost:4000/#Astronomy?theme=dark?theme=dark
+
+
+    // console.log(searchParams.has('topic'));               // true
+    // console.log(searchParams.get('topic') === "api");     // true
+    // console.log(searchParams.getAll('topic'));            // ["api"]
+    // console.log(searchParams.get('foo') === null);        // true
+    // console.log(searchParams.append('topic', 'webdev'));
+
     var args = '';
     var argsPos = hash.indexOf('?');
     if (argsPos >= 0) {
       args = hash.slice(argsPos + 1);
       hash = hash.slice(0, argsPos);
-      if (args.indexOf('theme=') === 0) {
-        themeName = args.slice('theme='.length);
+
+      const extraArgPos = args.indexOf('?');
+
+      if (extraArgPos >= 0) {
+        args = args.slice(0, extraArgPos);
       }
+
+      const argsParams = new URLSearchParams(args);
+      themeName = argsParams.get('theme') || '';
     }
 
     if (themeName === '') {
-      if (search.indexOf('?theme=') === 0) {
-        themeName = search.slice('?theme='.length);
-      }
+      const search = window.location.search;
+      const searchParams = new URLSearchParams(search);
+      themeName = searchParams.get('theme') || '';
     }
 
     updateTheme(themeName);
@@ -365,10 +378,10 @@ function starter(basePrefix, doneHandler) {
   function gistPrefix() {
     var result = lastLoadedRawPrefix;
     var hash = window.location.hash;
-    var args = '';
+    // var args = '';
     var argsPos = hash.indexOf('?');
     if (argsPos >= 0) {
-      args = hash.slice(argsPos);
+      // args = hash.slice(argsPos);
       hash = hash.slice(0, argsPos);
       // console.log('gistPrefix hashargs', hash, args, window.location.search);
     }
@@ -456,8 +469,6 @@ function starter(basePrefix, doneHandler) {
 
   function locationHashChanged(event) {
     // console.log('#locationHashChanged', event, window.location.href, window.location.hash, JSON.stringify(window.location.search), window.location.pathname, rootHash);
-    event.preventDefault();
-    event.stopImmediatePropagation();
 
     const oldURL = event.oldURL;
     const oldHashPos = oldURL.indexOf('#');
@@ -487,7 +498,7 @@ function starter(basePrefix, doneHandler) {
     }
 
     if (rootHash === hash) {
-      // console.log('...locationHashChanged INHIBIT', window.location.hash, hash, rootHash);
+      console.log('...locationHashChanged INHIBIT', window.location.hash, hash, rootHash);
       scrollToSubHash();
     }
     else {
@@ -517,6 +528,8 @@ function starter(basePrefix, doneHandler) {
       }
 
       relativeCardLoader(cardKey, document.querySelectorAll(outputDivSelector)[0].id);
+      event.preventDefault();
+      event.stopImmediatePropagation();
     }
 
     return false;
