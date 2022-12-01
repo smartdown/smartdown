@@ -1,0 +1,87 @@
+
+<html><head></head><body><h1 id="smartdown">smartdown</h1>
+<hr />
+<blockquote>
+<p>smartdown - A Javascript library for translating, rendering, and interacting with Smartdown documents.</p>
+</blockquote>
+<p>Smartdown is a <em>declarative</em>, <em>literate</em> and <em>reactive</em> authoring technology for writing technical and non-technical documents that are compelling and easy to share and publish within many existing forums and blogging systems. Smartdown is designed for blogging, technical communication, and teaching. Smartdown simplifies the creation of <em>Explorable Explanations</em>, which are prose documents with embedded interactive content such as charts, graphs, and featherweight programs called <em>playables</em>.</p>
+<p>Smartdown extends the simple expressivity of the <a href="https://en.wikipedia.org/wiki/Markdown">Markdown</a> language commonly used on blogs, messaging systems, technical forums, and on <a href="https://help.github.com/articles/basic-writing-and-formatting-syntax/">GitHub</a>. The Smartdown <strong>engine</strong> is a Javascript library that interprets the content in these Smartdown source files and enacts the desired behavior and presentation.</p>
+<ul>
+<li><a href="https://smartdown.github.io/smartdown/doc/">Smartdown Documentation</a></li>
+<li><a href="https://smartdown.github.io/smartdown/doc/api/">Smartdown API</a></li>
+<li><a href="https://smartdown.github.io/smartdown/doc/versions/">Version History</a></li>
+<li><a href="https://smartdown.github.io/smartdown/doc/license/">License</a></li>
+<li><a href="https://smartdown.github.io/smartdown/doc/contributing/">Contributing</a></li>
+<li><a href="https://smartdown.github.io/smartdown/doc/code_of_conduct/">Code of Conduct</a></li>
+<li><a href="https://github.com/smartdown/smartdown/">Smartdown Source</a></li>
+</ul>
+<h2 id="markdown-and-smartdown">Markdown and Smartdown</h2>
+<hr />
+<p><a href="https://en.wikipedia.org/wiki/Markdown">Markdown</a> is an easy-to-learn set of conventions for annotating text for structure and formatting purposes. Markdown embraces the simple principle that the information in a document should be <em>readable by default</em>, and that any additional formatting syntax should be unobtrusive to this readability. Smartdown extends Markdown with additional media and content types for enhanced expressivity, and adds its own features including <em>cells</em>, <em>playables</em>, and <em>reactivity</em>.</p>
+<p>I think that this principle is important when teaching students (of any age) how to present their ideas and eventually, to visualize their ideas. Unlike HTML and other syntax-restrictive media, Markdown enables an idea to be expressed in a crude form, and then iteratively refined into an ever-better expression of the idea. Sometimes that is simply a blog post with nicely formatted text and embedded graphics. Sometimes it might be an interactive webpage with P5JS or D3 graphics, an Explorable Explanation.</p>
+<p>There are several variants of the original Markdown language; Smartdown adopts the GitHub-flavored Markdown variant as its base language. The basic elements of most Markdown implementations are described in this <a href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">Markdown Cheatsheet</a>.</p>
+<h3 id="smartdown-cells">Smartdown Cells</h3>
+<p>Smartdown utilizes Markdown's link syntax and if it detects a Smartdown-formatted link, it replaces the link with a Smartdown <em>cell</em>, which can act as input, output, computation and more. A subset of the currently valid Smartdown cell types is below:</p>
+<ul>
+<li>Tunnels: <code>[Link Label](:@Location)</code></li>
+<li>Input Cells: <code>[Input Label](:?VarName)</code></li>
+<li>Output Cells: <code>[Output Label](:!VarName)</code></li>
+<li>Calculation Cells: <code>[Calculation Label](:=Expression)</code></li>
+<li>Checkbox Cells: <code>[Checkbox Label](:XVarName)</code></li>
+<li>Tweet: <code>![](https://twitter.com/nasa/status/735978603431768065)</code></li>
+<li>Tweet+: <code>![](https://twitter.com/nasa/status/735978603431768065&amp;showMedia)</code></li>
+</ul>
+<p>See <a href="https://smartdown.github.io/smartdown/#Cells">Cells</a> for detailed examples of Smartdown Cells.</p>
+<h3 id="smartdown-playables">Smartdown Playables</h3>
+<p>Smartdown extends Markdown's idea of <em>code blocks</em> with the option of making such code <em>playable</em>. For example, the code for a <a href="https://mermaidjs.github.io">Mermaid</a> diagram can be displayed normally using a code block; however, by using Smartdown's <code>/playable</code> qualifier, the code can be executed and rendered within the document via the Smartdown-generated Play/Pause buttons:</p>
+<pre><code class="markdown">```mermaid/playable
+%% Example of sequence diagram
+
+graph LR
+    id1((This is the text in the circle));
+
+```</code></pre>
+<p>There is also an <code>/autoplay</code> option, which will ensure that the playable content is executed when the Smartdown card is loaded. These two options may be combined to produced autoplay content that may be manually played and paused. The use of <code>/autoplay</code> without a corresponding <code>/playable</code> will result in a playable that cannot be paused or its source displayed, which is often useful.</p>
+<h2 id="philosophy">Philosophy</h2>
+<hr />
+<p><a href="https://smartdown.io">Smartdown</a> is a flexible system for authoring and interacting with <a href="https://medium.com/@Max_Goldstein/exploring-explorable-explanations-92f865c8d6ba#.10uo10u6k">Explorable explanations</a>, which are <em>micro-apps</em> composed of text, multimedia and code. Smartdown projects are written using an enhanced version of Markdown called <strong>Smartdown</strong>, which integrates MarkDown's ease-of-use with a reactive process engine.</p>
+<p>Users of this technology include teachers, students, bloggers, and anyone who wants to easily create and publish their ideas, research, questions or explanations. The mission of Smartdown is to nurture idea inspiration, simplify the process of creation, and to encourage sharing and exploration of the resulting knowledge.</p>
+<p>Smartdown is intended for teacher and student alike; the philosophy being that the best ways to learn a skill or concept are to <strong>use it</strong> and to <strong>teach it</strong>. A teacher might produce a Smartdown project for the purposes of teaching, and may then assign a student the task of <em>explaining</em> a learned concept by authoring their own project, which can then be shared (<em>show and tell</em> is a powerful technique).</p>
+<h2 id="ways-to-share-and-publish-smartdown">Ways to Share and Publish Smartdown</h2>
+<hr />
+<p>The <a href="https://github.com/smartdown">Smartdown</a> GitHub organization contains several tools, integrations and example applications to illustrate Smartdown usage:</p>
+<ul>
+<li><a href="https://github.com/smartdown/viewer">smartdown/viewer</a>, a web application that displays the Smartdown Gallery, as well as arbitrary Smartdown content, and allows for the display of the Smartdown document's source code.</li>
+<li><a href="https://github.com/smartdown/sublime-text-tools">smartdown/sublime-text-tools</a>, contains SmartdownPreviewer, a plugin to allow SublimeText to render a Smartdown document being edited.</li>
+<li><a href="https://github.com/smartdown/impress">smartdown/impress</a>, a means of embedding Smartdown documents within an <a href="https://github.com/impress/impress.js?utm_source=recordnotfound.com">impress.js</a> presentation</li>
+<li><a href="https://github.com/smartdown/wordpress">smartdown/wordpress</a>, examples and tools to support the rendering of Smartdown documents within a Wordpress site.</li>
+</ul>
+<h3 id="simple-site-example">Simple Site Example</h3>
+<p>This repository (smartdown) a simple example of a Smartdown-enabled site that includes the Smartdown library, initializes it, and displays the Smartdown Gallery of examples. This can be viewed at <a href="https://smartdown.github.io/smartdown">https://smartdown.github.io/smartdown</a>. Unlike the Smartdown Source Viewer Site below, this site does not support editing or the display of the Smartdown source files. It's basically an example of a static site of Smartdown content; in this case, the Smartdown Example Gallery. The source for this Simple Viewer is in <code>src/SimpleSiteExample/index.ejs</code> <em>(TBD... Create a simple example that is pure HTML without templating)</em></p>
+<p>The Simple Site Example does support the ability to view arbitrary Markdown or Smartdown files by appending the desired URL to the above URL, along with a hash (<code>#</code>) marker. For example, the following Markdown file:</p>
+<p><a href="https://cdn.rawgit.com/mozilla/mentat/ae91603b/README.md"><code>https://cdn.rawgit.com/mozilla/mentat/ae91603b/README.md</code></a></p>
+<p>can be viewed via the URL:</p>
+<p><a href="https://smartdown.github.io/smartdown/#https://cdn.rawgit.com/mozilla/mentat/ae91603b/README.md"><code>https://smartdown.github.io/smartdown/#https://cdn.rawgit.com/mozilla/mentat/ae91603b/README.md</code></a></p>
+<h3 id="smartdown-source-viewer-application">Smartdown Source Viewer Application</h3>
+<p>The <a href="https://github.com/smartdown/viewer">smartdown/viewer</a> is a web application that displays the Smartdown Gallery, as well as arbitrary Smartdown content, and allows for the display of the Smartdown document's source code. It can be used at at <a href="https://smartdown.site/">https://smartdown.site/</a>.</p>
+<p>The Smartdown Source Viewer application displays the same Gallery examples as above, but also supports a <code>Show Source</code> option which enables a user to view and edit the Smartdown source code, although these changes are not currently saved. Additonally, the Smartdown Source Viewer can load and display local files selected via drag-and-drop, or by specifying the URL of a web-based Smartdown file as in the Simple Smartdown Viewer above.</p>
+<p>For example, the URL above can be viewed via the Smartdown Source Viewer</p>
+<p><a href="https://smartdown.site/#https://cdn.rawgit.com/mozilla/mentat/ae91603b/README.md"><code>https://smartdown.site/#https://cdn.rawgit.com/mozilla/mentat/ae91603b/README.md</code></a></p>
+<h3 id="using-github-gists-to-store-smartdown-files">Using GitHub Gists to store Smartdown files</h3>
+<p>See <a href="https://smartdown.github.io/smartdown/#Gists">Gists</a> for details on how Smartdown deals with Gists.</p>
+<p>See <a href="https://smartdown.github.io/smartdown/#gist/DoctorBud/3b5cbab3424e08199b8046cf98d19c8f/Home">Smartdown Via Gists</a> for a very detailed tutorial on how to author Smartdown documents in GitHub Gists and then display.</p>
+<h3 id="via-a-blog">Via a Blog</h3>
+<p>TBD: Document the blog-starter-kit here.</p>
+<h2 id="current-state-of-the-smartdown-project">Current State of the Smartdown Project</h2>
+<hr />
+<h4 id="100-open-sourced-via-bsd-3-license-april-28-2019">1.0.0 Open Sourced via BSD-3 License April 28, 2019</h4>
+<p>This software is still incomplete in its implementation, documentation, and attribution. I intend to add much better documentation as well as proper citation of the software I use. Right now, the only way to test it in the real world is to deploy it with a bunch of disclaimers like this one, and to fix problems as we discover them.</p>
+<h4 id="contact-info">Contact Info</h4>
+<ul>
+<li>Principal Author: Daniel B Keith</li>
+<li>email: <a href="mailto:smartdown@quantumclay.com">smartdown@quantumclay.com</a></li>
+<li>Twitter: @TheDoctorBud</li>
+<li>GitHub: DoctorBud</li>
+<li>Blog: <a href="https://doctorbud.com">https://doctorbud.com</a></li>
+</ul>
+</body></html>

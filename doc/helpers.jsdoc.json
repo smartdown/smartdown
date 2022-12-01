@@ -1,0 +1,118 @@
+[
+  {
+    "comment": "/**\n * calc_handlers.js\n *\n * This file contains useful examples of Smartdown 'calc-handlers'.\n */",
+    "meta": {
+      "range": [
+        137,
+        2130
+      ],
+      "filename": "calc_handlers.js",
+      "lineno": 9,
+      "columnno": 0,
+      "path": "/Users/bud/DoctorBud/smartdown/src",
+      "code": {
+        "id": "astnode100001862",
+        "name": "calcWikidataImageUtil",
+        "type": "FunctionDeclaration",
+        "paramnames": [
+          "thumb",
+          "key",
+          "body",
+          "done"
+        ]
+      },
+      "vars": {
+        "body": "calcWikidataImageUtil~body",
+        "lookupComplete": "calcWikidataImageUtil~lookupComplete",
+        "wdKey": "calcWikidataImageUtil~wdKey",
+        "possibleJSONArray": "calcWikidataImageUtil~possibleJSONArray",
+        "": null,
+        "xhr": "calcWikidataImageUtil~xhr",
+        "url": "calcWikidataImageUtil~url"
+      }
+    },
+    "description": "calc_handlers.js\n\nThis file contains useful examples of Smartdown 'calc-handlers'.",
+    "name": "calcWikidataImageUtil",
+    "longname": "calcWikidataImageUtil",
+    "kind": "function",
+    "scope": "global",
+    "params": [],
+    "$longname": "calcWikidataImageUtil",
+    "$kind": "method",
+    "$docmaLink": "api/helpers/#calcWikidataImageUtil"
+  },
+  {
+    "comment": "/**\n * A convenient way to initialize Smartdown with common defaults.\n *\n * Although smartdown.configure() can be used directly by certain applications,\n * for many of the common Smartdown examples, this starter.js file can be used\n * to invoke smartdown.configure() with credible default behavior, and the ability\n * to customize this behavior to a reasonable degree.\n *\n * @param {object} [basePrefix=undefined] - Configuration options\n *\n * @example\n * // Use the smartdown/starter.js convenience wrapper to initialize smartdown.\n * // See smartdown/src/SimpleSiteExample/ for usage within an index.html.\n * <script src=\"lib/starter.js\">< /script>\n * <script>\n *   window.smartdownResourceURL = '';\n *   window.smartdownBaseURL = '/';\n *   window.smartdownStarter();\n * < /script>\n */",
+    "meta": {
+      "range": [
+        1718,
+        16951
+      ],
+      "filename": "starter.js",
+      "lineno": 62,
+      "columnno": 0,
+      "path": "/Users/bud/DoctorBud/smartdown/src",
+      "code": {
+        "id": "astnode100000061",
+        "name": "starter",
+        "type": "FunctionDeclaration",
+        "paramnames": [
+          "basePrefix",
+          "doneHandler"
+        ]
+      },
+      "vars": {
+        "defaultHome": "starter~defaultHome",
+        "baseURL": "starter~baseURL",
+        "resourceURL": "starter~resourceURL",
+        "rawPrefix": "starter~rawPrefix",
+        "gistPathPrefix": "starter~gistPathPrefix",
+        "gistHashPrefix": "starter~gistHashPrefix",
+        "outputDivSelector": "starter~outputDivSelector",
+        "postLoadMutator": "starter~postLoadMutator",
+        "media": "starter~media",
+        "multiparts": "starter~multiparts",
+        "rootHash": "starter~rootHash",
+        "gistOrg": "starter~gistOrg",
+        "gistID": "starter~gistID",
+        "lastLoadedRawPrefix": "starter~lastLoadedRawPrefix",
+        "cardLoaded": "starter~cardLoaded",
+        "loadAsyncCard": "starter~loadAsyncCard",
+        "relativeCardLoader": "starter~relativeCardLoader",
+        "updateTheme": "starter~updateTheme",
+        "loadHome": "starter~loadHome",
+        "calcHandlers": "starter~calcHandlers",
+        "replace": "starter~replace",
+        "gistPrefix": "starter~gistPrefix",
+        "linkRules": "starter~linkRules",
+        "locationHashChanged": "starter~locationHashChanged",
+        "window.onhashchange": "window.onhashchange",
+        "loadHomeDefault": "starter~loadHomeDefault",
+        "doneHandler": "starter~doneHandler"
+      }
+    },
+    "description": "A convenient way to initialize Smartdown with common defaults.\n\nAlthough smartdown.configure() can be used directly by certain applications,\nfor many of the common Smartdown examples, this starter.js file can be used\nto invoke smartdown.configure() with credible default behavior, and the ability\nto customize this behavior to a reasonable degree.",
+    "params": [
+      {
+        "type": {
+          "names": [
+            "object"
+          ]
+        },
+        "optional": true,
+        "description": "Configuration options",
+        "name": "basePrefix"
+      }
+    ],
+    "examples": [
+      "// Use the smartdown/starter.js convenience wrapper to initialize smartdown.\n// See smartdown/src/SimpleSiteExample/ for usage within an index.html.\n<script src=\"lib/starter.js\">< /script>\n<script>\n  window.smartdownResourceURL = '';\n  window.smartdownBaseURL = '/';\n  window.smartdownStarter();\n< /script>"
+    ],
+    "name": "starter",
+    "longname": "starter",
+    "kind": "function",
+    "scope": "global",
+    "$longname": "starter",
+    "$kind": "method",
+    "$docmaLink": "api/helpers/#starter"
+  }
+]
