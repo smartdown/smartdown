@@ -6,9 +6,14 @@
 REMOTE=`git remote get-url --push origin`
 rm -rf dist
 npm run build
-cd dist
+rm -rf /tmp/smartdown-publish/
+cp -r dist/ /tmp/smartdown-publish/
+cd /tmp/smartdown-publish/
 git init
-git add .
+git checkout -b master
+git checkout -b gh-pages
+touch .nojekyll
+git add . .nojekyll
 git commit -m "Initial commit"
 git remote add origin ${REMOTE}
-git push --force origin master:gh-pages
+git push --force origin gh-pages

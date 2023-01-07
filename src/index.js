@@ -1047,8 +1047,6 @@ function renderImage(href, title, text) {
     }
   }
 
-  console.log('...out', out);
-
   return out;
 }
 
@@ -1372,17 +1370,18 @@ function renderLink(href, title, text) {
         }
       }
 
+      const smartdownClass = 'smartdown-' + outputType;
+
       // DRY this up. It's stupidly repetitive
       if (
         outputType !== '' &&
         outputType !== 'text' &&
         outputType !== 'markdown' &&
         outputType !== 'url') {
-        var smartdownClass = 'smartdown-' + outputType;
         newHTML += `<div class="infocell-output ${smartdownClass} ${flavors}" id="${outputCellId}"></div>`;
       }
       else {
-        newHTML += `<span class="infocell-output ${flavors}" id="${outputCellId}"></span>`;
+        newHTML += `<span class="infocell-output ${smartdownClass} ${flavors}" id="${outputCellId}"></span>`;
       }
       if (hasLabel) {
         newHTML += '</span>';
@@ -1527,11 +1526,10 @@ function renderHeading(text, level, raw, slugger) {
 }
 
 function renderTable(header, body) {
-  console.log('renderTable', header, body);
   if (body) body = '<tbody>' + body + '</tbody>';
 
-  const emptyTH = header.split('<th></th>').length;
-  const allTH = header.split('<th>').length;
+  const emptyTH = header.split('></th>').length;
+  const allTH = header.split('</th>').length;
 
   const style = emptyTH === allTH ? ' style="display: none;"' : '';
   return `<table>
@@ -3526,7 +3524,6 @@ function renderCell(cellID, variableId, newValue) {
     }
   }
   else if (cellInfo.datatype === 'url') {
-    // console.log('cellInfo', cellInfo);
     element.innerHTML = `<a target="_blank" rel="noreferrer noopener" href="${newValue}" style="word-break:break-all;font-size:0.9em;line-height:1.15em;">${newValue}</a>`;
   }
   else if (cellInfo.datatype === 'markdown') {
