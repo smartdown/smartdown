@@ -45,7 +45,7 @@ import registerABC from './extensions/ABC';
 import registerD3 from './extensions/D3';
 import registerThree from './extensions/Three';
 import registerPlotly from './extensions/Plotly';
-import registerOpenJSCAD from './extensions/OpenJSCAD';
+import OpenJSCAD from './extensions/OpenJSCAD';
 import registerLeaflet from './extensions/Leaflet';
 import Brython from './extensions/Brython';
 import FilamentExtension from './extensions/Filament';
@@ -220,7 +220,7 @@ function registerDefaultExtensions() {
   registerThree();
   registerPlotly();
   registerLeaflet();
-  registerOpenJSCAD();
+  OpenJSCAD.register();
   Brython.register();
   FilamentExtension.register();
   React.register();
@@ -1838,125 +1838,27 @@ ${code}
       }
     }
     else if (language === 'openjscad') {
-      const innerHTML =
+      const innerHTML = OpenJSCAD.generateInnerHTML(divId);
+      const preludeCode =
 `
-  <div
-    class="openjscad-container">
-    <div
-      id="${divId}-viewerContext"
-      class="viewerContext"
-      oncontextmenu="return false;"
-    >
-      <div id="${divId}-viewerDiv">
-      </div>
-    </div>
-    <canvas
-      id="${divId}-viewerCanvas"
-      class="viewerCanvas"
-    ></canvas>
-    <div
-      class="viewer-footer">
-      <button
-        onclick="window.resetCamera${divId}()">
-        Reset Camera
-      </button>
-      <button
-        onclick="window.exportSTL${divId}()">
-        Export STL
-      </button>
-
-      <table
-        id="${divId}-parametersTable"
-        class="openjscad-parametersTable">
-      </table>
-    </div>
-  </div>
-`;
-
-      augmentedCode =
-`
-// Begin Augmented script
-// function(${playableArgNames.join(', ')})
-
-this.div.innerHTML =
+  this.div.innerHTML =
 \`
 ${innerHTML}
-\`;
+\`;  
 
+`;
 
-const viewerContextId = '${divId}-viewerContext';
-const viewerCanvasId = '${divId}-viewerCanvas';
-const viewerDivId = '${divId}-viewerDiv';
-const parametersTableId = '${divId}-parametersTable';
+      const bodyCode = OpenJSCAD.generateAugmentedPlayable(divId, code);
+      augmentedCode =
+`
+${preludeCode}
 
-const viewerContext = document.getElementById(viewerContextId);
-const viewerCanvas = document.getElementById(viewerCanvasId);
-const viewerDiv = document.getElementById(viewerDivId);
-const parametersTable = document.getElementById(parametersTableId);
+return (async () => {
 
-const camera = {
-  position: { x: 0, y: 0, z: 90 },
-  clip: { min: 1, max: 1000 },
-};
+  ${bodyCode}
 
-const axis = {
-  draw: true,
-};
+})();
 
-const panel = {
-  size: 223
-};
-
-function onUpdate(data) {
-  if (data.outputFile) {
-    console.log('data.outputFile', data.outputFile);
-    smartdown.fileSaver.saveAs(data.outputFile.data, data.outputFile.downloadAttribute);
-  }
-  else {
-    // console.log('onUpdate', data);
-  }
-}
-
-const jscadViewer = openjscad(viewerContext, {
-  processor: {
-    viewerContext: viewerContext,
-    viewerCanvas: viewerCanvas,
-    viewerdiv: viewerDiv,
-    parameterstable: parametersTable,
-    setStatus: (status, data) => {
-    },
-    instantUpdate: true,
-    onUpdate: onUpdate,
-    useAsync: true
-  },
-  viewer: {
-    axis: axis,
-    camera: camera,
-    panel: panel,
-    glOptions: {
-      canvas: viewerCanvas
-    }
-  }
-});
-
-window.resetCamera${divId} = function() {
-  jscadViewer.resetCamera();
-};
-
-window.exportSTL${divId} = function() {
-  jscadViewer.generateOutputFile({
-    name: 'stla',
-    extension: 'stl',
-  });
-};
-
-
-const diagramSource =
-\`
-${code}
-\`;
-
-jscadViewer.setJsCad(diagramSource);
 `;
     }
     else if (isModule) {
@@ -2068,7 +1970,7 @@ async function runModule(playable, argValues) {
     script: s,
     start: null,
     glueStart,
-  }
+  };
   s.type = 'module';
 
   s.onerror = function (error) {
@@ -2158,13 +2060,8 @@ async function playPlayableInternal(language, divId) {
     };
 
     if (language.toLowerCase() !== 'p5js') {
-      if (playable.isModule) {
-        if (playable.language === 'typescript') {
-          await smartdown.runFunction(playable.augmentedCode, playable.embedThis, argValues, language, div);
-        }
-        else {
-          await smartdown.runModule(playable, argValues, language);
-        }
+      if (playable.isModule && playable.language !== 'typescript') {
+        await smartdown.runModule(playable, argValues, language);
       }
       else {
         const embedResult = await smartdown.runFunction(playable.augmentedCode, playable.embedThis, argValues, language, div);
@@ -3541,41 +3438,18 @@ function renderCell(cellID, variableId, newValue) {
     }
     else {
       ensureExtension('openjscad', function() {
-        element.innerHTML =
-`
-  <div
-    class="openjscad-container">
-    <div
-      id="${divId}-viewerContext"
-      class="viewerContext"
-      oncontextmenu="return false;"
-    >
-      <div id="${divId}-viewerDiv">
-      </div>
-    </div>
-    <canvas
-      id="${divId}-viewerCanvas"
-      class="viewerCanvas"
-    ></canvas>
-    <div
-      class="viewer-footer">
-      <button
-        onclick="window.resetCamera${divId}()">
-        Reset Camera
-      </button>
-      <button
-        onclick="window.exportSTL${divId}()">
-        Export STL
-      </button>
-
-      <table
-        id="${divId}-parametersTable"
-        class="openjscad-parametersTable">
-      </table>
-    </div>
-  </div>
-`;
-
+        const innerHTML = OpenJSCAD.generateInnerHTML(divId);
+        element.innerHTML = innerHTML;
+        const augmentedCode = OpenJSCAD.generateAugmentedPlayable(divId, newValue);
+        console.log('augmentedCode');
+        console.log(augmentedCode);
+        /* eslint-disable-next-line no-new-func */
+        // eslint-disable-next-line @typescript-eslint/no-implied-eval
+        const f = new Function([], augmentedCode);
+        f.apply(this, [null]);
+      });
+    }
+/*
         const viewerContextId = `${divId}-viewerContext`;
         const viewerCanvasId = `${divId}-viewerCanvas`;
         const viewerDivId = `${divId}-viewerDiv`;
@@ -3619,7 +3493,7 @@ function renderCell(cellID, variableId, newValue) {
             viewerCanvas: viewerCanvas,
             viewerdiv: viewerDiv,
             parameterstable: parametersTable,
-            setStatus: (/* status, data */) => {
+            setStatus: () => {
             },
             instantUpdate: true,
             onUpdate: onUpdate,
@@ -3650,6 +3524,8 @@ function renderCell(cellID, variableId, newValue) {
         jscadViewer.setJsCad(diagramSource);
       });
     }
+*/
+
   }
   else if (cellInfo.datatype.indexOf('abc') === 0) {
     const abcBaseId = element.id;
@@ -4696,7 +4572,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.56',
+  version: '1.0.57',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,

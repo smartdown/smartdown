@@ -41,6 +41,6 @@ return smartdown.runFunction(asyncWrapperCode, this, [...arguments], 'react', th
 `;
 
   return augmentedCode;
-}
+};
 
 export default React;

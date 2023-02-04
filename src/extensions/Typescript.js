@@ -112,6 +112,6 @@ return smartdown.runFunction(result.outputText, this, [...arguments], 'typescrip
     }
     return augmentedCode;
   }
-}
+};
 
 export default Typescript;

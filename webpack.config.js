@@ -32,7 +32,10 @@ var stdlibRoot = path.join(nm, '@stdlib');
 var emojiJS = path.join(nm, '/emoji-js/lib/emoji.min.js');
 var abcJS = path.join(app, 'external/abcjs_midi_5.9.1-min.js');
 var abcCSS = path.join(app, 'external/abcjs-midi-no-fa.css');
-var openjscadJS = path.join(app, 'external/openjscad.reentrant.umd.js');
+var openjscadJSCore = path.join(app, 'external/jscad-core.min.js');
+var openjscadJSModeling = path.join(app, 'external/jscad-modeling.min.js');
+var openjscadJSReglRenderer = path.join(app, 'external/jscad-regl-renderer.min.js');
+var openjscadJSIoIo = path.join(app, 'external/jscad-io-io.min.js');
 var giffferJS = path.join(nm, 'gifffer/build/gifffer.min.js');
 var stacktraceJS = path.join(nm, 'stacktrace-js/dist/stacktrace.min.js');
 var p5JS = path.join(nm, '/p5/lib/p5.min.js');
@@ -45,8 +48,8 @@ var vizJS = path.join(nm, '/viz.js/viz.js');
 var vizLiteJS = path.join(nm, '/viz.js/lite.render.js');
 var webcomponentsJS = path.join(nm, '@webcomponents/webcomponentsjs/');
 var topojsonJS = path.join(nm, '/topojson/dist/topojson.min.js');
-// var galleryRoot = '/Users/bud/DoctorBud/smartdown-gallery/';
-var galleryRoot = path.join(nm, 'smartdown-gallery/');
+var galleryRoot = '/Users/bud/DoctorBud/smartdown-gallery/';
+// var galleryRoot = path.join(nm, 'smartdown-gallery/');
 // var galleryResourcesRoot = path.join(nm, 'smartdown-gallery/resources/');
 
 var useOlderBrowsers = false;
@@ -188,7 +191,12 @@ var config = {
         { from: path.join(app, 'external/ldf-client-browser.js') },
         { from: abcJS },
         { from: abcCSS },
-        { from: openjscadJS },
+
+        { from: openjscadJSCore },
+        { from: openjscadJSModeling },
+        { from: openjscadJSReglRenderer },
+        { from: openjscadJSIoIo },
+
         { from: filamentJS },
         { from: brythonJS },
         { from: brythonStdlibJS },

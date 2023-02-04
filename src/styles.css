@@ -2044,6 +2044,10 @@ img.media-image path {
   .viewerContext {
   }
 
+  .viewerDiv {
+    width: 15cm;
+    height: 15cm;
+  }
   .viewerCanvas {
     width: 100%;
     height: 300px;
