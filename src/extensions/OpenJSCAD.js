@@ -1,8 +1,6 @@
 /* global jscadCore */
-/* global jscadStlDeserializer */
 
 import {registerExtension} from 'extensions';
-
 
 const OpenJSCAD = {
   register() {
@@ -12,7 +10,7 @@ const OpenJSCAD = {
         'https://unpkg.com/@jscad/core/dist/jscad-core.min.js',
         'https://unpkg.com/@jscad/modeling/dist/jscad-modeling.min.js',
         'https://unpkg.com/@jscad/regl-renderer/dist/jscad-regl-renderer.min.js',
-        // 'jscad-io-io.min.js',
+        // Useful when debugging via a locally built OpenJSCAD
         // 'lib/jscad-core.min.js',
         // 'lib/jscad-modeling.min.js',
         // 'lib/jscad-regl-renderer.min.js',
@@ -20,10 +18,8 @@ const OpenJSCAD = {
         () => {
           let mostRecentlyRequiredData;
 
-          console.log('registerAllExtensions', jscadCore);
           const fsGlue = {
-            readFileSync: function(filename, encoding) {
-              console.log('fsGlue.readFileSync', filename, encoding, mostRecentlyRequiredData);
+            readFileSync: function(/* filename, encoding */) {
               return mostRecentlyRequiredData;
             },
           };
@@ -31,22 +27,16 @@ const OpenJSCAD = {
             extensions: {},
           };
           jscadCore.io.registerAllExtensions(fsGlue, requireGlue);
-          console.log('requireGlue', requireGlue);
 
           const stlDeserializer = requireGlue.extensions['.stl'];
-          console.log('stlDeserializer', stlDeserializer);
 
           // https://openjscad.xyz/docs/module-io_svg-deserializer.html
           window.jscadStlDeserializer = {
             deserializer: {
               deserialize: function(options, input) {
-                console.log('jscadStlDeserializer.deserialize', options, input);
-                console.log(JSON.stringify(options, null, 2));
                 mostRecentlyRequiredData = input;
                 const fakeOptions = {};
-                const result = stlDeserializer(/* options */ fakeOptions, 'hello', input);
-                console.log('result', result);
-                console.log('fakeOptions', fakeOptions);
+                stlDeserializer(/* options */ fakeOptions, 'hello', input);
                 return fakeOptions.exports[0];
               },
             },
@@ -149,7 +139,6 @@ const axisOptions = {
 };
 
 const wrapper = async () => {
-  console.log('wrapper jscadStlDeserializer', jscadStlDeserializer);
   const packageNameToGlobal = {
     '@jscad/core': jscadCore,
     '@jscad/modeling': jscadModeling,
@@ -338,7 +327,8 @@ window[\`resetCamera${divId}\`] = function() {
 };
 
 window[\`exportSTL${divId}\`] = function() {
-  console.log('exportSTL$ NYI', state, state.camera);
+  window.alert('Export STL is Not Yet Implemented.');
+  console.log('exportSTL NYI', state, state.camera);
 };
 
 

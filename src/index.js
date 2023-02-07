@@ -3383,7 +3383,7 @@ function initialize(media, baseURL, loadedHandler, cardLoader, calcHandlers, lin
 
 var patchesUnresolvedKludgeLimit = 0;
 
-function renderCell(cellID, variableId, newValue) {
+async function renderCell(cellID, variableId, newValue) {
   const cellInfo = smartdownCells[cellID];
 
   var element = document.getElementById(cellID);
@@ -3392,6 +3392,7 @@ function renderCell(cellID, variableId, newValue) {
   if (s) {
     s = s.slice(0, 20);
   }
+
   if (!element) {
     console.log('...renderCell cellID not found', cellID, variableId, newValue);
   }
@@ -3437,16 +3438,30 @@ function renderCell(cellID, variableId, newValue) {
       element.innerHTML = '';
     }
     else {
-      ensureExtension('openjscad', function() {
+      ensureExtension('openjscad', async function() {
         const innerHTML = OpenJSCAD.generateInnerHTML(divId);
         element.innerHTML = innerHTML;
         const augmentedCode = OpenJSCAD.generateAugmentedPlayable(divId, newValue);
-        console.log('augmentedCode');
-        console.log(augmentedCode);
+        // console.log('augmentedCode');
+        // console.log(augmentedCode);
+
+        const asyncAugmentedCode =
+`
+return (async () => {
+  ${augmentedCode}
+})();
+`;
         /* eslint-disable-next-line no-new-func */
         // eslint-disable-next-line @typescript-eslint/no-implied-eval
-        const f = new Function([], augmentedCode);
-        f.apply(this, [null]);
+        const func = new Function([], asyncAugmentedCode);
+
+        try {
+          await func.apply(this, [null]);
+        }
+        catch (e) {
+          console.log('###runFunction catch func.apply()', e);
+          element.innerHTML = `<b># Error evaluating OpenJSCAD cell: ${e}</b>`;
+        }
       });
     }
 /*
@@ -3639,18 +3654,18 @@ async function updateProcesses(id, newValue) {
     // lodashEach(smartdownCells, function(newCell, cellID) {
     //   console.log('........newCellCheck', id, newCell, newCell.cellBinding, cellID);
     // });
-    lodashEach(smartdownCells, function(newCell, cellID) {
+    lodashEach(smartdownCells, async function(newCell, cellID) {
       // console.log('........newCell', id, newCell, newCell.cellBinding, cellID);
 
       if (id === newCell.cellBinding) {
-        renderCell(cellID, newCell.cellBinding, newValue);
+        await renderCell(cellID, newCell.cellBinding, newValue);
       }
     });
   }
   else {
-    lodashEach(smartdownCells, function(newCell, cellID) {
+    lodashEach(smartdownCells, async function(newCell, cellID) {
       const oldValue = smartdownVariables[newCell.cellBinding];
-      renderCell(cellID, newCell.cellBinding, oldValue);
+      await renderCell(cellID, newCell.cellBinding, oldValue);
     });
   }
 

@@ -109,7 +109,7 @@
     "lodash": "^4.17.21",
     "marked": "^3.0.4",
     "p5": "^1.5.0",
-    "smartdown-gallery": "0.0.78",
+    "smartdown-gallery": "0.0.79",
     "smoothscroll-polyfill": "^0.4.4",
     "stacktrace-js": "^2.0.2",
     "vdom-to-html": "^2.3.1",
