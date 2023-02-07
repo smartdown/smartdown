@@ -107,7 +107,7 @@
     "js-yaml": "^4.1.0",
     "localforage": "^1.10.0",
     "lodash": "^4.17.21",
-    "marked": "^3.0.4",
+    "marked": "^4.0.10",
     "p5": "^1.5.0",
     "smartdown-gallery": "0.0.79",
     "smoothscroll-polyfill": "^0.4.4",
