@@ -3464,82 +3464,6 @@ return (async () => {
         }
       });
     }
-/*
-        const viewerContextId = `${divId}-viewerContext`;
-        const viewerCanvasId = `${divId}-viewerCanvas`;
-        const viewerDivId = `${divId}-viewerDiv`;
-        const parametersTableId = `${divId}-parametersTable`;
-
-        const viewerContext = document.getElementById(viewerContextId);
-        const viewerCanvas = document.getElementById(viewerCanvasId);
-        const viewerDiv = document.getElementById(viewerDivId);
-        const parametersTable = document.getElementById(parametersTableId);
-
-        // console.log('viewerContext', viewerContextId, viewerContext);
-        // console.log('viewerCanvas', viewerCanvasId, viewerCanvas);
-        // console.log('viewerDiv', viewerDivId, viewerDiv);
-        // console.log('parametersTable', parametersTableId, parametersTable);
-
-        const camera = {
-          position: { x: 0, y: 0, z: 90 },
-          clip: { min: 1, max: 1000 },
-        };
-
-        const axis = {
-          draw: true,
-        };
-
-        const panel = {
-          size: 223
-        };
-
-        function onUpdate(data) {
-          if (data.outputFile) {
-            smartdown.fileSaver.saveAs(data.outputFile.data, data.outputFile.downloadAttribute);
-          }
-          else {
-            // console.log('onUpdate', data);
-          }
-        }
-
-        const jscadViewer = openjscad(viewerContext, {
-          processor: {
-            viewerContext: viewerContext,
-            viewerCanvas: viewerCanvas,
-            viewerdiv: viewerDiv,
-            parameterstable: parametersTable,
-            setStatus: () => {
-            },
-            instantUpdate: true,
-            onUpdate: onUpdate,
-            useAsync: true
-          },
-          viewer: {
-            axis: axis,
-            camera: camera,
-            panel: panel,
-            glOptions: {
-              canvas: viewerCanvas
-            }
-          }
-        });
-
-        window[`resetCamera${divId}`] = function() {
-          jscadViewer.resetCamera();
-        };
-
-        window[`exportSTL${divId}`] = function() {
-          jscadViewer.generateOutputFile({
-            name: 'stla',
-            extension: 'stl',
-          });
-        };
-
-        const diagramSource = newValue;
-        jscadViewer.setJsCad(diagramSource);
-      });
-    }
-*/
 
   }
   else if (cellInfo.datatype.indexOf('abc') === 0) {
@@ -4587,7 +4511,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.57',
+  version: '1.0.58',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,
