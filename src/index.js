@@ -78,11 +78,11 @@ const localForageSmartdownPrefix = 'smartdownVariable/';
 const inlinePrefix = '^^InLiNe^^';
 
 let twitterLoading = false;
-var cardLoader = null;
-var calcHandlers = null;
-var linkRules = [];
-var currentHomeDiv = null;
-var currentMD = null;
+let cardLoader = null;
+let calcHandlers = null;
+const linkRules = [];
+let currentHomeDiv = null;
+let currentMD = null;
 const playableTypes = {
   'brython': {
     highlight: 'python',
@@ -3371,11 +3371,11 @@ function configure(options, loadedHandler) {
 
 function initialize(media, baseURL, loadedHandler, cardLoader, calcHandlers, linkRules) {
   const options = {
-    media: media,
-    baseURL: baseURL,
-    cardLoader: cardLoader,
-    calcHandlers: calcHandlers,
-    linkRules: linkRules
+    media,
+    baseURL,
+    cardLoader,
+    calcHandlers,
+    linkRules,
   };
 
   configure(options, loadedHandler);
@@ -4511,7 +4511,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.58',
+  version: '1.0.59',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,

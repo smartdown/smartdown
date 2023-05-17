@@ -194,7 +194,7 @@ function starter(basePrefix, doneHandler) {
       if (cardKeySubhash) {
         cardKeySubhash = cardKeySubhash.split('?')[0];
       }
-  
+
       if (rootHash !== '' && ('#' + cardKey) === rootHash) {
         history.replaceState({}, '', window.location.pathname + cardKeyWithHash);
         scrollToSubHash(cardKeySubhash);
