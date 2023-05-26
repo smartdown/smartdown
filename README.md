@@ -6,12 +6,12 @@ Smartdown is a *declarative*, *literate* and *reactive* authoring technology for
 
 Smartdown extends the simple expressivity of the [Markdown](https://en.wikipedia.org/wiki/Markdown) language commonly used on blogs, messaging systems, technical forums, and on [GitHub](https://help.github.com/articles/basic-writing-and-formatting-syntax/). The Smartdown **engine** is a Javascript library that interprets the content in these Smartdown source files and enacts the desired behavior and presentation.
 
-- [Smartdown Documentation](https://smartdown.github.io/smartdown/doc/)
-- [Smartdown API](https://smartdown.github.io/smartdown/doc/api/)
-- [Version History](https://smartdown.github.io/smartdown/doc/versions/)
-- [License](https://smartdown.github.io/smartdown/doc/license/)
-- [Contributing](https://smartdown.github.io/smartdown/doc/contributing/)
-- [Code of Conduct](https://smartdown.github.io/smartdown/doc/code_of_conduct/)
+- [Smartdown Documentation](doc/)
+- [Smartdown API](doc/api/)
+- [Version History](doc/versions/)
+- [License](doc/license/)
+- [Contributing](doc/contributing/)
+- [Code of Conduct](doc/code_of_conduct/)
 - [Smartdown Source](https://github.com/smartdown/smartdown/)
 
 
@@ -35,7 +35,7 @@ Smartdown utilizes Markdown's link syntax and if it detects a Smartdown-formatte
 - Tweet: `![](https://twitter.com/nasa/status/735978603431768065)`
 - Tweet+: `![](https://twitter.com/nasa/status/735978603431768065&showMedia)`
 
-See [Cells](https://smartdown.github.io/smartdown/#Cells) for detailed examples of Smartdown Cells.
+See [Cells](#Cells) for detailed examples of Smartdown Cells.
 
 ### Smartdown Playables
 

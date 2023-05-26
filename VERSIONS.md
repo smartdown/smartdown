@@ -60,4 +60,4 @@
 - **1.0.57** - Update deps. Updated the OpenJSCAD extension to OpenJSCAD V2.x, which required substantial changes, but mostly works, including async/await fetching of STL. Modernized the use of src/extension/OpenJSCAD.js to use generate*() functions. Deleted the custom build of OpenJSCAD from src/external/openjscad.reentrant.umd.js. ESLint fixes.
 - **1.0.58** - Remove dead code from OpenJSCAD. Improve pinch-to-zoom detection for mobile devices.
 - **1.0.59** - Update deps. Modernize JS code.
-
+- **1.0.60** - Update deps. Fix documentation links.

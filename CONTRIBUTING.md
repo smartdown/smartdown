@@ -7,7 +7,7 @@ Thanks for your contribution, feedback and patience.
 # Contributing to Smartdown
 
 Contributions are always welcome. Before contributing, please read the
-[CODE_OF_CONDUCT](CODE_OF_CONDUCT.md) and consult the [Issue Tracker](); your issue
+[CODE_OF_CONDUCT](CODE_OF_CONDUCT.md) and consult the [Issue Tracker](https://github.com/smartdown/smartdown/issues); your issue
 may have already been discussed or fixed. To contribute,
 [fork](https://help.github.com/articles/fork-a-repo/) Smartdown, commit your changes,
 and [Submit a Pull Request](https://help.github.com/articles/using-pull-requests/).
