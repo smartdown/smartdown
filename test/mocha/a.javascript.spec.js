@@ -2,11 +2,6 @@ var assert = require('assert');
 
 /* global describe */
 /* global it */
-/* global before */
-/* global after */
-/* global window */
-/* global document */
-/* global test */
 
 describe('a.javascript', function() {
   describe('#indexOf()', function() {

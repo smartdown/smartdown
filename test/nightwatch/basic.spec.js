@@ -4,10 +4,9 @@ this.testSmartdownBasic = function (browser) {
     .waitForElementVisible('body', 1000)
     .waitForElementVisible('#smartdown-output', 1000)
     .pause(2000)
-    .assert.containsText('#smartdown-output', 'Smartdown is designed for blogging')
+    .assert.textContains('#smartdown-output', 'Smartdown is designed for blogging')
     .end();
 };
-
 
 this.testSmartdownItalic = function (browser) {
   browser
@@ -15,7 +14,7 @@ this.testSmartdownItalic = function (browser) {
     .waitForElementVisible('body', 1000)
     .waitForElementVisible('#smartdown-output', 1000)
     .pause(2000)
-    .expect.element('#smartdown-output').to.have.attribute('innerHTML')
+    .expect.element('#smartdown-output').to.have.property('innerHTML')
     .which.contains('<em>Explorable Explanations</em>');
 };
 
@@ -29,11 +28,10 @@ this.testSmartdownClickREADME = function (browser) {
     .click('//*[.=\'Readme\']')
     .pause(500)
     .useCss()
-    .assert.containsText('#smartdown-output', 'Smartdown extends Markdown')
+    .assert.textContains('#smartdown-output', 'Smartdown extends Markdown')
     .end();
   browser.end();
 };
-
 
 this.testSmartdownVideos = function (browser) {
   browser

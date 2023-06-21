@@ -58,6 +58,7 @@ const graphvizImages = require('./extensions/Graphviz');
 
 var P5 = require('./extensions/P5.js');
 
+const testing = process.env.BUILD === 'test';
 
 let fileSaver = {};
 if (useFileSaver) {
@@ -3306,6 +3307,10 @@ function configure(options, loadedHandler) {
   __webpack_public_path__ = currentBase.slice(0, lastSlash + 1);
   // console.log('__webpack_# smartdown.configurepublic_path__', __webpack_public_path__, currentBase);
   window.xypicURL = window.smartdown.baseURL + 'lib/xypic.js';
+  if (window.smartdown.baseURL === 'https://mochalocalhost/') {
+    window.xypicURL = 'https://unpkg.com/smartdown/dist/lib/xypic.js';
+  }
+
   // console.log('__webpack_public_path__', __webpack_public_path__, window.smartdown.baseURL, window.location.origin, window.xypicURL);
   window.MathJax = global.MathJax = {
     delayStartupUntil: 'configured',
@@ -3318,7 +3323,7 @@ function configure(options, loadedHandler) {
           ver = '';
         }
         return ver;
-      }
+      };
     }
   };
 
@@ -3327,7 +3332,6 @@ function configure(options, loadedHandler) {
     window.setTimeout(loadedHandler, 0);
   }
 
-  const testing = process.env.BUILD === 'test';
   if (useMathJax) {
     const mathjaxURL = testing ?
       // 'https://localhost:8080/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured' :
@@ -4117,7 +4121,13 @@ function setSmartdown(md, outputDiv, setSmartdownCompleted) {
       }
 
       outputDiv.innerHTML = result;
-      MathJax.Hub.Typeset(outputDiv, finishIt);
+      if (testing) {
+        MathJax.Hub.Typeset(outputDiv);
+        finishIt();
+      }
+      else {
+        MathJax.Hub.Typeset(outputDiv, finishIt);
+      }
       // MathJax.Hub.Queue(['Typeset', MathJax.Hub, outputDiv, finishIt]);
     }
     else {
@@ -4511,7 +4521,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.60',
+  version: '1.0.61',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,

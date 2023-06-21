@@ -13,7 +13,8 @@ var config = {
           args: [
             '--ignore-ssl-errors=yes',
             '--ignore-certificate-errors',
-            '--allow-running-insecure-content']
+            '--allow-running-insecure-content',
+            'headless']
         }
       }
     }

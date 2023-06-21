@@ -61,3 +61,5 @@
 - **1.0.58** - Remove dead code from OpenJSCAD. Improve pinch-to-zoom detection for mobile devices.
 - **1.0.59** - Update deps. Modernize JS code.
 - **1.0.60** - Update deps. Fix documentation links.
+- **1.0.61** - Update deps. smartdown/gallery 0.0.80. npm scripts 'test', 'test:e2e', and 'test:unit' have been re-enabled with latest Nightwatch and MochaJS versions.
+ 
