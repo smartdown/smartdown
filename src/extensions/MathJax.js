@@ -54,7 +54,6 @@ function mathjaxConfigure() {
     // showMathMenuMSIE: false,
   });
 
-
   MathJax.Hub.Register.MessageHook('Math Processing Error', function (message) {
     console.log('Math Processing Error', message, MathJax.Hub.lastError);
   });

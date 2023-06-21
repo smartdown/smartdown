@@ -77,8 +77,28 @@ var galleryIgnores = [
   '**/index.html'];
 const baseURL = development ? '/' : '/smartdown/';
 
+const defines = {
+  useFileSaver: useFileSaver,
+  useLocalForage: useLocalForage,
+  useLeaflet: useLeaflet,
+  useBrython: useBrython,
+  useGifffer: useGifffer,
+  useP5JS: useP5JS,
+  useMathJax: useMathJax,
+};
+
+defines['process.env.BUILD'] = JSON.stringify(process.env.BUILD);
+if (test) {
+  defines['process.env.NODE_ENV'] = JSON.stringify(process.env.NODE_ENV);
+}
+
 var config = {
   // bail: true,
+
+  performance: {
+    maxEntrypointSize: 20000000,
+    maxAssetSize: 20000000,
+  },
 
   stats: {
     optimizationBailout: true
@@ -156,17 +176,7 @@ var config = {
 
     new webpack.HotModuleReplacementPlugin(),
 
-    new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify(nodeEnvironment),
-      'process.env.BUILD': JSON.stringify(process.env.BUILD),
-      useFileSaver: useFileSaver,
-      useLocalForage: useLocalForage,
-      useLeaflet: useLeaflet,
-      useBrython: useBrython,
-      useGifffer: useGifffer,
-      useP5JS: useP5JS,
-      useMathJax: useMathJax,
-    }),
+    new webpack.DefinePlugin(defines),
 
     new CopyWebpackPlugin({
       patterns: [
@@ -419,7 +429,6 @@ switch (nodeEnvironment) {
 var nodeExternals = require('webpack-node-externals');
 
 if (test) {
-  console.log('TEST');
   require.extensions['.css'] = function () {
     return null;
   };
