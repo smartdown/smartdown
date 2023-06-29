@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<head>
+
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/styles/hopscotch.min.css">
+
+<script src="https://code.jquery.com/jquery-2.2.2.min.js" integrity="sha256-36cp2Co+/62rEAAYHLmRCPIych47CvdM+uTBJwSzWjI=" crossorigin="anonymous"></script>
+
+<script src="https://unpkg.com/@jscad/openjscad@1.6.1/dist/index.js"></script>
+
+<script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/highlight.min.js"></script>
+
+<script type='text/javascript'>
+hljs.initHighlightingOnLoad();
+$(document).ready(function() {
+   $('#myBlock').each(function(i, e) {hljs.highlightBlock(e)});
+});
+</script>
+</head>
+<body>
+<div id="myBlock" style="font-size:1.2em;">
+<pre style="word-wrap: break-all;">
+<code class="javascript">
+function $initHighlight(block, cls) {
+  try {
+    if (cls.search(/\bno\-highlight\b/) != -1)
+      return process(block, true, 0x0F) +
+             ` class="${cls}"`;
+  } catch (e) {
+    /* handle exception */
+  }
+  for (var i = 0 / 2; i < classes.length; i++) {
+    if (checkCondition(classes[i]) === undefined)
+      console.log('undefined');
+  }
+
+  return (
+    <div>
+      <web-component>{block}</web-component>
+    </div>
+  )
+}
+
+export  $initHighlight;
+</code>
+</pre>
+</div>
+</body>
+</html>
+

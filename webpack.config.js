@@ -29,7 +29,6 @@ var outputPath = path.join(__dirname, 'dist/lib/');
 var outputFile = libraryName + '.js';
 var nm = path.join(__dirname, 'node_modules');
 var stdlibRoot = path.join(nm, '@stdlib');
-var emojiJS = path.join(nm, '/emoji-js/lib/emoji.min.js');
 var abcJS = path.join(app, 'external/abcjs_midi_5.9.1-min.js');
 var abcCSS = path.join(app, 'external/abcjs-midi-no-fa.css');
 
@@ -40,7 +39,6 @@ var abcCSS = path.join(app, 'external/abcjs-midi-no-fa.css');
 // var openjscadJSIoIo = path.join(app, 'external/jscad-io-io.min.js');
 
 var giffferJS = path.join(nm, 'gifffer/build/gifffer.min.js');
-var stacktraceJS = path.join(nm, 'stacktrace-js/dist/stacktrace.min.js');
 var p5JS = path.join(nm, '/p5/lib/p5.min.js');
 // var p5JS = path.join(nm, '/p5/lib/p5.js');
 // var brythonJS = path.join(nm, '/brython/brython.js');
@@ -51,8 +49,8 @@ var vizJS = path.join(nm, '/viz.js/viz.js');
 var vizLiteJS = path.join(nm, '/viz.js/lite.render.js');
 var webcomponentsJS = path.join(nm, '@webcomponents/webcomponentsjs/');
 var topojsonJS = path.join(nm, '/topojson/dist/topojson.min.js');
-// var galleryRoot = '/Users/bud/DoctorBud/smartdown-gallery/';
-var galleryRoot = path.join(nm, 'smartdown-gallery/');
+var galleryRoot = '/Users/bud/DoctorBud/smartdown-gallery/';
+// var galleryRoot = path.join(nm, 'smartdown-gallery/');
 // var galleryResourcesRoot = path.join(nm, 'smartdown-gallery/resources/');
 
 var useOlderBrowsers = false;
@@ -140,11 +138,9 @@ var config = {
   resolve: {
     alias: {
       'gifffer': giffferJS,
-      'stacktraceJS': stacktraceJS,
       'esprima$': path.join(__dirname, 'NOP.js'),
 
       topojson$: topojsonJS,
-      emojiJS$: emojiJS,
       p5JS$: p5JS,
       p5$: p5JS,
       'rx$': 'rx/dist/rx.all.js'
@@ -273,7 +269,6 @@ var config = {
   module: {
     noParse: [
       /node_modules\/localforage\/dist\/localforage.js/,
-      new RegExp('emojiJS'),
       new RegExp(p5JS),
       new RegExp('p5JS'),
       // new RegExp(vizJS),

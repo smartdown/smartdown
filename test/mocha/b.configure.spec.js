@@ -1,5 +1,7 @@
 import smartdown from '../../src';
+
 const assert = require('assert');
+
 const postConfigureTimeout = 3000;
 
 /* global describe */
@@ -11,8 +13,8 @@ describe('b.configure', function() {
   this.timeout(5000); // Default is 2000ms. Must be larger than postConfigureTimeout
 
   describe('smartdown.version()', function() {
-    it('should return "1.0.61"', function(done) {
-      assert.equal(smartdown.version, '1.0.61');
+    it('should return "1.0.62"', function(done) {
+      assert.equal(smartdown.version, '1.0.62');
       done();
     });
   });

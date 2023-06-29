@@ -10,36 +10,22 @@
 /* global useGifffer */
 /* global useMathJax */
 
-import './polyfills';
 import createDOMPurify from 'dompurify';
 
-import emoji from 'emojiJS';
+import emoji from 'emoji-js/lib/emoji.min';
+
 const emojiInstance = new emoji();
-const emojiReplacer = match => emojiInstance.replace_colons(match);
+const emojiReplacer = (match) => emojiInstance.replace_colons(match);
 import axios from 'axios';
 import smoothscroll from 'smoothscroll-polyfill';
 
-import {importScriptUrl, importModuleUrl, importTextUrl, importCssCode, importCssUrl} from 'importers';
-
 require('./styles.css');
-
-const marked = require('marked');
 
 const lodashEach = window.lodashEach = require('lodash/forEach');
 const lodashMap = window.lodashMap = require('lodash/map');
 const isEqual = window.lodashIsEqual = require('lodash/isEqual');
 
-const hljs = require('hljs');
-const vdomToHtml = require('vdom-to-html');
-
-window.jsyaml = require('js-yaml');
-
-const StackTrace = require('stacktraceJS');
-
-
-import {isExtensionRegistered, loadExternal, ensureExtension} from 'extensions';
-
-const mathjaxConfigure = require('./extensions/MathJax');
+import {isExtensionRegistered, loadExternal, ensureExtension} from './extensions';
 
 import registerABC from './extensions/ABC';
 import registerD3 from './extensions/D3';
@@ -54,9 +40,31 @@ import Typescript from './extensions/Typescript';
 import Mermaid from './extensions/Mermaid';
 import Stdlib from './extensions/Stdlib';
 
+import {
+  importScriptUrl,
+  importModuleUrl,
+  importTextUrl,
+  importCssCode,
+  importCssUrl,
+} from './importers';
+
+const vdomToHtml = require('vdom-to-html');
+const StackTrace = require('stacktrace-js/dist/stacktrace.min');
+
+const marked = require('marked');
+const hljs = require('./hljs');
+
+window.jsyaml = require('js-yaml');
+const mathjaxConfigure = require('./extensions/MathJax');
+
+
+
+
+
+
 const graphvizImages = require('./extensions/Graphviz');
 
-var P5 = require('./extensions/P5.js');
+const P5 = require('./extensions/P5');
 
 const testing = process.env.BUILD === 'test';
 
@@ -184,26 +192,26 @@ const playableArgNames = [
   'p5'
 ];
 
-var perPageState = {
+const perPageState = {
   expressionsRegistered: {},
   playablesRegistered: {},
   playablesRegisteredOrder: [],
 };
-var currentRenderDiv = null;
-var currentBackpatches = {};
+let currentRenderDiv = null;
+const currentBackpatches = {};
 
-var uniqueCellIndex = 0;
-var smartdownCells = {};
+let uniqueCellIndex = 0;
+const smartdownCells = {};
 
-var cardLoading = false;
+let cardLoading = false;
 
-var smartdownVariables = {};
-var smartdownScripts = [];
-var smartdownScriptsMap = {};
-var es6Playables = {};
+let smartdownVariables = {};
+const smartdownScripts = [];
+const smartdownScriptsMap = {};
+const es6Playables = {};
 
-var mediaRegistry = {};
-var uniquePlayableIndex = 0;
+let mediaRegistry = {};
+let uniquePlayableIndex = 0;
 
 function entityEscape(html, encode) {
   return html
@@ -234,13 +242,13 @@ registerDefaultExtensions();
 
 
 function expandHrefWithLinkRules(href) {
-  var result = href;
+  let result = href;
 
-  for (var i = 0; i < linkRules.length; ++i) {
+  for (let i = 0; i < linkRules.length; ++i) {
     const rule = linkRules[i];
     if (href.indexOf(rule.prefix) === 0) {
       if ((typeof rule.replace) === 'string') {
-        var newHRef = rule.replace + href.slice(rule.prefix.length);
+        let newHRef = rule.replace + href.slice(rule.prefix.length);
         if (newHRef.indexOf(window.location.origin) === 0) {
           newHRef = newHRef.slice(window.location.origin.length);
         }
@@ -248,7 +256,7 @@ function expandHrefWithLinkRules(href) {
         break;
       }
       else if ((typeof rule.replace) === 'function') {
-        var replacer = rule.replace(href);
+        const replacer = rule.replace(href);
         result = replacer + href.slice(rule.prefix.length);
       }
     }
@@ -263,7 +271,7 @@ function expandHrefWithLinkRules(href) {
 
 // Copied from https://github.com/jashkenas/underscore/blob/e944e0275abb3e1f366417ba8facb5754a7ad273/underscore.js#L1458
 
-var unescapeMap = {
+const unescapeMap = {
   '&amp;': '&',
   '&lt;': '<',
   '&gt;': '>',
@@ -279,9 +287,9 @@ function createEscaper(translationMap) {
     return translationMap[match];
   }
   // Regexes for identifying a key that needs to be escaped.
-  var source = '(?:' + Object.keys(translationMap).join('|') + ')';
-  var testRegexp = RegExp(source);
-  var replaceRegexp = RegExp(source, 'g');
+  const source = '(?:' + Object.keys(translationMap).join('|') + ')';
+  const testRegexp = RegExp(source);
+  const replaceRegexp = RegExp(source, 'g');
   return function (string) {
     string = string == null ? '' : '' + string;
     return testRegexp.test(string) ? string.replace(replaceRegexp, escaper) : string;
@@ -300,12 +308,12 @@ const youtubeClasses = {
   fullwidth: 'fullwidth',
 };
 
-var uniqueYouTubeId = 0;
+let uniqueYouTubeId = 0;
 
 function convertYoutubeFragmentToEmbed(href, title, text) {
   // console.log('convertYoutubeFragmentToEmbed', href, title, text);
-  var result = null;
-  var textParts = text.split('|');
+  let result = null;
+  const textParts = text.split('|');
   text = textParts[0];
 
   const hrefNoProtocol = href.replace(/^https?:\/\//, '');
@@ -374,9 +382,9 @@ function convertYoutubeFragmentToEmbed(href, title, text) {
 }
 
 function convertVimeoFragmentToEmbed(href, title, text) {
-  var result = null;
+  let result = null;
   const hrefNoProtocol = href.replace(/^https?:\/\//, '');
-  var classList = (text === 'thumbnail') ? 'thumbnail' : 'fullwidth';
+  const classList = (text === 'thumbnail') ? 'thumbnail' : 'fullwidth';
 
   if (hrefNoProtocol.indexOf('vimeo.com/') === 0) {
     let suffix = hrefNoProtocol.slice('vimeo.com/'.length);
@@ -548,7 +556,7 @@ function getPrelude(language, code) {
     const usePrefix = '//smartdown.import=';
     const usePrefixM = '//smartdown.importmodule=';
     const includePrefix = '//smartdown.include=';
-    lines.forEach(line => {
+    lines.forEach((line) => {
       if (line.indexOf(usePrefix) === 0) {
         const rhs = line.slice(usePrefix.length);
         imports.push([rhs, false]);
@@ -573,41 +581,40 @@ function getPrelude(language, code) {
 }
 
 function renderCodeInternal(renderDivId, code, language, languageOpts, prelude) {
-  var playable = languageOpts.indexOf('playable') >= 0;
-  var autoplay = languageOpts.indexOf('autoplay') >= 0;
-  var isModule = languageOpts.indexOf('module') >= 0;
-  var debug = languageOpts.indexOf('debug') >= 0;
-  var kiosk = languageOpts.indexOf('kiosk') >= 0;
-  var kioskable = languageOpts.indexOf('kioskable') >= 0;
-  var inline = languageOpts.indexOf('inline') >= 0;
-  var center = languageOpts.indexOf('center') >= 0;
-  var targetDivId = null;
+  const playable = languageOpts.indexOf('playable') >= 0;
+  const autoplay = languageOpts.indexOf('autoplay') >= 0;
+  const isModule = languageOpts.indexOf('module') >= 0;
+  const debug = languageOpts.indexOf('debug') >= 0;
+  const kiosk = languageOpts.indexOf('kiosk') >= 0;
+  const kioskable = languageOpts.indexOf('kioskable') >= 0;
+  const inline = languageOpts.indexOf('inline') >= 0;
+  const center = languageOpts.indexOf('center') >= 0;
+  let targetDivId = null;
+  let result = false;
 
-  var playableType = playableTypes[language];
+  const playableType = playableTypes[language];
   if (playableType && (playable || autoplay)) {
-    // console.log('renderCodeInternal', renderDivId, code, language, languageOpts, prelude);
-
     ++uniquePlayableIndex;
-    var divId = `div_playable_${uniquePlayableIndex}`;
-    var preId = `pre_playable_${uniquePlayableIndex}`;
-    var dbgId = `dbg_playable_${uniquePlayableIndex}`;
-    var dbgToggleId = `${dbgId}-toggle`;
-    var consoleId = `console_playable_${uniquePlayableIndex}`;
-    var consoleToggleId = `${consoleId}-toggle`;
-    var functionId = `function_playable_${uniquePlayableIndex}`;
-    var kioskId = `kiosk_playable_${uniquePlayableIndex}`;
-    var playId = `play_playable_${uniquePlayableIndex}`;
-    var stopId = `stop_playable_${uniquePlayableIndex}`;
-    var progressId = `progress_playable_${uniquePlayableIndex}`;
+    let divId = `div_playable_${uniquePlayableIndex}`;
+    const preId = `pre_playable_${uniquePlayableIndex}`;
+    const dbgId = `dbg_playable_${uniquePlayableIndex}`;
+    const dbgToggleId = `${dbgId}-toggle`;
+    const consoleId = `console_playable_${uniquePlayableIndex}`;
+    const consoleToggleId = `${consoleId}-toggle`;
+    const functionId = `function_playable_${uniquePlayableIndex}`;
+    const kioskId = `kiosk_playable_${uniquePlayableIndex}`;
+    const playId = `play_playable_${uniquePlayableIndex}`;
+    const stopId = `stop_playable_${uniquePlayableIndex}`;
+    const progressId = `progress_playable_${uniquePlayableIndex}`;
 
-    languageOpts.forEach(o => {
+    languageOpts.forEach((o) => {
       if (o.indexOf('&') === 0) {
         targetDivId = 'inline-target-' + o.slice(1);
         divId = targetDivId;
       }
     });
 
-    var registeredPlayable = smartdown.registerPlayable(
+    const registeredPlayable = smartdown.registerPlayable(
       prelude,
       language,
       renderDivId,
@@ -628,13 +635,13 @@ function renderCodeInternal(renderDivId, code, language, languageOpts, prelude) 
       targetDivId
     );
 
-    var highlightLanguage = playableType ? playableType.highlight : 'javascript';
-    var highlightedCode = hljs.highlightAuto(code, [highlightLanguage]).value;
-    var highlightedAugmentedCode = hljs.highlightAuto(registeredPlayable.augmentedCode, ['javascript']).value;
-    var debugIsHidden = debug ? '' : 'hidden';
+    const highlightLanguage = playableType ? playableType.highlight : 'javascript';
+    const highlightedCode = hljs.highlightAuto(code, [highlightLanguage]).value;
+    const highlightedAugmentedCode = hljs.highlightAuto(registeredPlayable.augmentedCode, ['javascript']).value;
+    const debugIsHidden = debug ? '' : 'hidden';
 
-    var kioskClass = kiosk ? 'smartdown-playable-kiosk' : '';
-    var kioskToggle = !(kiosk || kioskable) ? '' :
+    const kioskClass = kiosk ? 'smartdown-playable-kiosk' : '';
+    const kioskToggle = !(kiosk || kioskable) ? '' :
       `
   <button type="button"
     href="#"
@@ -644,9 +651,9 @@ function renderCodeInternal(renderDivId, code, language, languageOpts, prelude) 
     <span>&#9713;</span>
   </button>
 `;
-    var wrapperWrapperElement = 'div';
-    var wrapperWrapperClass = 'playable-wrapper-wrapper';
-    var progressClass = 'smartdown-progress';
+    let wrapperWrapperElement = 'div';
+    let wrapperWrapperClass = 'playable-wrapper-wrapper';
+    let progressClass = 'smartdown-progress';
 
     if (inline) {
       wrapperWrapperElement = 'span';
@@ -657,9 +664,9 @@ function renderCodeInternal(renderDivId, code, language, languageOpts, prelude) 
       wrapperWrapperClass = 'playable-wrapper-wrapper-center';
     }
 
-    var playableAutoplayClass = autoplay ? 'playable-autoplay' : '';
+    const playableAutoplayClass = autoplay ? 'playable-autoplay' : '';
     if (autoplay && !playable) {
-      var playableDiv =
+      let playableDiv =
 `
 <div class="smartdown-playable smartdown-${language}" id="${divId}"></div>
 </div>
@@ -668,7 +675,7 @@ function renderCodeInternal(renderDivId, code, language, languageOpts, prelude) 
         playableDiv = '';
       }
 
-      var playableWrapper =
+      const playableWrapper =
 `
 <${wrapperWrapperElement} class="${wrapperWrapperClass}">
 <div class="playable-wrapper ${kioskClass}">
@@ -691,10 +698,10 @@ ${playableDiv}
 </${wrapperWrapperElement}>
 `;
 
-      return playableWrapper;
+      result = playableWrapper;
     }
     else {
-      var playableButtons =
+      const playableButtons =
 `
   <button type="button"
     href="#"
@@ -713,7 +720,7 @@ ${playableDiv}
   </button>
 `;
 
-      var playableCodeDisplay =
+      const playableCodeDisplay =
 `
 <${wrapperWrapperElement} class="${wrapperWrapperClass}">
 <div class="playable-wrapper ${kioskClass}">
@@ -776,26 +783,26 @@ ${highlightedAugmentedCode}
    class="playable-console"><pre id="${consoleId}-pre"></pre></div>
 `;
 
-      return playableCodeDisplay;
+      result = playableCodeDisplay;
     }
   }
-  else {
-    return false;
-  }
+
+  return result;
 }
 
 
 function renderCode(code, languageString) {
   languageString = (languageString || '').replace(/ /g, '');
-  var languageElements = languageString.split('/');
-  var languageOpts = languageElements.slice(1);
-  var playable = languageOpts.indexOf('playable') >= 0;
-  var autoplay = languageOpts.indexOf('autoplay') >= 0;
-  // // var debug = languageOpts.indexOf('debug') >= 0;
+  const languageElements = languageString.split('/');
+  const languageOpts = languageElements.slice(1);
+  const playable = languageOpts.indexOf('playable') >= 0;
+  const autoplay = languageOpts.indexOf('autoplay') >= 0;
+  // // const debug = languageOpts.indexOf('debug') >= 0;
+  let result;
 
   let language = languageElements[0];
   if (language === 'javascript') {
-    languageOpts.forEach(o => {
+    languageOpts.forEach((o) => {
       if (playableTypes[o] && playableTypes[o].javascript) {
         language = o;
       }
@@ -816,7 +823,6 @@ function renderCode(code, languageString) {
       replace: null
     };
     bp.push(backpatch);
-    // console.log('renderCode added bp', deferredCode, currentRenderDiv.id);
 
     const includesRemaining = prelude.includes.slice(0);  // Copy
     const prefixCode = '';
@@ -837,11 +843,13 @@ function renderCode(code, languageString) {
       }
     });
 
-    return deferredCode;
+    result = deferredCode;
   }
   else {
-    return renderCodeInternal(currentRenderDiv.id, code, language, languageOpts, prelude);
+    result = renderCodeInternal(currentRenderDiv.id, code, language, languageOpts, prelude);
   }
+
+  return result;
 }
 
 /*
@@ -874,7 +882,7 @@ function isGifferable(href, title, tokens) {
   const isGif = isGIF(href);
 
   let useGiffer = false;
-  tokens.forEach(t => {
+  tokens.forEach((t) => {
     if (t === 'player') {
       useGiffer = true;
     }
@@ -892,25 +900,25 @@ const imageStyles = {
 
 function renderImage(href, title, text) {
   href = expandHrefWithLinkRules(href);
-  var out = '';
-  var specialClass = null;
-  var mediaLink = href.lastIndexOf('/media/', 0) >= 0;
+  let out = '';
+  const specialClass = null;
+  const mediaLink = href.lastIndexOf('/media/', 0) >= 0;
   if (mediaLink) {
-    var pathElements = href.split('/').reverse();
+    const pathElements = href.split('/').reverse();
     // console.log('render', href, pathElements);
-    var e1 = pathElements.pop();
+    const e1 = pathElements.pop();
     if (e1 !== '') {
       console.log('Unexpected /media syntax: ', href);
     }
-    var e2 = pathElements.pop();
+    const e2 = pathElements.pop();
     if (e2 === 'media') {
-      var imageName = pathElements.pop();
-      var imageClass = pathElements.pop() || '';
+      const imageName = pathElements.pop();
+      const imageClass = pathElements.pop() || '';
 
-      var fgClass = `media-image ${imageClass}`;
-      var media = mediaRegistry[imageName];
+      const fgClass = `media-image ${imageClass}`;
+      const media = mediaRegistry[imageName];
       if (media) {
-        var inlineData = media.svgData;
+        const inlineData = media.svgData;
         out += '<div class="' + fgClass + '">';
         out += inlineData;
         out += '</div>';
@@ -924,7 +932,7 @@ function renderImage(href, title, text) {
     }
   }
   else if (href.indexOf('https://twitter.com') === 0) {
-    var showCards = (/&amp;showmedia$/i.test(href));
+    const showCards = (/&amp;showmedia$/i.test(href));
     out = '<blockquote class="twitter-tweet"';
     out += ' data-width="250"';
     out += ' align="center"';
@@ -957,7 +965,7 @@ function renderImage(href, title, text) {
       out += `<div style="width:${width};margin:auto;padding:0;" class="gifffer-container"><img style="padding:0;" data-gifffer-width="100%" data-gifffer="${href}" data-gifffer-alt="${text}"`;
     }
     else {
-      var gifClassName = imageStyles[text] || imageStyles.default;
+      const gifClassName = imageStyles[text] || imageStyles.default;
 
       out += '<img class="' + gifClassName + '" src="' + href + '" alt="' + text + '"';
       if (title) {
@@ -1021,8 +1029,8 @@ function renderImage(href, title, text) {
     queueContentLoad(contentType, abcBaseId, href, title, text);
   }
   else {
-    var youtubeEmbed = convertYoutubeFragmentToEmbed(href, title, text);
-    var vimeoEmbed = convertVimeoFragmentToEmbed(href, title, text);
+    const youtubeEmbed = convertYoutubeFragmentToEmbed(href, title, text);
+    const vimeoEmbed = convertVimeoFragmentToEmbed(href, title, text);
 
     if (youtubeEmbed) {
       out += youtubeEmbed;
@@ -1035,7 +1043,7 @@ function renderImage(href, title, text) {
       out += `<span class="smartdown-swatch" style="background:${bgColor}"></span>`;
     }
     else {
-      var className = imageStyles[text] || imageStyles.default;
+      const className = imageStyles[text] || imageStyles.default;
 
       out += '<img class="' + className + '" src="' + href + '" alt="' + text + '"';
       if (title) {
@@ -1085,7 +1093,7 @@ function renderLink(href, title, text) {
   }
 
   const titleAttr = title ? `title="${title}" ` : '';
-  var linkHead = '<a ' + titleAttr +
+  let linkHead = '<a ' + titleAttr +
                  ' class="smartdown-link" href="' +
                  href;
   if (useNewWindow) {
@@ -1095,17 +1103,16 @@ function renderLink(href, title, text) {
     linkHead += '">';
   }
 
-  var linkBody = text;
-  var lowerhref = href.toLowerCase();
-  var linkTail = '</a>';
-  var result = linkHead + linkBody + linkTail;
+  const linkBody = text;
+  const lowerhref = href.toLowerCase();
+  const linkTail = '</a>';
+  let result = linkHead + linkBody + linkTail;
 
   if (lowerhref.indexOf(smartdownTag) === 0) {
-    var cellscript = decodeInlineScript(href.slice(smartdownTag.length));
-
-    var op = null;
-    var lhs = null;
-    var rhs = null;
+    let cellscript = decodeInlineScript(href.slice(smartdownTag.length));
+    let op = null;
+    let lhs = null;
+    let rhs = null;
 
     if (cellscript.indexOf('?') === 0) {
       op = 'INPUT';
@@ -1134,7 +1141,7 @@ function renderLink(href, title, text) {
     else if (cellscript.indexOf('=') === 0) {
       op = 'CALC';
       cellscript = cellscript.slice(1);
-      var exprs = cellscript.split(';');
+      const exprs = cellscript.split(';');
       if (exprs.length === 1) {
         const eqIndex = cellscript.indexOf('=');
         lhs = [cellscript.slice(0, eqIndex)];
@@ -1143,7 +1150,7 @@ function renderLink(href, title, text) {
       else {
         lhs = [];
         rhs = [];
-        exprs.forEach(e => {
+        exprs.forEach((e) => {
           const eqIndex = e.indexOf('=');
           lhs.push(e.slice(0, eqIndex));
           rhs.push(e.slice(eqIndex + 1));
@@ -1152,7 +1159,7 @@ function renderLink(href, title, text) {
       // console.log('lhs/rhs', lhs, rhs);
     }
     else if (cellscript.indexOf('/') === 0) {
-      var parts2 = cellscript.split('@');
+      const parts2 = cellscript.split('@');
       op = parts2[0];
       lhs = parts2[1];
     }
@@ -1169,14 +1176,14 @@ function renderLink(href, title, text) {
       }
     }
 
-    var newHTML = '';
-    var hasLabel = !!(text && text.length > 0);
+    let newHTML = '';
+    const hasLabel = !!(text && text.length > 0);
     if (op === 'INPUT') {
       uniqueCellIndex++;
-      var inputCellId = 'INPUT' + uniqueCellIndex;
+      const inputCellId = 'INPUT' + uniqueCellIndex;
       const inputCellIdParts = lhs.split(/[|!]/g);
-      var inputType = 'text';
-      var liveBlur = false;
+      let inputType = 'text';
+      let liveBlur = false;
       if (inputCellIdParts.length > 1) {
         lhs = inputCellIdParts[0];
         inputType = inputCellIdParts[1];
@@ -1233,14 +1240,14 @@ function renderLink(href, title, text) {
     }
     else if (op === 'INPUTRANGE') {
       uniqueCellIndex++;
-      var inputRangeCellId = 'INPUTRANGE' + uniqueCellIndex;
+      const inputRangeCellId = 'INPUTRANGE' + uniqueCellIndex;
 
-      var lhsElements = lhs.split('/');
+      const lhsElements = lhs.split('/');
       lhs = lhsElements[0];
 
-      var min = lhsElements[1];
-      var max = lhsElements[2];
-      var step = lhsElements[3];
+      let min = lhsElements[1];
+      let max = lhsElements[2];
+      let step = lhsElements[3];
 
       min = (min && min.length > 0) ? min : 0.0;
       max = (max && max.length > 0) ? max : 100.0;
@@ -1274,7 +1281,7 @@ function renderLink(href, title, text) {
     }
     else if (op === 'INPUTCHECKBOX') {
       uniqueCellIndex++;
-      var inputCheckboxCellId = 'INPUTCHECKBOX' + uniqueCellIndex;
+      const inputCheckboxCellId = 'INPUTCHECKBOX' + uniqueCellIndex;
 
       smartdownCells[inputCheckboxCellId] = {
         cellBinding: lhs,
@@ -1298,11 +1305,11 @@ function renderLink(href, title, text) {
     }
     else if (op === 'CALC') {
       ++uniqueCellIndex;
-      var manualInvoke = hasLabel;
+      const manualInvoke = hasLabel;
       if (hasLabel) {
         text = text.replace(/<code class="hljs-inline">(.+)<\/code>/g, '`$1`');
       }
-      var expr = smartdown.registerExpression(uniqueCellIndex, text, lhs, rhs, hasLabel);
+      const expr = smartdown.registerExpression(uniqueCellIndex, text, lhs, rhs, hasLabel);
       if (manualInvoke) {
         newHTML +=
 `<button
@@ -1341,10 +1348,10 @@ function renderLink(href, title, text) {
     }
     else if (op === 'GET') {
       uniqueCellIndex++;
-      var outputCellId = 'OUTPUT_' + uniqueCellIndex;
+      const outputCellId = 'OUTPUT_' + uniqueCellIndex;
 
       const outputCellIdParts = lhs.split(/[|!]/g);
-      var outputType = 'text';
+      let outputType = 'text';
       let flavors = '';
       if (outputCellIdParts.length > 1) {
         lhs = outputCellIdParts[0];
@@ -1395,7 +1402,7 @@ function renderLink(href, title, text) {
       if (rhs === null) {
         rhs = 'button';
       }
-      var settings = rhs.split(',');
+      const settings = rhs.split(',');
       if (settings.includes('link') || settings.includes('tooltip')) {
         rhs = 'link';
       }
@@ -1443,7 +1450,7 @@ function renderParagraph(text) {
   }
 
   const pClass = isInline ? 'smartdown_p_inline' : 'smartdown_p';
-  var result =
+  const result =
 `<p class="${pClass}">${text}</p>
 `;
 
@@ -1577,7 +1584,7 @@ const tokenizer = {
 
       return result;
       // src = src.substring(cap[0].length);
-      // var escaped = cap[0].replace(/</g, '< ');
+      // const escaped = cap[0].replace(/</g, '< ');
       // out += escaped;
       // continue;
     }
@@ -1603,10 +1610,10 @@ const markedOpts = {
   smartypants: false,
   langPrefix: 'hljs ',
   highlight: function (code, lang) {    // , callback)
-    var playableType = playableTypes[lang];
-    var result;
+    const playableType = playableTypes[lang];
+    let result;
     if (lang && playableType) {
-      var mappedLanguage = playableType ? playableType.highlight : lang;
+      const mappedLanguage = playableType ? playableType.highlight : lang;
       result = hljs.highlightAuto(code, [mappedLanguage]);
     }
     else {
@@ -1631,11 +1638,11 @@ function enhanceMarkedAndOpts() {
 
 function partitionMultipart(markdown) {
   markdown = '\n' + markdown; // deal with lack of leading \n
-  var splits = markdown.split(/\n# ([a-zA-Z0-9_]+)\n---\n/);
-  var result = {
+  const splits = markdown.split(/\n# ([a-zA-Z0-9_]+)\n---\n/);
+  const result = {
   };
-  var firstKey = null;
-  for (var i = 1; i < splits.length; i += 2) {
+  let firstKey = null;
+  for (let i = 1; i < splits.length; i += 2) {
     result[splits[i]] = splits[i + 1];
     if (!firstKey) {
       firstKey = splits[i];
@@ -1665,12 +1672,12 @@ function registerExpression(cellIndex, labelText, lhss, rhss, manual) {
   labelText = labelText.replace(/<code>/g, '`');
   labelText = labelText.replace(/<\/code>/g, '`');
 
-  var types = [];
+  const types = [];
 
   for (let i = 0; i < lhss.length; ++i) {
     let lhs = lhss[i];
     const calcCellIdParts = lhs.split(/[|!]/g);
-    var calcType = 'text';
+    let calcType = 'text';
     if (calcCellIdParts.length > 1) {
       lhs = calcCellIdParts[0];
       calcType = calcCellIdParts[1];
@@ -1679,11 +1686,11 @@ function registerExpression(cellIndex, labelText, lhss, rhss, manual) {
     types.push(calcType);
   }
 
-  var rootDivId = currentRenderDiv.id;
-  var exprId = `expr-${cellIndex}`;
-  var labelId = `label-${exprId}`;
+  const rootDivId = currentRenderDiv.id;
+  const exprId = `expr-${cellIndex}`;
+  const labelId = `label-${exprId}`;
 
-  var expr = {
+  const expr = {
     rootDivId: rootDivId,
     exprId: exprId,
     labelId: labelId,
@@ -1703,14 +1710,14 @@ function registerExpression(cellIndex, labelText, lhss, rhss, manual) {
 
 function expandStringWithSubstitutions(expr) {
   if (expr.indexOf('`') >= 0) {
-    var newExpr = '';
-    var splits = expr.split('`');
-    for (var i = 0; i < splits.length; ++i) {
-      var prefix = splits[i];
+    let newExpr = '';
+    const splits = expr.split('`');
+    for (let i = 0; i < splits.length; ++i) {
+      const prefix = splits[i];
       newExpr += prefix;
       if (i < splits.length - 1) {
-        var varName = splits[++i];
-        var varValue = smartdownVariables[varName];
+        const varName = splits[++i];
+        const varValue = smartdownVariables[varName];
         if (varValue) {
           newExpr += `${varValue}`;
         }
@@ -1725,21 +1732,18 @@ function expandStringWithSubstitutions(expr) {
   return expr;
 }
 
-
 function computeExpressions() {
-  // console.log('computeExpressions', perPageState.expressionsRegistered);
-  /* eslint-disable guard-for-in */
-
-  for (var exprId in perPageState.expressionsRegistered) {
-    const entry = perPageState.expressionsRegistered[exprId];
+  const expressions = perPageState.expressionsRegistered;
+  Object.keys(expressions).forEach((exprId) => {
+    const entry = expressions[exprId];
     if (!entry) {
       console.log('computeExpressions DELETED', exprId);
     }
     else if (entry.manual) {
       // console.log('compute manual', entry, entry.labelId);
       if (entry.labelId) {
-        // var rootDiv = document.getElementById(entry.rootDivId);
-        var labelElement = document.getElementById(entry.labelId);
+        // const rootDiv = document.getElementById(entry.rootDivId);
+        const labelElement = document.getElementById(entry.labelId);
         if (!labelElement) {
           // console.log('computeExpressions NO LABEL', entry, entry.labelId, entry.rootDivId, rootDiv);
           // debugger;
@@ -1756,13 +1760,12 @@ function computeExpressions() {
       entry.computed = true;
       smartdown.computeExpression(entry);
     }
-  }
-  /* eslint-enable guard-for-in */
+  });
 }
 
 function registerPlayable(prelude, language, renderDivId, divId, preId, dbgId, dbgToggleId, consoleId, consoleToggleId, functionId, playId, stopId, progressId, autoplay, isModule, code, transform, targetDivId) {
-  var augmentedCode = code;
-  var playableType = playableTypes[language];
+  let augmentedCode = code;
+  const playableType = playableTypes[language];
 
   const imports = prelude.imports;
   const includes = prelude.includes;
@@ -1955,7 +1958,7 @@ async function runModule(playable, argValues) {
   const embedThis = playable.embedThis;
   // console.log('runModule', playable, embedThis, code.slice(0, 50));
 
-  var s = document.createElement('script');
+  const s = document.createElement('script');
   playable.es6ModuleScript = s;
   if (smartdown.es6Playables[divId]) {
     console.log('runModule error: smartdown.es6Playables[divId] exists', divId, smartdown.es6Playables[divId]);
@@ -1998,14 +2001,14 @@ smartdown.es6Playables[augmentedDivId].glueStart();
 async function playPlayableInternal(language, divId) {
   // console.log('playPlayableInternal', divId);
 
-  var playable = perPageState.playablesRegistered[divId];
-  var div = document.getElementById(playable.divId);
-  var divPre = document.getElementById(playable.preId);
-  // var divDbg = document.getElementById(playable.dbgId);
-  // var divDbgToggle = document.getElementById(playable.dbgToggleId);
-  var play = document.getElementById(playable.playId);
-  var stop = document.getElementById(playable.stopId);
-  var progress = document.getElementById(playable.progressId);
+  const playable = perPageState.playablesRegistered[divId];
+  const div = document.getElementById(playable.divId);
+  const divPre = document.getElementById(playable.preId);
+  // const divDbg = document.getElementById(playable.dbgId);
+  // const divDbgToggle = document.getElementById(playable.dbgToggleId);
+  const play = document.getElementById(playable.playId);
+  const stop = document.getElementById(playable.stopId);
+  const progress = document.getElementById(playable.progressId);
   if (play) {
     play.style.display = 'none';
     stop.style.display = 'inline-block';
@@ -2021,10 +2024,9 @@ async function playPlayableInternal(language, divId) {
   if (div) {
     div.style.display = playable.targetDivId ? 'inline' : 'block';
   }
-  var playableType = playableTypes[language];
+  const playableType = playableTypes[language];
   if (playableType.javascript) {
-    /* eslint no-new-func: 0 */
-    var argValues = [
+    const argValues = [
       playable,
       smartdownVariables,
       P5.Loader,
@@ -2077,8 +2079,8 @@ async function playPlayableInternal(language, divId) {
       /* eslint no-inner-declarations: 0 */
       function patchedDisposeSound() {
         /* eslint no-invalid-this: 0 */
-        for (var i = 0; i < P5.Loader.soundOut.soundArray.length; i++) {
-          var soundResource = P5.Loader.soundOut.soundArray[i];
+        for (let i = 0; i < P5.Loader.soundOut.soundArray.length; i++) {
+          const soundResource = P5.Loader.soundOut.soundArray[i];
           if (!soundResource.owner ||
               soundResource.owner === this) {
             // console.log('DISPOSE [' + i + '] disposeSound soundResource:', soundResource);
@@ -2087,18 +2089,18 @@ async function playPlayableInternal(language, divId) {
         }
       }
 
-      var removeHandlers = P5.Loader.prototype._registeredMethods.remove;
-      for (var i = 0; i < removeHandlers.length; ++i) {
+      const removeHandlers = P5.Loader.prototype._registeredMethods.remove;
+      for (let i = 0; i < removeHandlers.length; ++i) {
         if (removeHandlers[i] === P5.Loader.prototype.disposeSound) {
           removeHandlers[i] = patchedDisposeSound;
         }
       }
 
-      // var oldmousemove = P5.Loader.prototype._onmousemove;
+      // const oldmousemove = P5.Loader.prototype._onmousemove;
       // P5.Loader.prototype._onmousemove = function(e) {
       //   console.log('onmousemove', e);
       // };
-      // var oldtouchend = P5.Loader.prototype._ontouchend;
+      // const oldtouchend = P5.Loader.prototype._ontouchend;
       P5.Loader.prototype._ontouchend = function (e) {
         // Smartdown addition to capture page dimensions
         e.clientX = e.pageX;
@@ -2115,8 +2117,8 @@ async function playPlayableInternal(language, divId) {
         if (this.touches.length === 0) {
           this._setProperty('touchIsDown', false);
         }
-        var context = this._isGlobal ? window : this;
-        var executeDefault;
+        const context = this._isGlobal ? window : this;
+        let executeDefault;
         if (typeof context.touchEnded === 'function') {
           executeDefault = context.touchEnded(e);
           if (executeDefault === false) {
@@ -2131,6 +2133,7 @@ async function playPlayableInternal(language, divId) {
         }
       };
 
+      /* eslint-disable-next-line @typescript-eslint/no-implied-eval */
       let func = new Function(...playableArgNames, playable.augmentedCode);
       playable.embedThis.IAMP5 = 'IAMP5';
       func = func.bind(
@@ -2139,14 +2142,14 @@ async function playPlayableInternal(language, divId) {
       );
 
       try {
-        var myP5 = new P5.Loader(func, div);
+        const myP5 = new P5.Loader(func, div);
         if (myP5._targetFrameRate === 60) {
           myP5.frameRate(16);
         }
         myP5._onresize();
         function keydownHandler(e) {
           // console.log('keydownHandler', e.target.tagName, e);
-          var ignoreKeys = [
+          const ignoreKeys = [
             myP5.LEFT_ARROW,
             myP5.RIGHT_ARROW,
             myP5.UP_ARROW,
@@ -2179,7 +2182,6 @@ ${e}
 
     if (playable && playable.playing) {
       const { depend, dependOn } = playable.embedThis;
-      const progress = playable.embedThis.progress;
       let atLeastOneDefined = false;
 
       if (Array.isArray(dependOn)) {
@@ -2238,11 +2240,11 @@ ${e}
   else if (language === 'graphviz') {
     div.innerHTML = '';
     window.smartdownJSModules.graphviz.loader(function () {
-      var options = {
+      const options = {
         images: graphvizImages
       };
 
-      (new window.Viz()).renderString(playable.code, options).then(result => {
+      (new window.Viz()).renderString(playable.code, options).then((result) => {
         if (progress) {
           progress.style.display = 'none';
         }
@@ -2319,11 +2321,11 @@ function recursivelyLoadImports(language, divId, importsRemaining, done) {
 
 function playPlayable(language, divId) {
   // console.log('playPlayable', divId);
-  var playable = perPageState.playablesRegistered[divId];
+  const playable = perPageState.playablesRegistered[divId];
   if (playable) {
     const importsRemaining = playable.imports.slice(0);  // Copy
 
-    var progress = document.getElementById(playable.progressId);
+    const progress = document.getElementById(playable.progressId);
     progress.style.display = playable.targetDivId ? 'inline-block' : 'block';
 
     recursivelyLoadImports(language, divId, importsRemaining, function() {
@@ -2338,16 +2340,16 @@ function playPlayable(language, divId) {
 
 
 function resetPlayable(language, divId, throwAway) {
-  var playable = perPageState.playablesRegistered[divId];
+  const playable = perPageState.playablesRegistered[divId];
   if (!playable.playing) {
     // console.log('resetPlayable NOT PLAYING', language, divId);
   }
   else {
     // console.log('resetPlayable PLAYING', playable.divId, playable);
-    var div = document.getElementById(playable.divId);
-    var play = document.getElementById(playable.playId);
-    var stop = document.getElementById(playable.stopId);
-    var progress = document.getElementById(playable.progressId);
+    const div = document.getElementById(playable.divId);
+    const play = document.getElementById(playable.playId);
+    const stop = document.getElementById(playable.stopId);
+    const progress = document.getElementById(playable.progressId);
     if (play) {
       play.style.display = 'inline-block';
       stop.style.display = 'none';
@@ -2357,12 +2359,12 @@ function resetPlayable(language, divId, throwAway) {
       progress.style.display = 'none';
     }
 
-    var divPre = document.getElementById(playable.preId);
+    const divPre = document.getElementById(playable.preId);
     if (divPre && !throwAway) {
       divPre.style.display = 'block';
     }
 
-    var playableType = playableTypes[language];
+    const playableType = playableTypes[language];
 
     playable.playing = false;
     div.parentElement.classList.remove('playable-playing');
@@ -2375,14 +2377,14 @@ function resetPlayable(language, divId, throwAway) {
         func();
       });
       if (language.toLowerCase() === 'p5js') {
-        var myP5 = playable.p5;
+        const myP5 = playable.p5;
         if (myP5) {
           window.removeEventListener('keydown', myP5.keydownHandler);
           // myP5.noLoop();
           playable.p5 = null;
           myP5.remove();
           if (div) {
-            var canvas = div.getElementsByTagName('canvas');
+            const canvas = div.getElementsByTagName('canvas');
             if (canvas && canvas.length > 0) {
               div.removeChild(canvas[0]);
             }
@@ -2424,7 +2426,7 @@ function resetPlayable(language, divId, throwAway) {
 
 
 function toggleDebug(divId) {
-  var div = document.getElementById(divId);
+  const div = document.getElementById(divId);
   const newStyle = (div.style.display === 'block' ? 'none' : 'block');
   div.style.display = newStyle;
 }
@@ -2432,7 +2434,7 @@ function toggleDebug(divId) {
 
 
 function toggleConsole(divId) {
-  var div = document.getElementById(divId);
+  const div = document.getElementById(divId);
   if (div) {
     const newStyle = (div.style.display === 'block' ? 'none' : 'block');
     div.style.display = newStyle;
@@ -2442,7 +2444,7 @@ function toggleConsole(divId) {
 
 function consoleWrite(playable, args) {
   let msg = '';
-  args.forEach(arg => {
+  args.forEach((arg) => {
     if (typeof arg === 'object') {
       arg = JSON.stringify(arg, null, 2);
     }
@@ -2472,12 +2474,12 @@ function consoleWrite(playable, args) {
 
 
 function activateDraggableDisclosure(divId) {
-  var div = document.getElementById(divId);
+  const div = document.getElementById(divId);
   // const body = document.getElementsByTagName('body')[0];
   const baseContainer = div.parentElement;
-  var divHeader = document.getElementById(divId + '_header');
-  var offsetX = 0;
-  var offsetY = 0;
+  const divHeader = document.getElementById(divId + '_header');
+  let offsetX = 0;
+  let offsetY = 0;
 
   function closeDragElement() {
     document.onmouseup = null;
@@ -2548,7 +2550,7 @@ function activateDraggableDisclosure(divId) {
 
 
 function deactivateOnMouseLeave(divId, overrideLocked) {
-  var div = document.getElementById(divId);
+  const div = document.getElementById(divId);
 
   if (overrideLocked || !div.disclosableLocked) {
     window.clearTimeout(div.disclosableTimer);
@@ -2669,7 +2671,7 @@ class DisclosableSettings {
 
 function parseDisclosureSettings(settingsStr) {
   const settings = new DisclosableSettings();
-  let options = settingsStr.split(',');
+  const options = settingsStr.split(',');
 
   if (options.includes('transparent')) {
     // pass
@@ -2773,11 +2775,11 @@ function parseDisclosureSettings(settingsStr) {
 function showDisclosure(divId, triggerId, settingsStr) {
   const settings = parseDisclosureSettings(settingsStr);
 
-  var div = document.getElementById(divId);
+  const div = document.getElementById(divId);
   if (div) {
     div.classList.remove('disclosable-draggable', 'disclosable-scrollable', 'disclosable-shadow', 'disclosable-lightbox', 'disclosable-outline', 'disclosable-transparent');
 
-    var contentDiv = div.querySelector('.disclosable-content');
+    const contentDiv = div.querySelector('.disclosable-content');
     contentDiv.classList.remove('disclosable-scrollable-content', 'disclosable-shadow-content', 'disclosable-lightbox-content', 'disclosable-outline-content', 'disclosable-transparent-content');
     div.classList.add('disclosable-open');
     if (settings.scrollable) {
@@ -2793,7 +2795,7 @@ function showDisclosure(divId, triggerId, settingsStr) {
       contentDiv.classList.add(`disclosable-${settings.decorationsInner[i]}`);
     }
 
-    var headerDiv = document.getElementById(`${divId}_header`);
+    const headerDiv = document.getElementById(`${divId}_header`);
     headerDiv.classList.remove('disclosable-header-position');
     headerDiv.innerHTML = '';
 
@@ -2824,10 +2826,10 @@ function showDisclosure(divId, triggerId, settingsStr) {
 
 function hideDisclosure(divId, settingsStr) {
   const settings = parseDisclosureSettings(settingsStr);
-  var div = document.getElementById(divId);
+  const div = document.getElementById(divId);
 
   if (div) {
-    var contentDiv = div.querySelector('.disclosable-content');
+    const contentDiv = div.querySelector('.disclosable-content');
 
     div.classList.remove('disclosable-open');
 
@@ -2871,7 +2873,7 @@ function isFullscreen() {
 // https://www.w3schools.com/howto/howto_js_fullscreen.asp
 /* View in fullscreen */
 function openFullscreen() {
-  var elem = document.documentElement;
+  const elem = document.documentElement;
   if (elem.requestFullscreen) {
     elem.requestFullscreen();
   }
@@ -2888,7 +2890,7 @@ function openFullscreen() {
 
 /* Close fullscreen */
 function closeFullscreen() {
-  // var elem = document.documentElement;
+  // const elem = document.documentElement;
   if (document.exitFullscreen) {
     document.exitFullscreen();
   }
@@ -2909,11 +2911,11 @@ function toggleKiosk(divId, event) {
     event.stopPropagation();
   }
 
-  var div = document.getElementById(divId);
+  const div = document.getElementById(divId);
   div.parentElement.classList.toggle('smartdown-playable-kiosk');
   div.scrollIntoView();
 
-  var playable = perPageState.playablesRegistered[divId];
+  const playable = perPageState.playablesRegistered[divId];
   if (playable && playable.p5) {
     playable.p5._onresize();
   }
@@ -2934,11 +2936,11 @@ function toggleDisclosure(divId, triggerId, settingsStr) {
     // this will need to be added when we have a datastructure for
     // disclosables.  A list of triggers to update.
     // maybe we could make an updateTriggerButton function
-    // var openedSpan = document.getElementById(`span_${divId}_opened`);
+    // const openedSpan = document.getElementById(`span_${divId}_opened`);
     // if (openedSpan) {
     //   openedSpan.style.display = willBeOpen ? 'inline' : 'none';
     // }
-    // var closedSpan = document.getElementById(`span_${divId}_closed`);
+    // const closedSpan = document.getElementById(`span_${divId}_closed`);
     // if (closedSpan) {
     //   closedSpan.style.display = willBeOpen ? 'none' : 'inline';
     // }
@@ -2954,7 +2956,7 @@ function toggleDisclosure(divId, triggerId, settingsStr) {
 
 
 function activateOnMouseLeave(divId, settingsStr) {
-  var div = document.getElementById(divId);
+  const div = document.getElementById(divId);
   if (div) {
     window.clearTimeout(div.disclosableTimer);
     div.disclosableTimer = null;
@@ -2966,7 +2968,7 @@ function activateOnMouseLeave(divId, settingsStr) {
       div.disclosableTimer = null;
     };
 
-    div.onmouseleave = e => {
+    div.onmouseleave = (e) => {
       if (
         (e.pageX <= div.offsetLeft) ||
         (e.pageX >= div.offsetLeft + div.offsetWidth) ||
@@ -3041,8 +3043,8 @@ function startAutoplay(outputDiv) {
     lodashEach(perPageState.playablesRegisteredOrder, function(playable) {
       // console.log('startAutoplay', outputDiv, outputDiv.id, playable);
       if (playable.autoplay && !playable.playing) {
-        var sel = '#' + outputDiv.id + ' #' + playable.divId;
-        var divHere = document.querySelectorAll(sel);
+        const sel = '#' + outputDiv.id + ' #' + playable.divId;
+        const divHere = document.querySelectorAll(sel);
         if (divHere && divHere.length > 0) {
           playPlayable(
             playable.language,
@@ -3065,15 +3067,16 @@ function resetPerPageState() {
 
 function cleanupOrphanedStuff() {
   const newER = {};
-  /* eslint-disable guard-for-in */
-  for (var exprId in perPageState.expressionsRegistered) {
-    const expr = perPageState.expressionsRegistered[exprId];
+  const expressions = perPageState.expressionsRegistered;
+
+  Object.keys(expressions).forEach((exprId) => {
+    const expr = expressions[exprId];
     if (!expr) {
       // console.log('cleanupOrphanedStuff expr DELETED', exprId);
     }
     else {
-      var element = document.getElementById(expr.rootDivId);
-      var labelElement = document.getElementById(expr.labelId);
+      const element = document.getElementById(expr.rootDivId);
+      const labelElement = document.getElementById(expr.labelId);
       // console.log('cleanupOrphanedStuff/expr', expr.rootDivId, expr);
       if (element && labelElement) {
         newER[expr.exprId] = expr;
@@ -3083,8 +3086,7 @@ function cleanupOrphanedStuff() {
         // console.log('...cleanupOrphanedStuff/expr divs not found', expr.rootDivId, expr.labelId, expr, element, labelElement);
       }
     }
-  }
-  /* eslint-enable guard-for-in */
+  });
 
   perPageState.expressionsRegistered = newER;
 
@@ -3093,7 +3095,7 @@ function cleanupOrphanedStuff() {
 
   lodashEach(perPageState.playablesRegisteredOrder, function (playable) {
     // console.log('cleanupOrphanedStuff/playable', playable.divId, playable);
-    var element1 = document.getElementById(playable.divId);
+    const element1 = document.getElementById(playable.divId);
 
     if (element1) {
       newPRO.push(playable);
@@ -3136,13 +3138,13 @@ function resetAllPlayables(outputDiv, throwAway) {
 
 
 function transformPlayables(outputDiv, done) {
-  var playablesToTransform = [];
+  const playablesToTransform = [];
   if (window.godownTranslate) {
     lodashEach(perPageState.playablesRegisteredOrder, function (playable) {
       if (playable.transform) {
         if (outputDiv.id) {
-          var sel = '#' + outputDiv.id + ' #' + playable.divId;
-          var divHere = document.querySelectorAll(sel);
+          const sel = '#' + outputDiv.id + ' #' + playable.divId;
+          const divHere = document.querySelectorAll(sel);
           if (divHere && divHere.length > 0) {
             playablesToTransform.push(playable);
           }
@@ -3156,16 +3158,16 @@ function transformPlayables(outputDiv, done) {
       slicedDone();
     }
     else {
-      var playable = slicedPlayablesToTransform[0];
-      var code = playable.code;
-      var packageIndex = code.indexOf('package ');
+      const playable = slicedPlayablesToTransform[0];
+      const code = playable.code;
+      const packageIndex = code.indexOf('package ');
 
       if (packageIndex === 0) {
-        var packageEndIndex = code.indexOf('\n');
+        const packageEndIndex = code.indexOf('\n');
         if (packageEndIndex !== 0) {
-          var packageName = code.slice('package '.length, packageEndIndex);
+          const packageName = code.slice('package '.length, packageEndIndex);
 
-          var divAccessCode =
+          const divAccessCode =
 `
 window.godownDiv_${packageName} = '${playable.divId}';
 console.log('window.godownDiv_${packageName}', window.godownDiv_${packageName});
@@ -3191,7 +3193,7 @@ console.log('window.godownDiv_${packageName}', window.godownDiv_${packageName});
 
 function setLinkRules(_linkRules) {
   linkRules.length = 0;
-  _linkRules.forEach(link => {
+  _linkRules.forEach((link) => {
     linkRules.push(link);
   });
 }
@@ -3222,9 +3224,13 @@ function setLinkRules(_linkRules) {
 
 function configure(options, loadedHandler) {
   const media = options.media;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   const _baseURL = options.baseURL;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   const _cardLoader = options.cardLoader;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   const _calcHandlers = options.calcHandlers;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   const _linkRules = options.linkRules;
 
   document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -3253,17 +3259,8 @@ function configure(options, loadedHandler) {
   /* eslint no-trailing-spaces: 0 */
   /* global smartdown */
 
-  function svgLoaded() {
-    /* eslint no-invalid-this: 0 */
-    var sourceText = this.responseText;
-    var media = mediaRegistry[this.svgKey];
-    media.svgData = sourceText;
-    media.type = 'svginline';
-    // console.log('svgLoaded', this.svgKey, media, sourceText.slice(0, 40));
-  }
-
-  for (var key in mediaRegistry) {
-    var url = mediaRegistry[key];
+  Object.keys(mediaRegistry).forEach((key) => {
+    const url = mediaRegistry[key];
     mediaRegistry[key] = {
       type: '',
       url: '',
@@ -3278,7 +3275,15 @@ function configure(options, loadedHandler) {
       mediaRegistry[key].svgData = url;
     }
     else if (url.endsWith('.svg')) {
-      var oReq = new XMLHttpRequest();
+      function svgLoaded() {
+        /* eslint no-invalid-this: 0 */
+        const sourceText = this.responseText;
+        const svgMedia = mediaRegistry[this.svgKey];
+        svgMedia.svgData = sourceText;
+        svgMedia.type = 'svginline';
+      }
+
+      const oReq = new XMLHttpRequest();
       oReq.svgKey = key;
       oReq.addEventListener('load', svgLoaded);
       mediaRegistry[key].type = 'svg';
@@ -3292,7 +3297,7 @@ function configure(options, loadedHandler) {
       mediaRegistry[key].url = url;
       mediaRegistry[key].expandedurl = expandHrefWithLinkRules(url);
     }
-  }
+  });
 
   window.smartdown.baseURL = _baseURL || (window.location.origin + '/');
 
@@ -3317,8 +3322,10 @@ function configure(options, loadedHandler) {
     AuthorInit: function() {
       const MathJax = window.MathJax;
       MathJax.Ajax.fileRev = function (file) {
-        var ver = MathJax.cdnFileVersions[file] || MathJax.cdnVersion || '';
-        if (ver) ver = '?ver='+ver;
+        let ver = MathJax.cdnFileVersions[file] || MathJax.cdnVersion || '';
+        if (ver) {
+          ver = '?ver=' + ver;
+        }
         if (file.indexOf('xypic.js') !== -1) {
           ver = '';
         }
@@ -3335,12 +3342,12 @@ function configure(options, loadedHandler) {
   if (useMathJax) {
     const mathjaxURL = testing ?
       // 'https://localhost:8080/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured' :
-      'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured' :
-      'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured';
+      'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured' :
+      'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured';
 
     importScriptUrl(
       mathjaxURL,
-      //xyjax doesn't work here
+      // xyjax doesn't work here
       function() {
         mathjaxConfigure();
 
@@ -3373,26 +3380,26 @@ function configure(options, loadedHandler) {
  */
 
 
-function initialize(media, baseURL, loadedHandler, cardLoader, calcHandlers, linkRules) {
+function initialize(media, baseURL, loadedHandler, cardLoaderArg, calcHandlersArg, linkRulesArg) {
   const options = {
     media,
     baseURL,
-    cardLoader,
-    calcHandlers,
-    linkRules,
+    cardLoader: cardLoaderArg,
+    calcHandlers: calcHandlersArg,
+    linkRules: linkRulesArg,
   };
 
   configure(options, loadedHandler);
 }
 
-var patchesUnresolvedKludgeLimit = 0;
+let patchesUnresolvedKludgeLimit = 0;
 
 async function renderCell(cellID, variableId, newValue) {
   const cellInfo = smartdownCells[cellID];
 
-  var element = document.getElementById(cellID);
+  const element = document.getElementById(cellID);
   // console.log('renderCell', cellInfo, newValue, element, element.type, element.tagName, cellInfo.cellType, cellInfo.datatype, s);
-  var s = JSON.stringify(newValue, null, 2);
+  let s = JSON.stringify(newValue, null, 2);
   if (s) {
     s = s.slice(0, 20);
   }
@@ -3498,10 +3505,10 @@ return (async () => {
     element.innerHTML = '';
     if (typeof newValue === 'string' && newValue.length > 0) {
       window.smartdownJSModules.graphviz.loader(function () {
-        var options = {
+        const options = {
           images: graphvizImages
         };
-        (new window.Viz()).renderString(newValue, options).then(result => {
+        (new window.Viz()).renderString(newValue, options).then((result) => {
           element.innerHTML = result;
         });
       });
@@ -3522,9 +3529,9 @@ return (async () => {
     // console.log('array', newValue, newValue.elementType);
     const isImage = newValue.elementType === 'image';
     const isURLTitle = newValue.elementType === 'title/url';
-    var elementList = '<ul class="infocell-output-list">';
-    for (var elementIndex = 0; elementIndex < newValue.length; ++elementIndex) {
-      var newElement = newValue[elementIndex];
+    let elementList = '<ul class="infocell-output-list">';
+    for (let elementIndex = 0; elementIndex < newValue.length; ++elementIndex) {
+      const newElement = newValue[elementIndex];
       if (isImage) {
         elementList += '<li><img src="' + newElement + '"></li>';
       }
@@ -3535,7 +3542,7 @@ return (async () => {
         elementList += '<li>' + newElement + '</li>';
       }
       else {
-        elementList += '<li>' + '<pre class="infocell-output-pre">' + JSON.stringify(newElement, null, 2) + '</pre>' + '</li>';
+        elementList += `<li><pre class="infocell-output-pre">${JSON.stringify(newElement, null, 2)}</pre></li>`;
       }
     }
     elementList += '</ul>';
@@ -3551,17 +3558,15 @@ return (async () => {
   else if (newValue === undefined) {
     element.innerHTML = '';
   }
+  else if (element.tagName === 'TEXTAREA') {
+    element.value = newValue; // newValue.replace('\n', '<br>');
+  }
+  else if (typeof newValue === 'string') {
+    element.innerHTML = entityEscape(newValue); // .replace(/\n/g, '<br>');
+  }
   else {
-    if (element.tagName === 'TEXTAREA') {
-      element.value = newValue; // newValue.replace('\n', '<br>');
-    }
-    else if (typeof newValue === 'string') {
-      element.innerHTML = entityEscape(newValue); // .replace(/\n/g, '<br>');
-    }
-    else {
-      element.innerHTML = newValue; //  = newValue.replace(/\n/g, '<br>');
-      element.value = newValue; //  = newValue.replace(/\n/g, '<br>');
-    }
+    element.innerHTML = newValue; //  = newValue.replace(/\n/g, '<br>');
+    element.value = newValue; //  = newValue.replace(/\n/g, '<br>');
   }
 }
 
@@ -3599,7 +3604,7 @@ async function updateProcesses(id, newValue) {
 
   lodashEach(perPageState.playablesRegisteredOrder, async function (playable) {
     if (playable) {
-      let progress = document.getElementById(playable.progressId);
+      const progress = document.getElementById(playable.progressId);
 
       if (playable.playing) {
         const {depend, dependOn} = playable.embedThis;
@@ -3610,17 +3615,15 @@ async function updateProcesses(id, newValue) {
 
             if (dependOn) {
               let atLeastOneUndefined = false;
-              dependOn.forEach(varname => {
+              dependOn.forEach((varname) => {
                 const oldValue = playable.dependLastValues[varname];
-                const newValue = smartdownVariables[varname];
-                playable.dependLastValues[varname] = newValue;
-                if (newValue === undefined) {
+                const newerValue = smartdownVariables[varname];
+                playable.dependLastValues[varname] = newerValue;
+                if (newerValue === undefined) {
                   atLeastOneUndefined = true;
                 }
 
-                // console.log('............varname', varname, oldValue, newValue);
-
-                if (!areValuesSameEnough(varname, oldValue, newValue)) {
+                if (!areValuesSameEnough(varname, oldValue, newerValue)) {
                   signal = true;
                 }
               });
@@ -3641,24 +3644,22 @@ async function updateProcesses(id, newValue) {
           }
         }
         else if (dependOn) {
-          for (const varname in dependOn) {
+          Object.keys(dependOn).forEach((varname) => {
             const oldValue = playable.dependLastValues[varname];
-            const newValue = smartdownVariables[varname];
-            playable.dependLastValues[varname] = newValue;
+            const newerValue = smartdownVariables[varname];
+            playable.dependLastValues[varname] = newerValue;
 
-            if (!areValuesSameEnough(varname, oldValue, newValue)) {
+            if (!areValuesSameEnough(varname, oldValue, newerValue)) {
               if (progress) {
                 progress.style.display = 'none';
               }
               dependOn[varname].apply(playable.embedThis);
             }
-          }
+          });
         }
       }
-      else {
-        if (progress) {
-          progress.style.display = 'none';
-        }
+      else if (progress) {
+        progress.style.display = 'none';
       }
     }
   });
@@ -3690,7 +3691,7 @@ function propagateChangedVariable(id, newValue, force) {
 
 function ensureCells() {
   lodashEach(smartdownCells, function(newCell, cellID) {
-    var element = document.getElementById(cellID);
+    const element = document.getElementById(cellID);
     if (!element) {
       // console.log('...ensureCells element for cellID not found', cellID, smartdownCells[cellID]);
       delete smartdownCells[cellID];
@@ -3700,8 +3701,8 @@ function ensureCells() {
 
 
 function ensureVariables() {
-  lodashEach(smartdownCells, function(newCell /*, cellID */) {
-    let oldValue = smartdownVariables[newCell.cellBinding];
+  lodashEach(smartdownCells, function(newCell) {
+    const oldValue = smartdownVariables[newCell.cellBinding];
     changeVariable(newCell.cellBinding, oldValue);
   });
 }
@@ -3712,19 +3713,19 @@ function resetVariables() {
   ensureVariables();
 }
 
-var scrollHoverDisableEnabled = false;
-var lastY;
+let scrollHoverDisableEnabled = false;
+let lastY;
 
 function setupScrollHoverDisable() {
   lastY = 0;
   if (!scrollHoverDisableEnabled) {
-    var timer;
+    let timer;
     scrollHoverDisableEnabled = true;
     // https://www.thecssninja.com/css/pointer-events-60fps
-    var body = document.getElementsByTagName('body')[0];
+    const body = document.getElementsByTagName('body')[0];
     window.addEventListener('scroll', function() {
-      var currentY = window.scrollY;
-      var delta = Math.abs(lastY - currentY);
+      const currentY = window.scrollY;
+      const delta = Math.abs(lastY - currentY);
 
       if (delta > 25) {
         body.classList.add('disable-hover');
@@ -3747,10 +3748,10 @@ function getFrontmatter(md) {
   const fmPrefix = '---\n';
   const fmSuffix = '\n---\n';
   if (md.indexOf(fmPrefix) === 0) {
-    var frontMatterBegin = md.slice(fmPrefix.length - 1);
-    var frontMatterEndIndex = frontMatterBegin.indexOf(fmSuffix);
+    const frontMatterBegin = md.slice(fmPrefix.length - 1);
+    const frontMatterEndIndex = frontMatterBegin.indexOf(fmSuffix);
     if (frontMatterEndIndex >= 0) {
-      let frontMatterText = frontMatterBegin.slice(0, frontMatterEndIndex);
+      const frontMatterText = frontMatterBegin.slice(0, frontMatterEndIndex);
       resultFMText = frontMatterText; // frontMatterBegin.slice(frontMatterEndIndex + fmSuffix.length);
       resultFM = frontMatterText === '' ? {} : jsyaml.load(resultFMText);
       resultMD = frontMatterBegin.slice(frontMatterEndIndex + fmSuffix.length);
@@ -3784,36 +3785,21 @@ function setSmartdown(md, outputDiv, setSmartdownCompleted) {
   // window.getSelection().removeAllRanges();
 
   function completeTypeset() {
-    var resizeTimeout;
+    let resizeTimeout;
 
     function actualResizeHandler() {
-      for (var k in perPageState.playablesRegistered) {
-        var playable = perPageState.playablesRegistered[k];
+      const playables = perPageState.playablesRegistered;
+      Object.keys(playables).forEach((k) => {
+        const playable = playables[k];
         if (playable.playing) {
-          var d = document.getElementById(playable.divId);
+          const d = document.getElementById(playable.divId);
           if (d) {
-            if (playable.language === 'plotly') {
-              try {
-                // Plotly.Plots.resize(d);
-                var newLayout = {
-                  autosize: true
-                };
-                if (smartdownVariables.PLOT_TITLE) {
-                  newLayout.title = smartdownVariables.PLOT_TITLE;
-                }
-                Plotly.relayout(d, newLayout)
-              }
-              catch (e) {
-                // console.log('plotly resize exception:', e);
-                // throw e;
-              }
-            }
-            else if (playable.embedThis && playable.embedThis.sizeChanged) {
+            if (playable.embedThis && playable.embedThis.sizeChanged) {
               playable.embedThis.sizeChanged();
             }
           }
         }
-      }
+      });
     }
 
     function resizeThrottler() {
@@ -3827,9 +3813,8 @@ function setSmartdown(md, outputDiv, setSmartdownCompleted) {
     }
 
     function applyLocalStorage(done) {
-      const doneHandler = done || function done() {};
+      const doneHandler = done || function emptyDone() {};
 
-      // console.log('applyLocalStorage', useLocalForage, smartdown.persistence, fm.markdown);
       if (useLocalForage && smartdown.persistence) {
         localForage.iterate(function(value, key) {
           // Resulting key/value pair -- this callback
@@ -3902,7 +3887,7 @@ function setSmartdown(md, outputDiv, setSmartdownCompleted) {
 
         gifs.forEach((g) => {
           g.addEventListener('click', function (event) {
-            event.stopPropagation()
+            event.stopPropagation();
           });
         });
       }
@@ -4021,13 +4006,13 @@ function setSmartdown(md, outputDiv, setSmartdownCompleted) {
   let result = marked.parser(tokens);
 
   // https://github.com/cure53/DOMPurify/tree/master/demos#advanced-config-demo-link
-  var config = {
+  const config = {
     FORCE_BODY: true,
     ADD_TAGS: ['script', 'iframe'],
     ADD_ATTR: ['onblur', 'oninput', 'onchange', 'onclick', 'onmousedown', 'onmouseup', 'onmouseenter', 'onmouseleave', 'onkeydown', 'onkeyup', 'target', 'allow', 'allowfullscreen'],
   };
 
-  var sanitized = createDOMPurify.sanitize(result, config);
+  const sanitized = createDOMPurify.sanitize(result, config);
   if (result !== sanitized) {
     // console.log('result !== sanitized', result.length, sanitized.length);
     // console.log('-------------------');
@@ -4045,8 +4030,8 @@ function setSmartdown(md, outputDiv, setSmartdownCompleted) {
 
   function applyBackpatches(done) {
     const bp = currentBackpatches[outputDiv.id];
-    var patchesUnresolved = 0;
-    bp.forEach(patch => {
+    let patchesUnresolved = 0;
+    bp.forEach((patch) => {
       if (patch.key) {
         if (patch.replace) {
           // console.log('###Resolved patch', patch.key);
@@ -4094,8 +4079,8 @@ function setSmartdown(md, outputDiv, setSmartdownCompleted) {
       // has broken the mathjax menu.
       //
 
-      // var renderDivId = outputDiv.id + '-render';
-      // var renderDiv = document.getElementById(renderDivId);
+      // const renderDivId = outputDiv.id + '-render';
+      // const renderDiv = document.getElementById(renderDivId);
 
       // if (!renderDiv) {
       //   renderDiv = document.createElement('div');
@@ -4209,8 +4194,8 @@ function set(varnameOrAssignments, varValue, varType) {
 
 function setVariables(assignments) {
   if (Array.isArray(assignments)) {
-    lodashEach(assignments, assignment => {
-      var newValue = assignment.rhs;
+    lodashEach(assignments, (assignment) => {
+      let newValue = assignment.rhs;
       if (assignment.type === 'number') {
         newValue = Number(newValue);
       }
@@ -4218,25 +4203,23 @@ function setVariables(assignments) {
     });
   }
   else {
-    for (let varname in assignments) {
+    Object.keys(assignments).forEach((varname) => {
       changeVariable(varname, assignments[varname]);
-    }
+    });
   }
+
   ensureCells();
   updateProcesses();
 }
 
 
 function computeStoredExpression(exprId) {
-  // console.log('computeStoredExpression', exprId);
-  var entry = perPageState.expressionsRegistered[exprId];
+  const entry = perPageState.expressionsRegistered[exprId];
   if (!entry) {
     console.log('computeStoredExpression no such expression', exprId, perPageState.expressionsRegistered);
     // debugger;
   }
   else if (entry.manual) {
-    // console.log('computeStoredExpression', exprId, entry);
-
     computeExpression(entry, function() {
       updateProcesses();
     });
@@ -4259,9 +4242,7 @@ function computeStoredExpression(exprId) {
 
 
 function computeExpression(entry, done) {
-  var {lhss: lhss, rhss: rhss, types /*, labelId */} = entry;
-  // console.log('computeExpression', lhss, rhss, types, labelId, entry);
-  // console.log(done);
+  const {lhss, rhss, types} = entry;
 
   if (lhss.length !== rhss.length || types.length !== lhss.length) {
     console('lhss.length !== rhss.length || types.length !== lhss.length', lhss.length, rhss.length, types.length);
@@ -4269,10 +4250,20 @@ function computeExpression(entry, done) {
   else {
     let numPending = 0;
 
+    function resolvePending(result, lhs) {
+      propagateChangedVariable(lhs, result);
+      // changeVariable(lhs, result);
+      if (--numPending === 0) {
+        if (done) {
+          done();
+        }
+      }
+    }
+
     for (let i = 0; i < lhss.length; ++i) {
-      let lhs = lhss[i];
+      const lhs = lhss[i];
       let rhs = rhss[i];
-      let type = types[i];
+      const type = types[i];
 
       rhs = expandStringWithSubstitutions(rhs);
       if (lhs === 'TEMPLATECELLID') {
@@ -4284,41 +4275,34 @@ function computeExpression(entry, done) {
       else if (rhs[0] === '/') {
         rhs = rhs.slice(1);
         if (calcHandlers) {
-          var calcParts = rhs.split(/[./[]/);
-          // var bracketIndex = rhs.indexOf('[');
-          // var slashIndex = rhs.indexOf('/');
+          const calcParts = rhs.split(/[./[]/);
+          // const bracketIndex = rhs.indexOf('[');
+          // const slashIndex = rhs.indexOf('/');
 
-          var calcKey = calcParts[0];
-          var calcBody = rhs.slice(calcKey.length);
-          var calcHandler = calcHandlers[calcKey];
+          const calcKey = calcParts[0];
+          const calcBody = rhs.slice(calcKey.length);
+          const calcHandler = calcHandlers[calcKey];
           if (calcHandler) {
             ++numPending;
             calcHandler(calcKey, calcBody, function(result) {
-              propagateChangedVariable(lhs, result);
-              // changeVariable(lhs, result);
-              if (--numPending === 0) {
-                if (done) {
-                  done();
-                }
-              }
-              // console.log('...calcHandler', lhs, oldValue, newValue, entry);
+              resolvePending(result, lhs);
             });
           }
         }
       }
       else {
-        var vars = '';
+        let vars = '';
         lodashEach(smartdownVariables, function (v, k) {
           vars += ',' + k;
         });
         vars = vars.slice(1);
-        var vals = lodashMap(smartdownVariables, function (v) {
+        const vals = lodashMap(smartdownVariables, function (v) {
           return v;
         });
 
-        /* eslint no-new-func: 0 */
-        var f = new Function(vars, 'return ' + rhs + ';');
-        var newValue = f.apply({}, vals);
+        /* eslint-disable-next-line @typescript-eslint/no-implied-eval */
+        const f = new Function(vars, 'return ' + rhs + ';');
+        let newValue = f.apply({}, vals);
         // console.log('#rhs', f, vars, rhs, vals, type);
         if (type === 'number') {
           newValue = Number(newValue);
@@ -4354,13 +4338,13 @@ function goToCard(cardKey, event, outputDivId) {
     cardLoader(cardKey, outputDivId);
   }
   else {
-    var modelAsMarkdown = null;
+    let modelAsMarkdown = null;
 
     if (!cardKey || cardKey === 'Home') {
       modelAsMarkdown = currentMD;
     }
     else {
-      var scriptx = smartdownScriptsMap[cardKey];
+      const scriptx = smartdownScriptsMap[cardKey];
       if (scriptx) {
         modelAsMarkdown = scriptx.text;
       }
@@ -4378,31 +4362,32 @@ function setPersistence(persistence) {
 
 function loadCardsFromDocumentScripts() {
   smartdownScripts.length = 0;
-  for (var k in smartdownScriptsMap) {
+  Object.keys(smartdownScriptsMap).forEach((k) => {
     delete smartdownScriptsMap[k];
-  }
-  var scripts = document.scripts;
-  for (var s in scripts) {
-    var script = scripts[s];
+  });
+
+  const scripts = document.scripts;
+  Object.keys(scripts).forEach((s) => {
+    const script = scripts[s];
     if (script && script.type && script.type === 'text/x-smartdown') {
       smartdownScripts.push(script);
       smartdownScriptsMap[script.id] = script;
     }
-  }
+  });
 }
 
 function getMedia(mediaKey) {
   return mediaRegistry[mediaKey];
 }
 
-var youtubeIframeAPILoaded = false;
-var youtubeIframeAPILoadedCbs = [];
+let youtubeIframeAPILoaded = false;
+let youtubeIframeAPILoadedCbs = [];
 
 function onYouTubeIframeAPIReady() {
   // console.log('onYouTubeIframeAPIReady');
   youtubeIframeAPILoaded = true;
 
-  youtubeIframeAPILoadedCbs.forEach(cb => {
+  youtubeIframeAPILoadedCbs.forEach((cb) => {
     cb();
   });
 
@@ -4421,12 +4406,9 @@ function loadYouTubeIframeAPI(done) {
 function setupYouTubePlayer(div, varName) {
   // console.log('setupYouTubePlayer', div, varName, youtubeIframeAPILoaded);
   if (youtubeIframeAPILoaded) {
-    var playerDiv = document.getElementById(div);
+    const playerDiv = document.getElementById(div);
 
-    var player;
-
-    // console.log('YT', Object.keys(YT), YT.Player);
-    player = new YT.Player(playerDiv, {
+    const player = new YT.Player(playerDiv, {
         events: {
           'onReady': function (/* event */) {
               // console.log('onPlayerReady', event);
@@ -4521,7 +4503,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.61',
+  version: '1.0.62',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,

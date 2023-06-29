@@ -91,7 +91,7 @@ function loadResourceList(thisModule: any): void {
         importCssUrl(
           url,
           function() {
-            thisModule.resourceToLoad = thisModule.resourceToLoad + 1;
+            thisModule.resourceToLoad += 1;
             loadResourceList(thisModule);
           },
           function(e: any) {
@@ -102,7 +102,7 @@ function loadResourceList(thisModule: any): void {
         importScriptUrl(
           url,
           function() {
-            thisModule.resourceToLoad = thisModule.resourceToLoad + 1;
+            thisModule.resourceToLoad += 1;
             loadResourceList(thisModule);
           },
           function(e: any) {
@@ -112,7 +112,7 @@ function loadResourceList(thisModule: any): void {
     }
     else if (typeof resource === 'function') {
       resource();
-      thisModule.resourceToLoad = thisModule.resourceToLoad + 1;
+      thisModule.resourceToLoad += 1;
       loadResourceList(thisModule);
     }
     else {

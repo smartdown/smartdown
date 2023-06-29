@@ -1,4 +1,4 @@
-var assert = require('assert');
+const assert = require('assert');
 
 /* global describe */
 /* global it */

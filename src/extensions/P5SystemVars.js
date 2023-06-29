@@ -1,4 +1,4 @@
-var P5SystemVars = [
+const P5SystemVars = [
   'canvas',
   'frameCount',
 

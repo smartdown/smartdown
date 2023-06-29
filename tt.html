@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <title>Tooltip Test</title>
+
+  <style>
+    #disclosable {
+      border: 2px solid red;
+      display: none;
+      padding: 0;
+      margin: 0;
+    }
+    #disclosable.open {
+      display: inline-block;
+    }
+    #disclosable.tooltip {
+      position: absolute;
+      top: 100px;
+      left: 100px;
+      display: inline-block;
+    }
+
+    #content {
+      border: 2px solid orange;
+      margin: 0;
+      padding: 0;
+    }
+
+    #content-inner p {
+      border: 5px solid green;
+      margin: 0;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <script>
+    window.click = function(e, useTooltip) {
+      var trigger = e.srcElement;
+      console.log('click', e, trigger.clientLeft, trigger.clientTop);
+      var tt = document.getElementById('disclosable');
+      tt.classList.remove('tooltip');
+      tt.classList.remove('open');
+      if (useTooltip) {
+        tt.classList.add('tooltip');
+        tt.style.left = '50%';
+        tt.style.top = '50%';
+      }
+      else {
+        tt.style.left = 0;
+        tt.style.top = 0;
+        tt.classList.add('open');
+      }
+    }
+  </script>
+
+  <div>
+    <h1>Click any of the links below to invoke tooltip</h1>
+
+    <ul>
+    <li><button onclick="window.click(event, false)">Show Me</button></li>
+    <li><button onclick="window.click(event, true)">Tooltip Me</button></li>
+    </ul>
+
+
+    <div id="disclosable">
+      <div id="content">
+        <div id="content-inner">
+          <p>Hullo World</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+
+

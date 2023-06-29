@@ -8,10 +8,8 @@
 /* global smartdownOutputDivSelector */
 /* global smartdownPostLoadMutator */
 /* global smartdownMedia */
-/* eslint no-var: 0 */
 
-var themeName = '';
-
+let currentThemeName = '';
 
 function scrollToSubHash(cardKeySubhash) {
   let scrollToTop = true;
@@ -60,16 +58,15 @@ function scrollToSubHash(cardKeySubhash) {
 
 
 function starter(basePrefix, doneHandler) {
-  var defaultHome = 'Home';
-
-  var baseURL = 'https://unpkg.com/smartdown/dist/';
-  var resourceURL = baseURL + 'lib/resources/';
-  var rawPrefix = window.location.origin + window.location.pathname;
-  var gistPathPrefix = '';
-  var gistHashPrefix = 'gist/';
-  var outputDivSelector = '#smartdown-output';
-  var postLoadMutator = null;
-  var media = {
+  let defaultHome = 'Home';
+  let baseURL = 'https://unpkg.com/smartdown/dist/';
+  let resourceURL = baseURL + 'lib/resources/';
+  let rawPrefix = window.location.origin + window.location.pathname;
+  let gistPathPrefix = '';
+  let gistHashPrefix = 'gist/';
+  let outputDivSelector = '#smartdown-output';
+  let postLoadMutator = null;
+  let media = {
     cloud: '/gallery/resources/cloud.jpg',
     badge: '/gallery/resources/badge.svg',
     hypercube: '/gallery/resources/Hypercube.svg',
@@ -79,10 +76,10 @@ function starter(basePrefix, doneHandler) {
     barn: '/gallery/resources/barn.svg',
     'medieval-gate': '/gallery/resources/medieval-gate.svg'
   };
-  var multiparts = {};
-  var rootHash = '';
-  var gistOrg = '';
-  var gistID = '';
+  let multiparts = {};
+  let rootHash = '';
+  let gistOrg = '';
+  let gistID = '';
 
 
   if (typeof smartdownBaseURL === 'string') {
@@ -114,7 +111,7 @@ function starter(basePrefix, doneHandler) {
     media = Object.assign(media, smartdownMedia);
   }
 
-  var lastLoadedRawPrefix = rawPrefix;
+  let lastLoadedRawPrefix = rawPrefix;
 
   /* Common code above between inline/blocks helpers */
 
@@ -124,7 +121,7 @@ function starter(basePrefix, doneHandler) {
       sourceText = postLoadMutator(sourceText, cardKey, cardURL, defaultHome);
     }
     multiparts = smartdown.partitionMultipart(sourceText);
-    var output = document.getElementById(outputDivId);
+    const output = document.getElementById(outputDivId);
     rootHash = '#' + cardKey;
     if (lastLoadedRawPrefix !== rawPrefix) {
       rootHash = '#' + cardURL;
@@ -132,8 +129,8 @@ function starter(basePrefix, doneHandler) {
     }
 
     let search = window.location.search;
-    if (themeName !== '') {
-      search = `?theme=${themeName}`;
+    if (currentThemeName !== '') {
+      search = `?theme=${currentThemeName}`;
     }
 
     let defaultPart = '_default_';
@@ -155,7 +152,7 @@ function starter(basePrefix, doneHandler) {
       }
 
       // console.log('newHash ignored', newHash, cardKeySubhash, window.location.pathname);
-      history.pushState({}, '', window.location.pathname + newHash + search);
+      window.history.pushState({}, '', window.location.pathname + newHash + search);
       scrollToSubHash(cardKeySubhash);
 
       if (!output.id) {
@@ -168,7 +165,7 @@ function starter(basePrefix, doneHandler) {
   function loadAsyncCard(cardKey, cardURL, outputDivId, cardKeySubhash) {
     // console.log('loadAsyncCard', cardKey, cardURL, cardKeySubhash, rootHash, outputDivId);
 
-    var oReq = new XMLHttpRequest();
+    const oReq = new XMLHttpRequest();
     oReq.addEventListener('load', function() {
       cardLoaded(this.responseText, cardKey, cardURL, outputDivId, cardKeySubhash);
     });
@@ -196,14 +193,15 @@ function starter(basePrefix, doneHandler) {
       }
 
       if (rootHash !== '' && ('#' + cardKey) === rootHash) {
-        history.replaceState({}, '', window.location.pathname + cardKeyWithHash);
+        window.history.replaceState({}, '', window.location.pathname + cardKeyWithHash);
         scrollToSubHash(cardKeySubhash);
 
         return;
       }
-      else {
-        // console.log('empty roothash', cardKeyWithHash, cardKey, rootHash, cardKeySubhash);
-      }
+      // else
+      // {
+      //   // console.log('empty roothash', cardKeyWithHash, cardKey, rootHash, cardKeySubhash);
+      // }
     }
     else {
       console.log('... illformatted cardKeyWithHash', cardKeyWithHash);
@@ -214,23 +212,23 @@ function starter(basePrefix, doneHandler) {
     // console.log('# gistPathPrefix', gistPathPrefix);
     // console.log('# gistHashPrefix', gistHashPrefix);
     // console.log('# window.location.pathname', window.location.pathname);
-    // var re = '^/?(' + gistPathPrefix + ')?' + gistHashPrefix + '([^/]+)/([^/]+)(/(\\w*))?$';
-    var re = '^/?(' + gistPathPrefix + ')?' + gistHashPrefix + '([^/]+)/([^/]+)(/(\\w*))?$';
-    // var re = `^/?(${gistPathPrefix})?${gistHashPrefix}([^/]+)/([^/]+)(/(\\w*))?$`;
-    var gistRE = new RegExp(re, 'g');
-    var match = gistRE.exec(cardKey);
+    // const re = '^/?(' + gistPathPrefix + ')?' + gistHashPrefix + '([^/]+)/([^/]+)(/(\\w*))?$';
+    const re = '^/?(' + gistPathPrefix + ')?' + gistHashPrefix + '([^/]+)/([^/]+)(/(\\w*))?$';
+    // const re = `^/?(${gistPathPrefix})?${gistHashPrefix}([^/]+)/([^/]+)(/(\\w*))?$`;
+    const gistRE = new RegExp(re, 'g');
+    const match = gistRE.exec(cardKey);
     if (match) {
       // console.log('#re match', cardKey, re, window.location.pathname, match);
       gistOrg = match[2];
       gistID = match[3];
-      var newCardKey = match[5] || 'Home';
+      const newCardKey = match[5] || 'Home';
       // console.log('cardKey', cardKey, gistOrg, gistID, newCardKey);
       cardKey = newCardKey;
     }
 
-    var part = multiparts[cardKey];
+    const part = multiparts[cardKey];
     if (part) {
-      var output = document.querySelectorAll(outputDivSelector)[0];
+      const output = document.querySelectorAll(outputDivSelector)[0];
       smartdown.setHome(part, output, function() {
         if (!output.id) {
           output.id = 'smartdown-output-' + String(Math.random()).slice(2);
@@ -241,7 +239,7 @@ function starter(basePrefix, doneHandler) {
     else if (cardKey.indexOf('http') === 0) {
       gistOrg = '';
       gistID = '';
-      var endOfPath = cardKey.lastIndexOf('/');
+      const endOfPath = cardKey.lastIndexOf('/');
       if (endOfPath > 0) {
         lastLoadedRawPrefix = cardKey.slice(0, endOfPath + 1);
       }
@@ -255,20 +253,20 @@ function starter(basePrefix, doneHandler) {
       loadAsyncCard(cardKey, cardKey, outputDivId);
     }
     else if (gistOrg !== '' && gistID !== '') {
-      var gistAPIBase = 'https://api.github.com/gists/' + gistID;
+      const gistAPIBase = 'https://api.github.com/gists/' + gistID;
       // console.log('gistAPIBase', gistAPIBase);
 
-      var oReq = new XMLHttpRequest();
+      const oReq = new XMLHttpRequest();
       oReq.addEventListener('load', function() {
-        var gistResponse = JSON.parse(this.responseText);
+        const gistResponse = JSON.parse(this.responseText);
         // console.log('gist Response', gistResponse);
-        var gistFile = gistResponse.files[cardKey + '.md'];
+        const gistFile = gistResponse.files[cardKey + '.md'];
         if (!gistFile) {
           console.log('Unable to locate Gist for "', cardKey, '" ', gistAPIBase);
         }
         else {
           // console.log('gistFile', gistFile);
-          var gistFileURL = gistFile.raw_url;
+          const gistFileURL = gistFile.raw_url;
           cardKey = gistHashPrefix + gistOrg + '/' + gistID + '/' + cardKey;
           lastLoadedRawPrefix = 'https://gist.githubusercontent.com/' + gistOrg + '/' + gistID + '/raw/';
 
@@ -302,27 +300,26 @@ function starter(basePrefix, doneHandler) {
     }
   }
 
-
-  function updateTheme(themeName) {
-    var container = document.getElementById('smartdown-outer-container');
+  function updateTheme(newThemeName) {
+    const container = document.getElementById('smartdown-outer-container');
     if (container) {
-      if (themeName !== '') {
-        [...container.classList].forEach(c => {
+      if (newThemeName !== '') {
+        [...container.classList].forEach((c) => {
           if (c.indexOf('smartdown-theme-') === 0) {
             // console.log('updateTheme: Removing class ', c);
             container.classList.remove(c);
           }
         });
-        container.classList.add(`smartdown-theme-${themeName}`);
+        container.classList.add(`smartdown-theme-${newThemeName}`);
       }
     }
   }
 
   function loadHome(baseHash) {
-    var hash = window.location.hash;
+    let hash = window.location.hash;
     if (baseHash) {
-      var hashElements = hash.split('/');
-      var baseHashElements = baseHash.split('/');
+      const hashElements = hash.split('/');
+      const baseHashElements = baseHash.split('/');
 
       hash = baseHash;
       if (baseHashElements.length === 4 &&
@@ -342,8 +339,8 @@ function starter(basePrefix, doneHandler) {
     // console.log(searchParams.get('foo') === null);        // true
     // console.log(searchParams.append('topic', 'webdev'));
 
-    var args = '';
-    var argsPos = hash.indexOf('?');
+    let args = '';
+    const argsPos = hash.indexOf('?');
     if (argsPos >= 0) {
       args = hash.slice(argsPos + 1);
       hash = hash.slice(0, argsPos);
@@ -355,16 +352,16 @@ function starter(basePrefix, doneHandler) {
       }
 
       const argsParams = new URLSearchParams(args);
-      themeName = argsParams.get('theme') || '';
+      currentThemeName = argsParams.get('theme') || '';
     }
 
-    if (themeName === '') {
+    if (currentThemeName === '') {
       const search = window.location.search;
       const searchParams = new URLSearchParams(search);
-      themeName = searchParams.get('theme') || '';
+      currentThemeName = searchParams.get('theme') || '';
     }
 
-    updateTheme(themeName);
+    updateTheme(currentThemeName);
 
     if (hash === '') {
       hash = defaultHome;
@@ -373,54 +370,49 @@ function starter(basePrefix, doneHandler) {
     relativeCardLoader(hash, document.querySelectorAll(outputDivSelector)[0].id);
   }
 
-  var calcHandlers = smartdown.defaultCalcHandlers;
-  var replace = rawPrefix;
+  const calcHandlers = smartdown.defaultCalcHandlers;
+  const replace = rawPrefix;
   function gistPrefix() {
-    var result = lastLoadedRawPrefix;
-    var hash = window.location.hash;
-    // var args = '';
-    var argsPos = hash.indexOf('?');
+    let result = lastLoadedRawPrefix;
+    let hash = window.location.hash;
+    // const args = '';
+    const argsPos = hash.indexOf('?');
     if (argsPos >= 0) {
       // args = hash.slice(argsPos);
       hash = hash.slice(0, argsPos);
       // console.log('gistPrefix hashargs', hash, args, window.location.search);
     }
 
-    /* eslint-disable block-scoped-var */
-    /* eslint-disable no-redeclare */
     if (gistPathPrefix.length > 0 && window.location.pathname.endsWith(gistPathPrefix)) {
-      var re = '^/?(' + gistPathPrefix + ')?' + gistHashPrefix + '([^/]+)/([^/]+)(/(\\w*))?$';
-      var gistRE = new RegExp(re, 'g');
-      var match = gistRE.exec(hash);
+      const re = '^/?(' + gistPathPrefix + ')?' + gistHashPrefix + '([^/]+)/([^/]+)(/(\\w*))?$';
+      const gistRE = new RegExp(re, 'g');
+      const match = gistRE.exec(hash);
       if (match) {
-        var matchGistOrg = match[2].replace('#', '');
-        var matchGistID = match[3];
+        const matchGistOrg = match[2].replace('#', '');
+        const matchGistID = match[3];
         result = 'https://gist.githubusercontent.com/' + matchGistOrg + '/' + matchGistID + '/raw/';
       }
     }
     else if (gistHashPrefix.length > 0 && hash.indexOf('#' + gistHashPrefix) === 0) {
-      var re = '^#' + gistHashPrefix + '([^/]+)/([^/]+)(/(\\w*))?$';
-      var gistRE = new RegExp(re, 'g');
-      var match = gistRE.exec(hash);
+      const re = '^#' + gistHashPrefix + '([^/]+)/([^/]+)(/(\\w*))?$';
+      const gistRE = new RegExp(re, 'g');
+      const match = gistRE.exec(hash);
       if (match) {
-        var matchGistOrg = match[1];
-        var matchGistID = match[2];
+        const matchGistOrg = match[1];
+        const matchGistID = match[2];
         result = 'https://gist.githubusercontent.com/' + matchGistOrg + '/' + matchGistID + '/raw/';
       }
     }
     else if (hash.indexOf('#https://gist.githubusercontent.com/') === 0) {
-      var re = '^#https://gist.githubusercontent.com/([^/]+)/([^/]+)/.*$';
-      var gistRE = new RegExp(re, 'g');
-      var match = gistRE.exec(hash);
+      const re = '^#https://gist.githubusercontent.com/([^/]+)/([^/]+)/.*$';
+      const gistRE = new RegExp(re, 'g');
+      const match = gistRE.exec(hash);
       if (match) {
-        var matchGistOrg = match[1];
-        var matchGistID = match[2];
+        const matchGistOrg = match[1];
+        const matchGistID = match[2];
         result = 'https://gist.githubusercontent.com/' + matchGistOrg + '/' + matchGistID + '/raw/';
       }
     }
-
-    /* eslint-enable block-scoped-var */
-    /* eslint-enable no-redeclare */
 
     // console.log('gistPrefix', result, lastLoadedRawPrefix, hash);
 
@@ -485,15 +477,15 @@ function starter(basePrefix, doneHandler) {
       // console.log('oldURL', oldURL, oldSearch, oldHashPos, oldSearchPos);
     }
 
-    var hash = window.location.hash;
-    var args = '';
-    var argsPos = hash.indexOf('?');
+    let hash = window.location.hash;
+    let args = '';
+    const argsPos = hash.indexOf('?');
     if (argsPos >= 0) {
       args = hash.slice(argsPos + 1);
       hash = hash.slice(0, argsPos);
       if (args.indexOf('theme=') === 0) {
-        themeName = args.slice('theme='.length);
-        updateTheme(themeName);
+        currentThemeName = args.slice('theme='.length);
+        updateTheme(currentThemeName);
       }
     }
 
@@ -502,7 +494,7 @@ function starter(basePrefix, doneHandler) {
       scrollToSubHash();
     }
     else {
-      var cardKey = hash.slice(1);
+      let cardKey = hash.slice(1);
 
       if (cardKey === '') {
         cardKey = defaultHome;
