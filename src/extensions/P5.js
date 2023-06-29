@@ -4,7 +4,7 @@ const P5UserFunctions = require('./P5UserFunctions');
 const P5SystemVars = require('./P5SystemVars');
 const P5LoaderPrototypeInfo = require('./P5LoaderPrototypeInfo');
 
-var P5 = {
+const P5 = {
   Loader: {},
   VarDefs: null,
   UserFunctionDefs: null,
@@ -26,8 +26,8 @@ function loadP5JS(loaded) {
     window.smartdownJSModules.p5js.loadedCallbacks.push(loaded);
     // console.log('loadP5JS...p5js initiate load', window.smartdownJSModules.p5js.loadedCallbacks[0]);
 
-    import(/* webpackChunkName: "p5js" */ 'p5JS')
-      .then(p5js => {
+    import(/* webpackChunkName: "p5js" */ 'p5')
+      .then((p5js) => {
         window.smartdownJSModules.p5js.loaded = p5js;
         P5.Loader = p5js.default;
 
@@ -35,7 +35,7 @@ function loadP5JS(loaded) {
         window.P5 = P5.Loader;
         window.p5 = P5.Loader;
 
-        import(/* webpackChunkName: "p5Sound" */ 'p5/lib/addons/p5.sound.min.js')
+        import(/* webpackChunkName: "p5Sound" */ 'p5/lib/addons/p5.sound.min')
           .then(() => {
 
             // for (const f in P5.Loader.prototype) {
@@ -44,11 +44,11 @@ function loadP5JS(loaded) {
 
             const callThese = window.smartdownJSModules.p5js.loadedCallbacks;
             window.smartdownJSModules.p5js.loadedCallbacks = [];
-            callThese.forEach(loadedCb => {
+            callThese.forEach((loadedCb) => {
               loadedCb();
             });
           })
-          .catch(error => {
+          .catch((error) => {
             console.log('loadP5Sound error', error);
           });
 
@@ -71,7 +71,7 @@ function loadP5JS(loaded) {
         //     console.log('loadP5DOM error', error);
         //   });
       })
-      .catch(error => {
+      .catch((error) => {
         console.log('loadP5JSerror', error);
       });
   }
@@ -79,7 +79,7 @@ function loadP5JS(loaded) {
 
 
 if (useP5JS) {
-  var isTesting = (typeof process === 'object' && process.env.TEST_RUN);
+  const isTesting = (typeof process === 'object' && process.env.TEST_RUN);
   if (isTesting) {
     document.hasFocus = document.hasFocus ||
       function () {
@@ -94,18 +94,17 @@ if (useP5JS) {
     loadedCallbacks: []
   };
 
-  var implicitP5VarDefs = [];
-
-  for (const f in P5LoaderPrototypeInfo) {
-    if (f.indexOf('_') !== 0) {
-      if (P5SystemVars.indexOf(f) !== -1) {
-        // console.log('Skipping ', f);
+  const implicitP5VarDefs = [];
+  Object.keys(P5LoaderPrototypeInfo).forEach((element) => {
+    if (element.indexOf('_') !== 0) {
+      if (P5SystemVars.indexOf(element) !== -1) {
+        // console.log('Skipping ', element);
       }
       else {
-        const val = P5LoaderPrototypeInfo[f];
-        // console.log('...f', f, P5.Loader[f], val);
+        const val = P5LoaderPrototypeInfo[element];
+        // console.log('...element', element, P5.Loader[element], val);
         if (val === 'function') {
-          if (f === 'loadFont') {
+          if (element === 'loadFont') {
             const loadFontWrapper =
               `
               function loadFontWrapper(p5, path, callback, onError) {
@@ -115,7 +114,7 @@ if (useP5JS) {
               `;
             implicitP5VarDefs.push(loadFontWrapper);
           }
-          else if (f === 'createCanvas') {
+          else if (element === 'createCanvas') {
             const createCanvasWrapper =
               `
               function createCanvasWrapper(p5, w, h, renderer) {
@@ -129,23 +128,24 @@ if (useP5JS) {
             implicitP5VarDefs.push(createCanvasWrapper);
           }
           else {
-            // console.log('...', f);
-            // implicitP5VarDefs.push(`console.log('p5.${f}', p5.${f}, typeof p5.${f});const ${f} = p5.${f}.bind(p5);`);
-            implicitP5VarDefs.push(`const ${f} = p5.${f}.bind(p5);`);
+            // console.log('...', element);
+            // implicitP5VarDefs.push(`console.log('p5.${element}', p5.${element}, typeof p5.${element});const ${element} = p5.${element}.bind(p5);`);
+            implicitP5VarDefs.push(`const ${element} = p5.${element}.bind(p5);`);
           }
         }
         else {
-          implicitP5VarDefs.push('const ' + f + ' = p5.' + f + ';');
+          implicitP5VarDefs.push('const ' + element + ' = p5.' + element + ';');
         }
       }
     }
-  }
+  });
+
   P5.VarDefs = implicitP5VarDefs.join('\n');
 
-  var implicitP5SystemVarDecls = [];
-  var implicitP5SystemVarUpdates = [];
-  var implicitP5SystemVarDefs = [];
-  P5SystemVars.forEach(f => {
+  const implicitP5SystemVarDecls = [];
+  const implicitP5SystemVarUpdates = [];
+  const implicitP5SystemVarDefs = [];
+  P5SystemVars.forEach((f) => {
     implicitP5SystemVarDecls.push(`var ${f};`);
     implicitP5SystemVarUpdates.push(`${f} = p5.${f};`);
     implicitP5SystemVarDefs.push(`const ${f} = p5.${f};`);
@@ -155,8 +155,8 @@ if (useP5JS) {
   P5.SystemVarUpdates = implicitP5SystemVarUpdates.join('');
   P5.SystemVarDefs = implicitP5SystemVarDefs.join('');
 
-  var implicitP5UserFunctionDefs = [];
-  P5UserFunctions.forEach(f => {
+  const implicitP5UserFunctionDefs = [];
+  P5UserFunctions.forEach((f) => {
     const userFunctionSource =
       `if (typeof ${f} === 'function') {
         p5.${f} = function(p5, ${f}) {

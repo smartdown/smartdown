@@ -1,7 +1,7 @@
 function mathjaxConfigure() {
   // https://github.com/mathjax/MathJax/blob/master/config/default.js
 
-  var MathJax = window.MathJax;
+  const MathJax = window.MathJax;
   global.MathJax = window.MathJax;
 
   MathJax.Hub.Config({

@@ -1,4 +1,4 @@
-import {registerExtension} from 'extensions';
+import {registerExtension} from '../extensions';
 
 export default function registerPlotly() {
   registerExtension(

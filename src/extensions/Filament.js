@@ -1,4 +1,4 @@
-import {registerExtension} from 'extensions';
+import {registerExtension} from '../extensions';
 /* global smartdown */
 /* global Filament */
 
@@ -102,6 +102,7 @@ FilamentExtension.register = function register() {
 
 FilamentExtension.generateAugmentedPlayable = function(isModule, code) {
   let augmentedCode;
+  let result;
 
   if (isModule) {
     console.log('FilamentExtension.generateAugmentedPlayable isModule==true not yet implemented');
@@ -124,8 +125,10 @@ else {
   this.log(errorMsg);
 }
 })();`;
-    return augmentedCode;
+    result = augmentedCode;
   }
+
+  return result;
 };
 
 module.exports = FilamentExtension;

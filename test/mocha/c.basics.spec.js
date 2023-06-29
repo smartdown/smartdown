@@ -1,14 +1,13 @@
 import smartdown from '../../src';
-var assert = require('assert');
+
+const assert = require('assert');
+
 const postConfigureTimeout = 3000; // Don't make this larger than 2000 without
 
 /* global describe */
 /* global it */
 /* global before */
 /* global after */
-/* xglobal window */
-/* xglobal document */
-/* xglobal test */
 
 describe('c.basic', function() {
   this.slow('400ms');

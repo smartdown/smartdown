@@ -1,6 +1,6 @@
 /* global jscadCore */
 
-import {registerExtension} from 'extensions';
+import {registerExtension} from '../extensions';
 
 const OpenJSCAD = {
   register() {

@@ -30,7 +30,6 @@ module.exports = {
     'func-names': 0,
     'object-shorthand': 0,
     'prefer-destructuring': 0,
-    'no-var': 0,
     'no-plusplus': 0,
     '@typescript-eslint/no-use-before-define': 0,
     '@typescript-eslint/brace-style': 0,
@@ -57,7 +56,6 @@ module.exports = {
     // Place to specify ESLint rules. Can be used to overwrite rules specified from the extended configs
     // e.g. "@typescript-eslint/explicit-function-return-type": "off",
     // 'no-undef': 0,
-    // 'no-var': 0,
     // 'prefer-arrow-callback': 0,
     // 'no-restricted-syntax': 0,
     // 'no-useless-escape': 0,

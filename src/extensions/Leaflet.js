@@ -1,4 +1,4 @@
-import {registerExtension} from 'extensions';
+import {registerExtension} from '../extensions';
 
 // https://leafletjs.com/download.html
 

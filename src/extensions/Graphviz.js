@@ -1,7 +1,7 @@
 const each = window.lodashEach = require('lodash/forEach');
 
 // https://github.com/mdaines/viz.js/wiki/API#render-options
-var graphvizImages = [];
+const graphvizImages = [];
 function registerMediaWithGraphviz() {
   each(window.mediaRegistry, function (data,) {
     //     graphvizFiles.push({
@@ -46,7 +46,7 @@ function loadGraphviz(loaded) {
             registerMediaWithGraphviz();
             const callThese = window.smartdownJSModules.graphviz.loadedCallbacks;
             window.smartdownJSModules.graphviz.loadedCallbacks = [];
-            callThese.forEach(loadedCb => {
+            callThese.forEach((loadedCb) => {
               loadedCb();
             });
           });

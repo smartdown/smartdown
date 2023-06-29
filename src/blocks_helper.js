@@ -1,13 +1,13 @@
 /* global smartdownBaseURL */
 
-var baseURL = 'https://smartdown.site/';
+let baseURL = 'https://smartdown.site/';
 if (typeof smartdownBaseURL === 'string') {
   baseURL = smartdownBaseURL;
 }
 
-var starterScript = baseURL + 'lib/starter.js';
-var head = document.head || document.getElementsByTagName('head')[0];
-var script = document.createElement('script');
+const starterScript = baseURL + 'lib/starter.js';
+const head = document.head || document.getElementsByTagName('head')[0];
+const script = document.createElement('script');
 script.type = 'text/javascript';
 script.src = starterScript;
 script.onerror = function loadError(error) {

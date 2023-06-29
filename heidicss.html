@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<head>
+
+<style>
+body {
+  background: lightyellow;
+}
+
+.outer {
+  border: 5px solid red;
+  text-align: center;
+}
+
+.left {
+  border: 1px solid green;
+}
+
+.middle {
+  border: 1px solid cyan;
+}
+
+.right {
+  border: 1px solid magenta;
+}
+
+@media (min-width: 800px) {
+  .outer {
+    border: 5px solid pink;
+  }
+
+  .left {
+    width: 30%;
+    display: inline-block;
+  }
+
+  .middle {
+    width: 30%;
+    display: inline-block;
+  }
+
+  .right {
+    width: 30%;
+    display: inline-block;
+  }
+
+
+
+}
+
+</style>
+
+</head>
+<body>
+
+<div class="outer">
+  <div class="left">
+    <h1>Left</h1>
+  </div>
+
+  <div class="middle">
+    <h1>Middle</h1>
+  </div>
+
+  <div class="right">
+    <h1>Right</h1>
+  </div>
+</div>
+
+</body>
+</html>
+

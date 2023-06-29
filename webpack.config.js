@@ -29,7 +29,6 @@ var outputPath = path.join(__dirname, 'dist/lib/');
 var outputFile = libraryName + '.js';
 var nm = path.join(__dirname, 'node_modules');
 var stdlibRoot = path.join(nm, '@stdlib');
-var emojiJS = path.join(nm, '/emoji-js/lib/emoji.min.js');
 var abcJS = path.join(app, 'external/abcjs_midi_5.9.1-min.js');
 var abcCSS = path.join(app, 'external/abcjs-midi-no-fa.css');
 
@@ -40,7 +39,6 @@ var abcCSS = path.join(app, 'external/abcjs-midi-no-fa.css');
 // var openjscadJSIoIo = path.join(app, 'external/jscad-io-io.min.js');
 
 var giffferJS = path.join(nm, 'gifffer/build/gifffer.min.js');
-var stacktraceJS = path.join(nm, 'stacktrace-js/dist/stacktrace.min.js');
 var p5JS = path.join(nm, '/p5/lib/p5.min.js');
 // var p5JS = path.join(nm, '/p5/lib/p5.js');
 // var brythonJS = path.join(nm, '/brython/brython.js');
@@ -73,8 +71,10 @@ var galleryIgnores = [
   '**/.gitignore',
   '**/hide',
   '**/LICENSE',
-  '**/package.json',
-  '**/index.html'];
+  '**/*.sh',
+  '**/node_modules',
+  '**/package*.json',
+  '**/index.*'];
 const baseURL = development ? '/' : '/smartdown/';
 
 const defines = {
@@ -140,11 +140,9 @@ var config = {
   resolve: {
     alias: {
       'gifffer': giffferJS,
-      'stacktraceJS': stacktraceJS,
       'esprima$': path.join(__dirname, 'NOP.js'),
 
       topojson$: topojsonJS,
-      emojiJS$: emojiJS,
       p5JS$: p5JS,
       p5$: p5JS,
       'rx$': 'rx/dist/rx.all.js'
@@ -273,7 +271,6 @@ var config = {
   module: {
     noParse: [
       /node_modules\/localforage\/dist\/localforage.js/,
-      new RegExp('emojiJS'),
       new RegExp(p5JS),
       new RegExp('p5JS'),
       // new RegExp(vizJS),
