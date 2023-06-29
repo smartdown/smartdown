@@ -1,4 +1,4 @@
-import {registerExtension} from 'extensions';
+import {registerExtension} from '../extensions';
 
 const Brython = {
 };
@@ -18,6 +18,7 @@ Brython.register = function register() {
 
 Brython.generateAugmentedPlayable = function(divId, isModule, code) {
   let augmentedCode;
+  let result;
 
   if (isModule) {
     console.log('Brython.generateAugmentedPlayable isModule==true not yet implemented');
@@ -99,8 +100,10 @@ else {
   div.innerHTML = '<h4>' + errorMsg + '</h4>';
 }
 `;
-    return augmentedCode;
+    result = augmentedCode;
   }
+
+  return result;
 };
 
 module.exports = Brython;

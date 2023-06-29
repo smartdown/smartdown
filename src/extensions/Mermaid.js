@@ -1,4 +1,4 @@
-import {registerExtension} from 'extensions';
+import {registerExtension} from '../extensions';
 
 const Mermaid = {
   mermaid: null,
@@ -19,26 +19,26 @@ Mermaid.register = function register() {
 
 function fixupMermaidSVG(svgCode) {
   svgCode = svgCode.replace(/\n/g, '');
-  var beginStyleTag = '<style>';
-  var endStyleTag = '</style>';
+  const beginStyleTag = '<style>';
+  const endStyleTag = '</style>';
 
-  var beginStyle = svgCode.indexOf(beginStyleTag);
-  var endStyle = svgCode.indexOf(endStyleTag);
-  var svgStyle = svgCode.slice(beginStyle + beginStyleTag.length, endStyle).trim();
-  var svgStyleLines = svgStyle.split(/}/g);
+  const beginStyle = svgCode.indexOf(beginStyleTag);
+  const endStyle = svgCode.indexOf(endStyleTag);
+  const svgStyle = svgCode.slice(beginStyle + beginStyleTag.length, endStyle).trim();
+  const svgStyleLines = svgStyle.split(/}/g);
   --svgStyleLines.length; // Assumes last element is ''
-  var svgNewStyleLines = svgStyleLines.map(function (line) {
-    var bracePos = line.indexOf('{');
-    var selectors = line.slice(0, bracePos);
-    var body = line.slice(bracePos);
-    var selectorsNew = selectors.replace(/,/g, ',.mermaid ');
+  const svgNewStyleLines = svgStyleLines.map(function (line) {
+    const bracePos = line.indexOf('{');
+    const selectors = line.slice(0, bracePos);
+    const body = line.slice(bracePos);
+    let selectorsNew = selectors.replace(/,/g, ',.mermaid ');
     selectorsNew = '.mermaid ' + selectorsNew;
     selectorsNew = selectorsNew.replace(/.mermaid .mermaid/g, '.mermaid');
 
-    var newLine = selectorsNew + body;
+    const newLine = selectorsNew + body;
     return newLine;
   });
-  var svgNewStyle = beginStyleTag + svgNewStyleLines.join('}') + endStyleTag;
+  const svgNewStyle = beginStyleTag + svgNewStyleLines.join('}') + endStyleTag;
   svgCode =   svgCode.slice(0, beginStyle) +
               svgNewStyle +
               svgCode.slice(endStyle + endStyleTag.length);
@@ -52,7 +52,7 @@ function mermaidRender(div, code) {
       div.id + '_svg',
       code,
       function (svgCode) {
-        var svgCodeNew = fixupMermaidSVG(svgCode);
+        const svgCodeNew = fixupMermaidSVG(svgCode);
         div.innerHTML = svgCodeNew;
       },
       div
@@ -67,7 +67,7 @@ function initializeMermaid() {
   Mermaid.mermaid = window.mermaid;
   Mermaid.mermaidRender = mermaidRender;
 
-  var config = {
+  const config = {
     startOnLoad: false,
     cloneCssStyles: false,
     logLevel: 3,

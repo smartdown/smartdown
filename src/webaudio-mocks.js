@@ -2,7 +2,8 @@
 /* eslint no-native-reassign: 0 */
 /* eslint no-undef: 0 */
 
-var mock = require('web-audio-mock-api');
+const mock = require('web-audio-mock-api');
+
 window.AnalyserNode = mock.AnalyserNode;
 window.AudioBuffer = mock.AudioBuffer;
 window.AudioBufferSourceNode = mock.AudioBufferSourceNode;

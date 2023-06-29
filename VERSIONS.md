@@ -62,4 +62,4 @@
 - **1.0.59** - Update deps. Modernize JS code.
 - **1.0.60** - Update deps. Fix documentation links.
 - **1.0.61** - Update deps. smartdown/gallery 0.0.80. npm scripts 'test', 'test:e2e', and 'test:unit' have been re-enabled with latest Nightwatch and MochaJS versions.
- 
+- **1.0.62** - Update deps. Update all code to pass 'npm run lint'. Remove dead code. Add distdocts/ to .gitignore. 

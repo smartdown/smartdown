@@ -1,7 +1,8 @@
 /* global smartdown */
 
-import {registerExtension} from 'extensions';
-import {importScriptUrl} from 'importers';
+import {importScriptUrl} from '../importers';
+
+import {registerExtension} from '../extensions';
 
 const Stdlib = {};
 
@@ -17,12 +18,12 @@ Stdlib.register = function register() {
         smartdown.Stdlib = Stdlib;
         Stdlib.datasets = {};
         const stdlibData = window.stdlib_datasets_exclude.datasets;
-        Object.keys(stdlibData).forEach(slot => {
+        Object.keys(stdlibData).forEach((slot) => {
           Stdlib.datasets[slot.toLowerCase()] = stdlibData[slot];
         });
 
         const stdlibPackage = window.stdlib;
-        Object.keys(stdlibPackage).forEach(slot => {
+        Object.keys(stdlibPackage).forEach((slot) => {
           Stdlib[slot] = stdlibPackage[slot];
         });
       },
