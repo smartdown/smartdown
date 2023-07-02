@@ -4503,7 +4503,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.62',
+  version: '1.0.63',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,
