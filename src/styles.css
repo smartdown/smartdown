@@ -248,6 +248,7 @@
 .smartdown-container pre > code {
   font-size: inherit !important;
   line-height: inherit !important;
+  display: block;
 }
 
 .smartdown-container .pre-scrollable {
@@ -1803,7 +1804,7 @@ img.media-image path {
   color: white;
 }
 
-.smartdown-theme-dark .smartdown-container pre > code.hljs,
+.smartdown-theme-dark .smartdown-container pre > code,
 .smartdown-theme-dark .smartdown-container code.hljs-inline {
   background: palegoldenrod;
   color: black;

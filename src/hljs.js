@@ -5,6 +5,9 @@ import hljs from 'highlight.js/lib/core';
 global.hljs = hljs;
 window.hljs = hljs;
 
+hljs.initHighlighting.called = false;
+hljs.initHighlighting();
+
 hljs.registerLanguage('bash', require('highlight.js/lib/languages/bash'));
 hljs.registerLanguage('css', require('highlight.js/lib/languages/css'));
 hljs.registerLanguage('markdown', require('highlight.js/lib/languages/markdown'));
