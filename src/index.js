@@ -57,11 +57,6 @@ const hljs = require('./hljs');
 window.jsyaml = require('js-yaml');
 const mathjaxConfigure = require('./extensions/MathJax');
 
-
-
-
-
-
 const graphvizImages = require('./extensions/Graphviz');
 
 const P5 = require('./extensions/P5');
@@ -790,7 +785,6 @@ ${highlightedAugmentedCode}
   return result;
 }
 
-
 function renderCode(code, languageString) {
   languageString = (languageString || '').replace(/ /g, '');
   const languageElements = languageString.split('/');
@@ -850,6 +844,12 @@ function renderCode(code, languageString) {
   }
 
   return result;
+}
+
+function renderCodeSpan(text) {
+  const unescaped = decodeInlineScript(text);
+  const hljsResult = hljs.highlightAuto(unescaped, ['javascript']);
+  return `<code class="hljs-inline">${hljsResult.value}</code>`;
 }
 
 /*
@@ -1558,13 +1558,10 @@ const renderer = {
   heading: renderHeading,
   table: renderTable,
   code: renderCode,
-  // codespan: function(text) {
-  //   const result = hljs.highlightAuto(text).value; // '<code>' + text + '</code>';
-  //   return `<code class="hljs-inline">${result}</code>`;
-  // },
+  codespan: renderCodeSpan,
   text(src) {
-
-    return entityEscape(src.replace(/:([A-Za-z0-9_\-+]+?):/g, emojiReplacer));
+    const result = entityEscape(src.replace(/:([A-Za-z0-9_\-+]+?):/g, emojiReplacer));
+    return result;
   },
 };
 
@@ -1611,15 +1608,17 @@ const markedOpts = {
   langPrefix: 'hljs ',
   highlight: function (code, lang) {    // , callback)
     const playableType = playableTypes[lang];
-    let result;
+    let langs = [lang];
     if (lang && playableType) {
       const mappedLanguage = playableType ? playableType.highlight : lang;
-      result = hljs.highlightAuto(code, [mappedLanguage]);
+      langs = [mappedLanguage];
     }
-    else {
-      result = hljs.highlightAuto(code, [lang]);
+    else if (lang === '') {
+      const tempResult = hljs.highlightAuto(code);
+      langs = [tempResult.language];
     }
 
+    const result = hljs.highlightAuto(code, langs);
     return result.value;
   },
   renderer,
@@ -4503,7 +4502,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.63',
+  version: '1.0.64',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,

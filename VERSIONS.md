@@ -64,3 +64,4 @@
 - **1.0.61** - Update deps. smartdown/gallery 0.0.80. npm scripts 'test', 'test:e2e', and 'test:unit' have been re-enabled with latest Nightwatch and MochaJS versions.
 - **1.0.62** - Update deps. Update all code to pass 'npm run lint'. Remove dead code. Add distdocts/ to .gitignore. 
 - **1.0.63** - Update deps.
+- **1.0.64** - Update deps. Improve syntax highlighting for inline code rendering. Fix issue with 'bash' code blocks not being highlighted without a language identifier. 
