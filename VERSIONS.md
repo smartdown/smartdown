@@ -65,3 +65,4 @@
 - **1.0.62** - Update deps. Update all code to pass 'npm run lint'. Remove dead code. Add distdocts/ to .gitignore. 
 - **1.0.63** - Update deps.
 - **1.0.64** - Update deps. Improve syntax highlighting for inline code rendering. Fix issue with 'bash' code blocks not being highlighted without a language identifier. 
+- **1.0.65** - Update deps. Add option to 'configure()' to allow overriding of the default 'xypicURL', to support at least the 'smartdown/editor' project.

@@ -3232,6 +3232,9 @@ function configure(options, loadedHandler) {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const _linkRules = options.linkRules;
 
+  window.smartdown.baseURL = _baseURL || (window.location.origin + '/');
+  window.xypicURL = options.xypicURL || (window.smartdown.baseURL + 'lib/xypic.js');
+
   document.addEventListener('visibilitychange', handleVisibilityChange);
 
   if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
@@ -3298,8 +3301,6 @@ function configure(options, loadedHandler) {
     }
   });
 
-  window.smartdown.baseURL = _baseURL || (window.location.origin + '/');
-
   const st = StackTrace.getSync();
   let currentBase = st[0].fileName;
   if (currentBase.indexOf('http') === -1) {
@@ -3310,12 +3311,11 @@ function configure(options, loadedHandler) {
   const lastSlash = currentBase.lastIndexOf('/');
   __webpack_public_path__ = currentBase.slice(0, lastSlash + 1);
   // console.log('__webpack_# smartdown.configurepublic_path__', __webpack_public_path__, currentBase);
-  window.xypicURL = window.smartdown.baseURL + 'lib/xypic.js';
+
   if (window.smartdown.baseURL === 'https://mochalocalhost/') {
     window.xypicURL = 'https://unpkg.com/smartdown/dist/lib/xypic.js';
   }
 
-  // console.log('__webpack_public_path__', __webpack_public_path__, window.smartdown.baseURL, window.location.origin, window.xypicURL);
   window.MathJax = global.MathJax = {
     delayStartupUntil: 'configured',
     AuthorInit: function() {
@@ -3339,10 +3339,7 @@ function configure(options, loadedHandler) {
   }
 
   if (useMathJax) {
-    const mathjaxURL = testing ?
-      // 'https://localhost:8080/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured' :
-      'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured' :
-      'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured';
+    const mathjaxURL = 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured';
 
     importScriptUrl(
       mathjaxURL,
@@ -4502,7 +4499,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.64',
+  version: '1.0.65',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,
