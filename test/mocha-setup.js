@@ -24,7 +24,6 @@ const resourceLoader = new jsdom.ResourceLoader({
   userAgent: 'Node.js'
 });
 
-
 const jsdomOpts = {
   runScripts: 'dangerously', // 'outside-only',
   url: 'https://mochalocalhost',
@@ -34,7 +33,6 @@ const jsdomOpts = {
 const jsdomInstance = new JSDOM('<!doctype html><html><body></body></html>', jsdomOpts);
 const { window } = jsdomInstance;
 
-global.smartdown = window.smartdown;
 global.window = window;
 global.document = window.document;
 global.navigator = window.navigator;
