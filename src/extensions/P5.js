@@ -179,5 +179,4 @@ if (useP5JS) {
   // console.log('P5.UserFunctionDefs', P5.UserFunctionDefs);
 }
 
-
-module.exports = P5;
+export default P5;

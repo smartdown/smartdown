@@ -60,4 +60,4 @@ window.smartdownJSModules.graphviz = {
   loadedCallbacks: []
 };
 
-module.exports = graphvizImages;
+export default graphvizImages;

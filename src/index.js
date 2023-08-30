@@ -5,7 +5,8 @@
 // Copyright 2015, Daniel B Keith
 //
 
-/* global useFileSaver */
+/* global smartdown */
+/* xglobal useFileSaver */
 /* global useLocalForage */
 /* global useGifffer */
 /* global useMathJax */
@@ -19,13 +20,34 @@ const emojiReplacer = (match) => emojiInstance.replace_colons(match);
 import axios from 'axios';
 import smoothscroll from 'smoothscroll-polyfill';
 
-require('./styles.css');
+import lodashEach from 'lodash/forEach';
+import lodashMap from 'lodash/map';
+import lodashIsEqual from 'lodash/isEqual';
 
-const lodashEach = window.lodashEach = require('lodash/forEach');
-const lodashMap = window.lodashMap = require('lodash/map');
-const isEqual = window.lodashIsEqual = require('lodash/isEqual');
+window.lodashMap = lodashMap;
+window.lodashEach = lodashEach;
+window.lodashIsEqual = lodashIsEqual;
+
+import vdomToHtml from 'vdom-to-html';
+import StackTrace from 'stacktrace-js/dist/stacktrace.min';
+
+import marked from 'marked';
+import jsyaml from 'js-yaml';
+import fileSaver from 'file-saver';
+import localForage from 'localforage';
+import Gifffer from 'gifffer';
+
+window.jsyaml = jsyaml;
 
 import {isExtensionRegistered, loadExternal, ensureExtension} from './extensions';
+
+import hljs from './hljs';
+import playableTypes from './playableTypes';
+import mathjaxConfigure from './extensions/MathJax';
+import P5 from './extensions/P5';
+
+import './styles.css';
+
 
 import registerABC from './extensions/ABC';
 import registerD3 from './extensions/D3';
@@ -39,6 +61,9 @@ import React from './extensions/React';
 import Typescript from './extensions/Typescript';
 import Mermaid from './extensions/Mermaid';
 import Stdlib from './extensions/Stdlib';
+import expandHrefWithLinkRules from './expandHrefWithLinkRules';
+import renderImage from './renderImage';
+import renderLink from './renderLink';
 
 import {
   importScriptUrl,
@@ -48,35 +73,29 @@ import {
   importCssUrl,
 } from './importers';
 
-const vdomToHtml = require('vdom-to-html');
-const StackTrace = require('stacktrace-js/dist/stacktrace.min');
-
-const marked = require('marked');
-const hljs = require('./hljs');
-
-window.jsyaml = require('js-yaml');
-const mathjaxConfigure = require('./extensions/MathJax');
-
-const graphvizImages = require('./extensions/Graphviz');
-
-const P5 = require('./extensions/P5');
+import entityEscape from './entityEscape';
+import decodeInlineScript from './decodeInlineScript';
+import areValuesSameEnough from './areValuesSameEnough';
+import renderCell from './renderCell';
+import renderABCIntoDivs from './renderABCIntoDivs';
+import graphvizImages from './extensions/Graphviz';
 
 const testing = process.env.BUILD === 'test';
 
-let fileSaver = {};
-if (useFileSaver) {
-  fileSaver = require('file-saver');
-}
+// let fileSaver = {};
+// if (useFileSaver) {
+//   fileSaver = require('file-saver');
+// }
 
-let localForage = {};
-if (useLocalForage) {
-  localForage = require('localforage');
-}
+// let localForage = {};
+// if (useLocalForage) {
+//   localForage = require('localforage');
+// }
 
-let Gifffer = {};
-if (useGifffer) {
-  Gifffer = require('gifffer');
-}
+// let Gifffer = {};
+// if (useGifffer) {
+//   Gifffer = require('gifffer');
+// }
 
 const localForageSmartdownPrefix = 'smartdownVariable/';
 const inlinePrefix = '^^InLiNe^^';
@@ -87,89 +106,6 @@ let calcHandlers = null;
 const linkRules = [];
 let currentHomeDiv = null;
 let currentMD = null;
-const playableTypes = {
-  'brython': {
-    highlight: 'python',
-    javascript: true
-  },
-  'filament': {
-    highlight: 'python',
-    javascript: true
-  },
-  'go': {
-    highlight: 'go',
-    transform: 'gopherjs',
-    javascript: true
-  },
-  'javascript': {
-    highlight: 'javascript',
-    javascript: true
-  },
-  'typescript': {
-    highlight: 'TypeScript',
-    javascript: true
-  },
-  'react': {
-    highlight: 'javascript',
-    javascript: true
-  },
-  'd3': {
-    highlight: 'javascript',
-    javascript: true
-  },
-  'leaflet': {
-    highlight: 'javascript',
-    javascript: true
-  },
-  'plotly': {
-    highlight: 'javascript',
-    javascript: true
-  },
-  'openjscad': {
-    highlight: 'javascript',
-    javascript: true
-  },
-  'stdlib': {
-    highlight: 'javascript',
-    javascript: true
-  },
-  'three': {
-    highlight: 'javascript',
-    javascript: true
-  },
-  'p5js': {
-    highlight: 'javascript',
-    javascript: true
-  },
-  'P5JS': {
-    highlight: 'javascript',
-    javascript: true
-  },
-  'smartdown': {
-    highlight: 'markdown',
-    javascript: false
-  },
-  'graphviz': {
-    highlight: 'graphviz',
-    javascript: false
-  },
-  'abc': {
-    highlight: 'abc',
-    javascript: false
-  },
-  'abcmidi': {
-    highlight: 'abc',
-    javascript: false
-  },
-  'abcsheet': {
-    highlight: 'abc',
-    javascript: false
-  },
-  'mermaid': {
-    highlight: 'mermaid',
-    javascript: false
-  }
-};
 
 const playableArgNames = [
   'playable',
@@ -192,31 +128,14 @@ const perPageState = {
   playablesRegistered: {},
   playablesRegisteredOrder: [],
 };
-let currentRenderDiv = null;
-const currentBackpatches = {};
-
-let uniqueCellIndex = 0;
-const smartdownCells = {};
 
 let cardLoading = false;
 
-let smartdownVariables = {};
 const smartdownScripts = [];
 const smartdownScriptsMap = {};
 const es6Playables = {};
 
-let mediaRegistry = {};
 let uniquePlayableIndex = 0;
-
-function entityEscape(html, encode) {
-  return html
-    .replace(!encode ? /&(?!#?\w+;)/g : /&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
 
 function registerDefaultExtensions() {
   registerABC();
@@ -234,239 +153,6 @@ function registerDefaultExtensions() {
 }
 
 registerDefaultExtensions();
-
-
-function expandHrefWithLinkRules(href) {
-  let result = href;
-
-  for (let i = 0; i < linkRules.length; ++i) {
-    const rule = linkRules[i];
-    if (href.indexOf(rule.prefix) === 0) {
-      if ((typeof rule.replace) === 'string') {
-        let newHRef = rule.replace + href.slice(rule.prefix.length);
-        if (newHRef.indexOf(window.location.origin) === 0) {
-          newHRef = newHRef.slice(window.location.origin.length);
-        }
-        result = newHRef;
-        break;
-      }
-      else if ((typeof rule.replace) === 'function') {
-        const replacer = rule.replace(href);
-        result = replacer + href.slice(rule.prefix.length);
-      }
-    }
-  }
-
-  // console.log('expandHrefWithLinkRules', linkRules, href, result);
-  // console.log(JSON.stringify(linkRules, null, 2));
-
-  return result;
-}
-
-
-// Copied from https://github.com/jashkenas/underscore/blob/e944e0275abb3e1f366417ba8facb5754a7ad273/underscore.js#L1458
-
-const unescapeMap = {
-  '&amp;': '&',
-  '&lt;': '<',
-  '&gt;': '>',
-  '&quot;': '"',
-  '&#x27;': '\'',
-  '&#39;': '\'',
-  '&#x60;': '`'
-};
-
-// Functions for escaping and unescaping strings to/from HTML interpolation.
-function createEscaper(translationMap) {
-  function escaper(match) {
-    return translationMap[match];
-  }
-  // Regexes for identifying a key that needs to be escaped.
-  const source = '(?:' + Object.keys(translationMap).join('|') + ')';
-  const testRegexp = RegExp(source);
-  const replaceRegexp = RegExp(source, 'g');
-  return function (string) {
-    string = string == null ? '' : '' + string;
-    return testRegexp.test(string) ? string.replace(replaceRegexp, escaper) : string;
-  };
-}
-const decodeInlineScript = createEscaper(unescapeMap);
-
-const youtubeDimensions = {
-  thumbnail: 'width="426" height="240"',
-  halfwidth: 'width="640" height="360"',
-  fullwidth: 'width="1280" height="720"',
-};
-const youtubeClasses = {
-  thumbnail: 'thumbnail',
-  halfwidth: 'halfwidth',
-  fullwidth: 'fullwidth',
-};
-
-let uniqueYouTubeId = 0;
-
-function convertYoutubeFragmentToEmbed(href, title, text) {
-  // console.log('convertYoutubeFragmentToEmbed', href, title, text);
-  let result = null;
-  const textParts = text.split('|');
-  text = textParts[0];
-
-  const hrefNoProtocol = href.replace(/^https?:\/\//, '');
-
-  const sizing = youtubeDimensions[text] || '';
-  const classList = youtubeClasses[text] || '';
-  let suffix;
-
-  if (hrefNoProtocol.indexOf('youtu.be/') === 0) {
-    suffix = hrefNoProtocol.slice('youtu.be/'.length);
-  }
-  else if (hrefNoProtocol.indexOf('www.youtube.com/watch?v=') === 0) {
-    suffix = hrefNoProtocol.slice('www.youtube.com/watch?v='.length);
-    suffix = suffix.replace(/&/, '?'); // onlu replace first one
-  }
-
-  if (suffix) {
-    ++uniqueYouTubeId;
-    let args = '?html5=1&ecver=2&modestbranding=1';
-    const argsIndex = suffix.indexOf('?');
-    if (argsIndex >= 0) {
-      args += '&' + suffix.slice(argsIndex + 1);
-      suffix = suffix.slice(0, argsIndex);
-    }
-
-    let enablejsapi = '';
-    let apiButton = '';
-    let apiPlayerKey = `player_${uniqueYouTubeId}`;
-    if (textParts.length > 1) {
-      const apiParts = textParts[1].split('=');
-      if (apiParts[0] === 'api') {
-        if (apiParts.length > 1) {
-          apiPlayerKey = apiParts[1];
-        }
-        enablejsapi = '&enablejsapi=1';
-        apiButton =
-          `
-          <button
-            type="button"
-            id="youtube-api-${uniqueYouTubeId}"
-            href="#"
-            onclick="smartdown.setupYouTubePlayer('youtube-iframe-${uniqueYouTubeId}', '${apiPlayerKey}')"
-            class="api-button">
-            Enable API for player <b>${apiPlayerKey}</b>
-          </button>
-          `;
-      }
-    }
-
-    result =
-      `<div class="video-container youtube ${classList}">
-        <iframe
-          id="youtube-iframe-${uniqueYouTubeId}"
-          ${sizing}
-          src="https://www.youtube.com/embed/${suffix}${args}${enablejsapi}"
-          frameborder="0"
-          allow="camera;microphone;autoplay;encrypted-media;picture-in-picture"
-          allowfullscreen>
-        </iframe>
-      </div>
-      ${apiButton}
-      `;
-  }
-
-  return result;
-}
-
-function convertVimeoFragmentToEmbed(href, title, text) {
-  let result = null;
-  const hrefNoProtocol = href.replace(/^https?:\/\//, '');
-  const classList = (text === 'thumbnail') ? 'thumbnail' : 'fullwidth';
-
-  if (hrefNoProtocol.indexOf('vimeo.com/') === 0) {
-    let suffix = hrefNoProtocol.slice('vimeo.com/'.length);
-    let args = '?title=0&byline=0&portrait=0&badge=0';
-
-    const argsIndex = suffix.indexOf('?');
-    if (argsIndex >= 0) {
-      args += '&' + suffix.slice(argsIndex + 1);
-      suffix = suffix.slice(0, argsIndex);
-      console.log('args', args, suffix);
-    }
-
-    result =
-`<div class="video-container vimeo ${classList}">
-  <iframe
-    src="https://player.vimeo.com/video/${suffix}${args}"
-    width="640"
-    height="360"
-    frameborder="0"
-    allow="camera;microphone;autoplay;encrypted-media;picture-in-picture"
-    webkitallowfullscreen
-    mozallowfullscreen
-    allowfullscreen>
-  </iframe>
-</div>
-`;
-  }
-
-  return result;
-}
-
-function renderABCIntoDivs(baseId, abcType, abcText) {
-  if (window.ABCJS.midi) {
-    window.ABCJS.midi.stopPlaying();
-  }
-  const params = {
-    responsive: 'resize',
-  };
-  if (abcType !== 'abcmidi') {
-    const sheetDiv = document.getElementById(`${baseId}-sheet`);
-    window.ABCJS.renderAbc([sheetDiv], abcText, params);
-  }
-  if (abcType !== 'abcsheet') {
-    const midiDiv = document.getElementById(`${baseId}-midi`);
-    window.ABCJS.renderMidi([midiDiv], abcText, params);
-  }
-}
-
-function queueContentLoad(contentType, baseId, href, title, text) {
-  // console.log('queueContentLoad', contentType, baseId, href, title, text);
-
-  axios.get(href)
-    .then(function(result) {
-      ensureExtension('abc',
-        function () {
-          renderABCIntoDivs(baseId, text, result.data);
-        });
-    })
-    .catch(function(err) {
-      console.log('queueContentLoad error', err);
-    });
-}
-
-
-function areValuesSameEnough(varname, oldValue, newValue) {
-  // const oldValueJSON = JSON.stringify(oldValue);
-  // const newValueJSON = JSON.stringify(newValue);
-  // const result = oldValueJSON === newValueJSON;
-
-  // const result = oldValue === newValue;
-
-  const result = isEqual(oldValue, newValue);
-
-  //  let result = oldValue === newValue;
-  //
-  //  if ((typeof oldValue === 'number') && isNaN(oldValue) &&
-  //      (typeof newValue === 'number') && isNaN(newValue)) {
-  //    result = true;
-  //  }
-  //
-  //  if (!result) {
-  //    console.log('areValuesSameEnough', oldValue, newValue, typeof oldValue, typeof newValue);
-  //  }
-
-  return result;
-}
-
 
 //
 // Marked rendering extensions
@@ -805,14 +491,14 @@ function renderCode(code, languageString) {
 
   const prelude = getPrelude(language, code);
 
-  const bp = currentBackpatches[currentRenderDiv.id];
+  const bp = smartdown.currentBackpatches[smartdown.currentRenderDiv.id];
 
   if ((playable || autoplay) && prelude.includes.length > 0) {
     const backpatchIndex = bp.length;
     const deferredCode =
-`<pre>backpatch_${backpatchIndex}_${currentRenderDiv.id}</pre>`;
+`<pre>backpatch_${backpatchIndex}_${smartdown.currentRenderDiv.id}</pre>`;
     const backpatch = {
-      currentRenderDiv: currentRenderDiv,
+      currentRenderDiv: smartdown.currentRenderDiv,
       key: deferredCode,
       replace: null
     };
@@ -821,10 +507,10 @@ function renderCode(code, languageString) {
     const includesRemaining = prelude.includes.slice(0);  // Copy
     const prefixCode = '';
     recursivelyLoadIncludes(prefixCode, includesRemaining, function(includedCode) {
-      const saveRenderDiv = currentRenderDiv;
-      currentRenderDiv = backpatch.currentRenderDiv;
-      const renderedExpandedCode = renderCodeInternal(currentRenderDiv.id, includedCode, language, languageOpts, prelude);
-      currentRenderDiv = saveRenderDiv;
+      const saveRenderDiv = smartdown.currentRenderDiv;
+      smartdown.currentRenderDiv = backpatch.currentRenderDiv;
+      const renderedExpandedCode = renderCodeInternal(smartdown.currentRenderDiv.id, includedCode, language, languageOpts, prelude);
+      smartdown.currentRenderDiv = saveRenderDiv;
       const patch = bp[backpatchIndex];
 
       if (patch.key === deferredCode) {
@@ -840,7 +526,7 @@ function renderCode(code, languageString) {
     result = deferredCode;
   }
   else {
-    result = renderCodeInternal(currentRenderDiv.id, code, language, languageOpts, prelude);
+    result = renderCodeInternal(smartdown.currentRenderDiv.id, code, language, languageOpts, prelude);
   }
 
   return result;
@@ -850,596 +536,6 @@ function renderCodeSpan(text) {
   const unescaped = decodeInlineScript(text);
   const hljsResult = hljs.highlightAuto(unescaped, ['javascript']);
   return `<code class="hljs-inline">${hljsResult.value}</code>`;
-}
-
-/*
-  I don't know when this was ever used.
-
-function edit(regex, opt) {
-  regex = regex.source || regex;
-  opt = opt || '';
-  return {
-    replace: function(name, val) {
-      val = val.source || val;
-      val = val.replace(/(^|[^\[])\^/g, '$1');
-      regex = regex.replace(name, val);
-      return this;
-    },
-    getRegex: function() {
-      return new RegExp(regex, opt);
-    }
-  };
-}
-*/
-
-
-function isGIF(href) {
-  return (href.endsWith('.gif') || href.indexOf('data:image/gif;base64') === 0);
-}
-
-
-function isGifferable(href, title, tokens) {
-  const isGif = isGIF(href);
-
-  let useGiffer = false;
-  tokens.forEach((t) => {
-    if (t === 'player') {
-      useGiffer = true;
-    }
-  });
-  return isGif && useGiffer;
-}
-
-const imageStyles = {
-  default: '',
-  icon: 'icon',
-  thumbnail: 'thumbnail',
-  halfwidth: 'halfwidth',
-  fullwidth: 'fullwidth',
-};
-
-function renderImage(href, title, text) {
-  href = expandHrefWithLinkRules(href);
-  let out = '';
-  const specialClass = null;
-  const mediaLink = href.lastIndexOf('/media/', 0) >= 0;
-  if (mediaLink) {
-    const pathElements = href.split('/').reverse();
-    // console.log('render', href, pathElements);
-    const e1 = pathElements.pop();
-    if (e1 !== '') {
-      console.log('Unexpected /media syntax: ', href);
-    }
-    const e2 = pathElements.pop();
-    if (e2 === 'media') {
-      const imageName = pathElements.pop();
-      const imageClass = pathElements.pop() || '';
-
-      const fgClass = `media-image ${imageClass}`;
-      const media = mediaRegistry[imageName];
-      if (media) {
-        const inlineData = media.svgData;
-        out += '<div class="' + fgClass + '">';
-        out += inlineData;
-        out += '</div>';
-      }
-      else {
-        console.log('Media not found', imageName);
-        out += '<h6 style="color:red;">';
-        out += `Media not found: ${imageName}`;
-        out += '</h6>';
-      }
-    }
-  }
-  else if (href.indexOf('https://twitter.com') === 0) {
-    const showCards = (/&amp;showmedia$/i.test(href));
-    out = '<blockquote class="twitter-tweet"';
-    out += ' data-width="250"';
-    out += ' align="center"';
-    if (!showCards) {
-      out += ' data-cards="hidden"';
-    }
-    out += ' data-conversation="none"';
-    out += ' data-dnt="true"';
-    out += ' style="border:4px solid darkgray;">';
-    out += '<a href="' + href + '">' + (text || href) + '</a>';
-    out += '</blockquote>';
-  }
-  else if (isGIF(href)) {
-    const tokens = text.split(' ');
-    const usePlayer = isGifferable(href, title, tokens);
-
-    let width = '50%';
-    if (tokens.indexOf('fullwidth') >= 0) {
-      width = '100%';
-    }
-    else if (tokens.indexOf('thumbnail') >= 0) {
-      width = '320px';
-    }
-    else if (tokens.indexOf('icon') >= 0) {
-      width = '200px';
-    }
-    // console.log('isGIF', href, text, tokens, width);
-
-    if (usePlayer) {
-      out += `<div style="width:${width};margin:auto;padding:0;" class="gifffer-container"><img style="padding:0;" data-gifffer-width="100%" data-gifffer="${href}" data-gifffer-alt="${text}"`;
-    }
-    else {
-      const gifClassName = imageStyles[text] || imageStyles.default;
-
-      out += '<img class="' + gifClassName + '" src="' + href + '" alt="' + text + '"';
-      if (title) {
-        out += ' title="' + title + '"';
-      }
-      if (specialClass) {
-        out += ' class="' + specialClass + '"';
-      }
-    }
-    if (title) {
-      out += ' title="' + title + '"';
-    }
-    if (specialClass) {
-      out += ' class="' + specialClass + '"';
-    }
-    out += this.options.xhtml ? '/>' : '></div>';
-  }
-  else if (text === 'iframe') {
-    out +=
-      `
-      <div class="resp-iframe-container">
-        <iframe
-          src="${href}"
-          xwidth="800"
-          xheight="600"
-          frameborder="0"
-          allowfullscreen>
-        </iframe>
-      </div>`;
-  }
-  else if (href.endsWith('.mp3')) {
-    out += '<div style="margin:auto;padding:0;">\n';
-    out += '<audio preload="auto" controls>\n';
-    out += '<source type="audio/mpeg" src="' + href + '"/>\n';
-    out += '</audio>\n';
-    out += '</div>\n';
-  }
-  else if (href.endsWith('.abc')) {
-    const abcIndex = uniqueCellIndex++;
-    const abcBaseId = `abc-wrapper-${abcIndex}`;
-    out +=
-`
-  <div class="abc-wrapper">
-    <div
-      id="${abcBaseId}-sheet"
-      class="smartdown-abcsheet">
-    </div>
-    <div
-      id="${abcBaseId}-midi"
-      class="smartdown-abcmidi">
-    </div>
-  </div>
-`;
-    let contentType = 'abc';
-    if (text === 'abcsheet') {
-      contentType = text;
-    }
-    else if (text === 'abcmidi') {
-      contentType = text;
-    }
-    queueContentLoad(contentType, abcBaseId, href, title, text);
-  }
-  else {
-    const youtubeEmbed = convertYoutubeFragmentToEmbed(href, title, text);
-    const vimeoEmbed = convertVimeoFragmentToEmbed(href, title, text);
-
-    if (youtubeEmbed) {
-      out += youtubeEmbed;
-    }
-    else if (vimeoEmbed) {
-      out += vimeoEmbed;
-    }
-    else if (text === 'swatch') {
-      const bgColor = href || 'pink';
-      out += `<span class="smartdown-swatch" style="background:${bgColor}"></span>`;
-    }
-    else {
-      const className = imageStyles[text] || imageStyles.default;
-
-      out += '<img class="' + className + '" src="' + href + '" alt="' + text + '"';
-      if (title) {
-        out += ' title="' + title + '"';
-      }
-      if (specialClass) {
-        out += ' class="' + specialClass + '"';
-      }
-      out += this.options.xhtml ? '/>' : '>';
-    }
-  }
-
-  return out;
-}
-
-
-function renderLink(href, title, text) {
-  const smartdownTag = ':';
-
-  let useNewWindow = true;
-  let expanded = expandHrefWithLinkRules(href);
-
-  let forceNewWindow = false;
-  const attrsIndex = expanded.lastIndexOf('#-');
-
-  let attrs = '';
-  if (attrsIndex >= 0) {
-    attrs = expanded.slice(attrsIndex + '#-'.length);
-    expanded = expanded.slice(0, attrsIndex);
-    forceNewWindow = attrs === 'blank';
-    // console.log('attrs', href, attrs, expanded, forceNewWindow);
-  }
-
-  if (expanded !== href) {
-    href = expanded;
-    useNewWindow = false || forceNewWindow;
-    //
-  }
-  else if (href.indexOf('#') === 0) {
-    useNewWindow = false || forceNewWindow;
-  }
-  else if (href.indexOf('http') !== 0) {
-    useNewWindow = false || forceNewWindow;
-  }
-  else if (href.indexOf(smartdownTag) === 0) {
-    // x
-  }
-
-  const titleAttr = title ? `title="${title}" ` : '';
-  let linkHead = '<a ' + titleAttr +
-                 ' class="smartdown-link" href="' +
-                 href;
-  if (useNewWindow) {
-    linkHead += '" target="_blank" rel="noreferrer noopener">';
-  }
-  else {
-    linkHead += '">';
-  }
-
-  const linkBody = text;
-  const lowerhref = href.toLowerCase();
-  const linkTail = '</a>';
-  let result = linkHead + linkBody + linkTail;
-
-  if (lowerhref.indexOf(smartdownTag) === 0) {
-    let cellscript = decodeInlineScript(href.slice(smartdownTag.length));
-    let op = null;
-    let lhs = null;
-    let rhs = null;
-
-    if (cellscript.indexOf('?') === 0) {
-      op = 'INPUT';
-      lhs = cellscript.slice(1);
-    }
-    else if (cellscript.indexOf('-') === 0) {
-      op = 'INPUTRANGE';
-      lhs = cellscript.slice(1);
-    }
-    else if (cellscript.indexOf('X') === 0) {
-      op = 'INPUTCHECKBOX';
-      lhs = cellscript.slice(1);
-    }
-    else if (cellscript.indexOf('!') === 0) {
-      op = 'GET';
-      lhs = cellscript.slice(1);
-    }
-    else if (cellscript.indexOf('@') === 0) {
-      op = 'GO';
-      lhs = cellscript.slice(1);
-    }
-    else if (cellscript.indexOf('&') === 0) {
-      op = 'DIV';
-      lhs = cellscript.slice(1);
-    }
-    else if (cellscript.indexOf('=') === 0) {
-      op = 'CALC';
-      cellscript = cellscript.slice(1);
-      const exprs = cellscript.split(';');
-      if (exprs.length === 1) {
-        const eqIndex = cellscript.indexOf('=');
-        lhs = [cellscript.slice(0, eqIndex)];
-        rhs = [cellscript.slice(eqIndex + 1)];
-      }
-      else {
-        lhs = [];
-        rhs = [];
-        exprs.forEach((e) => {
-          const eqIndex = e.indexOf('=');
-          lhs.push(e.slice(0, eqIndex));
-          rhs.push(e.slice(eqIndex + 1));
-        });
-      }
-      // console.log('lhs/rhs', lhs, rhs);
-    }
-    else if (cellscript.indexOf('/') === 0) {
-      const parts2 = cellscript.split('@');
-      op = parts2[0];
-      lhs = parts2[1];
-    }
-    else if (cellscript.indexOf(':') === 0) {
-      op = 'REVEAL';
-      cellscript = cellscript.slice(1);
-      if (cellscript.indexOf('/') >= 0) {
-        const parts = cellscript.split('/');
-        lhs = parts[0];
-        rhs = parts.slice(1).join(',');
-      }
-      else {
-        lhs = cellscript;
-      }
-    }
-
-    let newHTML = '';
-    const hasLabel = !!(text && text.length > 0);
-    if (op === 'INPUT') {
-      uniqueCellIndex++;
-      const inputCellId = 'INPUT' + uniqueCellIndex;
-      const inputCellIdParts = lhs.split(/[|!]/g);
-      let inputType = 'text';
-      let liveBlur = false;
-      if (inputCellIdParts.length > 1) {
-        lhs = inputCellIdParts[0];
-        inputType = inputCellIdParts[1];
-      }
-      else {
-        liveBlur = true;
-      }
-
-      smartdownCells[inputCellId] = {
-        cellBinding: lhs,
-        cellID: inputCellId,
-        cellType: 'input',
-        datatype: inputType
-      };
-
-      if (hasLabel) {
-        newHTML += '<span class="infocell-group">\n';
-
-        newHTML += '<span class="infocell-group-addon"><span class="infocell-label">' + decodeURIComponent(text) + '</span></span>';
-        if (inputType === 'number') {
-          newHTML += '<input type="number" class="infocell-input"';
-        }
-        else {
-          newHTML += '<textarea rows="1" type="text" class="infocell-textarea"';
-        }
-      }
-      else if (inputType === 'number') {
-        newHTML += '<input type="number" class="infocell-input"';
-      }
-      else {
-        newHTML += '<textarea rows="1" type="text" class="infocell-textarea"';
-      }
-
-      if (inputType === 'number' || !liveBlur) {
-        newHTML += ' onblur="smartdown.setVariable(\'' + lhs + '\', this.value, \'' + inputType + '\')"';
-      }
-      else {
-        newHTML += ' onkeyup="smartdown.setVariable(\'' + lhs + '\', this.value, \'' + inputType + '\')"';
-      }
-      newHTML += ' id="' + inputCellId + '"';
-      // newHTML += ' placeholder="' + decodeURIComponent(text) + '" aria-describedby="' + lhs + '"';
-      newHTML += '>';
-
-      if (inputType === 'number') {
-        newHTML += '\n';
-      }
-      else {
-        newHTML += '</textarea>\n';
-      }
-
-      if (hasLabel) {
-        newHTML += '</span>';
-      }
-    }
-    else if (op === 'INPUTRANGE') {
-      uniqueCellIndex++;
-      const inputRangeCellId = 'INPUTRANGE' + uniqueCellIndex;
-
-      const lhsElements = lhs.split('/');
-      lhs = lhsElements[0];
-
-      let min = lhsElements[1];
-      let max = lhsElements[2];
-      let step = lhsElements[3];
-
-      min = (min && min.length > 0) ? min : 0.0;
-      max = (max && max.length > 0) ? max : 100.0;
-      step = (step && step.length > 0) ? step : 1.0;
-
-      smartdownCells[inputRangeCellId] = {
-        cellBinding: lhs,
-        cellID: inputRangeCellId,
-        cellType: 'inputrange',
-        datatype: 'number'
-      };
-
-      if (hasLabel) {
-        newHTML += '<span class="infocell-group">\n';
-        newHTML += '<span class="infocell-group-addon" id="' + lhs + '"><span class="infocell-label">' + decodeURIComponent(text) + '</span></span>';
-      }
-
-      // <input type="range" min="5" max="10" step="0.01">
-      newHTML += '<input type="range"';
-      newHTML += ' class="infocell-input-range"';
-      newHTML += ' style="width:40%;"';
-      newHTML += ' min="' + min + '"';
-      newHTML += ' max="' + max + '"';
-      newHTML += ' step="' + step + '"';
-      newHTML += ' id="' + inputRangeCellId + '"';
-      newHTML += ' oninput="smartdown.setVariable(\'' + lhs + '\', this.valueAsNumber, \'number\')"';
-      newHTML += '</input>';
-      if (hasLabel) {
-        newHTML += '</span>';
-      }
-    }
-    else if (op === 'INPUTCHECKBOX') {
-      uniqueCellIndex++;
-      const inputCheckboxCellId = 'INPUTCHECKBOX' + uniqueCellIndex;
-
-      smartdownCells[inputCheckboxCellId] = {
-        cellBinding: lhs,
-        cellID: inputCheckboxCellId,
-        cellType: 'inputcheckbox',
-        datatype: 'boolean'
-      };
-
-      if (hasLabel) {
-        newHTML += '<span class="infocell-group">\n';
-        newHTML += '<span class="infocell-group-addon" id="' + lhs + '"><span class="infocell-label">' + decodeURIComponent(text) + '</span></span>';
-      }
-
-      newHTML += '<input class="smartdown-checkbox" type="checkbox"';
-      newHTML += ' id="' + inputCheckboxCellId + '"';
-      newHTML += ' onchange="smartdown.setVariable(\'' + lhs + '\', this.checked, \'boolean\')"';
-      newHTML += '</input>';
-      if (hasLabel) {
-        newHTML += '</span>';
-      }
-    }
-    else if (op === 'CALC') {
-      ++uniqueCellIndex;
-      const manualInvoke = hasLabel;
-      if (hasLabel) {
-        text = text.replace(/<code class="hljs-inline">(.+)<\/code>/g, '`$1`');
-      }
-      const expr = smartdown.registerExpression(uniqueCellIndex, text, lhs, rhs, hasLabel);
-      if (manualInvoke) {
-        newHTML +=
-`<button
-  class="btn-infocell btn-infocell-calc"
-  onclick="smartdown.computeStoredExpression('${expr.exprId}')">
-  <span id="${expr.labelId}">${decodeURIComponent(expr.labelText)}</span>
-</button>`;
-      }
-      else {
-        newHTML += `<span style="display:none;" id="${expr.labelId}"></span>`;
-      }
-    }
-    else if (op === 'GO') {
-      newHTML += '<button class="btn-infocell btn-infocell-go" onclick="smartdown.goToCard(\'' +
-      lhs +
-      '\', event, \'' +
-      currentRenderDiv.id +
-      '\')">' +
-      decodeURIComponent(text) +
-      '</button>';
-    }
-    else if (op === 'DIV') {
-      if (hasLabel) {
-        newHTML += '<span class="infocell-group">\n';
-        if (text && text.length > 0) {
-          newHTML += '<span class="infocell-group-addon infocell-group-inline"><span class="infocell-label">' + decodeURIComponent(text) + '</span></span>';
-        }
-      }
-
-      newHTML +=
-`<span
-  class="smartdown-playable inline-target-div"
-  id="inline-target-${lhs}">
-</span>
-`;
-    }
-    else if (op === 'GET') {
-      uniqueCellIndex++;
-      const outputCellId = 'OUTPUT_' + uniqueCellIndex;
-
-      const outputCellIdParts = lhs.split(/[|!]/g);
-      let outputType = 'text';
-      let flavors = '';
-      if (outputCellIdParts.length > 1) {
-        lhs = outputCellIdParts[0];
-        outputType = outputCellIdParts[1];
-        if (outputType === '') {
-          outputType = 'text';
-        }
-        const tmp = outputCellIdParts.slice(2);
-        tmp.unshift('');
-        flavors = tmp.join(' smartdown-flavor-');
-      }
-
-      smartdownCells[outputCellId] = {
-        cellBinding: lhs,
-        cellID: outputCellId,
-        cellType: 'output',
-        datatype: outputType
-      };
-
-      if (hasLabel) {
-        newHTML += '<span class="infocell-group">\n';
-        if (text && text.length > 0) {
-          newHTML += '<span class="infocell-group-addon"><span class="infocell-label">' + decodeURIComponent(text) + '</span></span>';
-        }
-      }
-
-      const smartdownClass = 'smartdown-' + outputType;
-
-      // DRY this up. It's stupidly repetitive
-      if (
-        outputType !== '' &&
-        outputType !== 'text' &&
-        outputType !== 'markdown' &&
-        outputType !== 'url') {
-        newHTML += `<div class="infocell-output ${smartdownClass} ${flavors}" id="${outputCellId}"></div>`;
-      }
-      else {
-        newHTML += `<span class="infocell-output ${smartdownClass} ${flavors}" id="${outputCellId}"></span>`;
-      }
-      if (hasLabel) {
-        newHTML += '</span>';
-      }
-    }
-    else if (op === 'REVEAL') {
-      uniqueCellIndex++;
-      const body = decodeURIComponent(text);
-
-      if (rhs === null) {
-        rhs = 'button';
-      }
-      const settings = rhs.split(',');
-      if (settings.includes('link') || settings.includes('tooltip')) {
-        rhs = 'link';
-      }
-      else {
-        rhs = 'button';
-      }
-      let settingsStr = '';
-      if (settings.length >= 1) {
-        settingsStr = settings.join(',');
-      }
-
-      if (rhs === 'button') {
-        newHTML += `<button
-                  id="trigger_${lhs}"
-                  class="btn-infocell disclosable-trigger-button"
-                  onclick="smartdown.toggleDisclosure('${lhs}', 'trigger_${lhs}', '${settingsStr}');">
-                  <span id="span_${lhs}_closed">${body}</span>
-                  <span id="span_${lhs}_opened" style="display: none">${body}</span>
-                  </button>`;
-      }
-      else if (rhs === 'link') {
-        newHTML += `<span
-                      class="disclosable-trigger-tooltip-wrapper"
-                      onmouseleave="smartdown.linkWrapperExit('${lhs}', '${settingsStr}');">
-                    <a
-                      id="trigger_${lhs}_${uniqueCellIndex}"
-                      class="disclosable-trigger-tooltip"
-                      onmouseenter="smartdown.showDisclosure('${lhs}', 'trigger_${lhs}_${uniqueCellIndex}', '${settingsStr}');">
-                      ${body}
-                    </a></span>`;
-      }
-    }
-
-    result = newHTML;
-  }
-
-  return result;
 }
 
 function renderParagraph(text) {
@@ -1685,7 +781,7 @@ function registerExpression(cellIndex, labelText, lhss, rhss, manual) {
     types.push(calcType);
   }
 
-  const rootDivId = currentRenderDiv.id;
+  const rootDivId = smartdown.currentRenderDiv.id;
   const exprId = `expr-${cellIndex}`;
   const labelId = `label-${exprId}`;
 
@@ -1716,7 +812,7 @@ function expandStringWithSubstitutions(expr) {
       newExpr += prefix;
       if (i < splits.length - 1) {
         const varName = splits[++i];
-        const varValue = smartdownVariables[varName];
+        const varValue = smartdown.smartdownVariables[varName];
         if (varValue) {
           newExpr += `${varValue}`;
         }
@@ -2027,7 +1123,7 @@ async function playPlayableInternal(language, divId) {
   if (playableType.javascript) {
     const argValues = [
       playable,
-      smartdownVariables,
+      smartdown.smartdownVariables,
       P5.Loader,
       window.d3,
       window.d3fc,
@@ -2046,7 +1142,7 @@ async function playPlayableInternal(language, divId) {
     // 'this' value, and the value of the 'playable' argument.
     //
     playable.embedThis = {
-      env: smartdownVariables,
+      env: smartdown.smartdownVariables,
       div,
       progress,
       dependOn: {},
@@ -2191,7 +1287,7 @@ ${e}
         else {
           let atLeastOneUndefined = false;
           dependOn.forEach((varname) => {
-            const newValue = smartdownVariables[varname];
+            const newValue = smartdown.smartdownVariables[varname];
             if (newValue === undefined) {
               atLeastOneUndefined = true;
             }
@@ -2208,7 +1304,7 @@ ${e}
         let atLeastOneEvaluated = false;
         Object.keys(dependOn).forEach((varname) => {
           atLeastOneEvaluated = true;
-          const newValue = smartdownVariables[varname];
+          const newValue = smartdown.smartdownVariables[varname];
           playable.dependLastValues[varname] = newValue;
 
           if (newValue !== undefined) {
@@ -2923,7 +2019,7 @@ function toggleKiosk(divId, event) {
 
 function toggleDisclosure(divId, triggerId, settingsStr) {
   const div = document.getElementById(divId);
-  const isOpen = !!smartdownVariables[divId];
+  const isOpen = !!smartdown.smartdownVariables[divId];
 
   if (div) {
     const isOpenClass = div.classList.contains('disclosable-open');
@@ -3222,6 +2318,15 @@ function setLinkRules(_linkRules) {
  */
 
 function configure(options, loadedHandler) {
+  global.smartdown = window.smartdown; // Needed for MochaJS/JSDom usage
+
+  smartdown.currentRenderDiv = null;
+  smartdown.currentBackpatches = {};
+  smartdown.smartdownCells = {};
+  smartdown.smartdownVariables = {};
+  smartdown.uniqueCellIndex = 0;
+  smartdown.mediaRegistry = {};
+
   const media = options.media;
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const _baseURL = options.baseURL;
@@ -3252,18 +2357,17 @@ function configure(options, loadedHandler) {
     setLinkRules(_linkRules);
   }
 
-  mediaRegistry = media || {};
-  window.mediaRegistry = mediaRegistry;
+  smartdown.mediaRegistry = media || {};
+  window.mediaRegistry = smartdown.mediaRegistry;
 
   /* global MathJax */
   /* eslint new-cap: 0 */
   /* eslint no-native-reassign: 0 */
   /* eslint no-trailing-spaces: 0 */
-  /* global smartdown */
-
-  Object.keys(mediaRegistry).forEach((key) => {
-    const url = mediaRegistry[key];
-    mediaRegistry[key] = {
+  
+  Object.keys(smartdown.mediaRegistry).forEach((key) => {
+    const url = smartdown.mediaRegistry[key];
+    smartdown.mediaRegistry[key] = {
       type: '',
       url: '',
       expandedurl: '',
@@ -3271,16 +2375,16 @@ function configure(options, loadedHandler) {
     };
 
     if (url.indexOf('<svg ') === 0) {
-      mediaRegistry[key].type = 'svg';
-      mediaRegistry[key].url = key;
-      mediaRegistry[key].expandedurl = key;
-      mediaRegistry[key].svgData = url;
+      smartdown.mediaRegistry[key].type = 'svg';
+      smartdown.mediaRegistry[key].url = key;
+      smartdown.mediaRegistry[key].expandedurl = key;
+      smartdown.mediaRegistry[key].svgData = url;
     }
     else if (url.endsWith('.svg')) {
       function svgLoaded() {
         /* eslint no-invalid-this: 0 */
         const sourceText = this.responseText;
-        const svgMedia = mediaRegistry[this.svgKey];
+        const svgMedia = smartdown.mediaRegistry[this.svgKey];
         svgMedia.svgData = sourceText;
         svgMedia.type = 'svginline';
       }
@@ -3288,16 +2392,16 @@ function configure(options, loadedHandler) {
       const oReq = new XMLHttpRequest();
       oReq.svgKey = key;
       oReq.addEventListener('load', svgLoaded);
-      mediaRegistry[key].type = 'svg';
-      mediaRegistry[key].url = url;
-      mediaRegistry[key].expandedurl = expandHrefWithLinkRules(url);
-      oReq.open('GET', mediaRegistry[key].expandedurl);
+      smartdown.mediaRegistry[key].type = 'svg';
+      smartdown.mediaRegistry[key].url = url;
+      smartdown.mediaRegistry[key].expandedurl = expandHrefWithLinkRules(url, linkRules);
+      oReq.open('GET', smartdown.mediaRegistry[key].expandedurl);
       oReq.send();
     }
     else {
-      mediaRegistry[key].type = 'url';
-      mediaRegistry[key].url = url;
-      mediaRegistry[key].expandedurl = expandHrefWithLinkRules(url);
+      smartdown.mediaRegistry[key].type = 'url';
+      smartdown.mediaRegistry[key].url = url;
+      smartdown.mediaRegistry[key].expandedurl = expandHrefWithLinkRules(url, linkRules);
     }
   });
 
@@ -3390,187 +2494,10 @@ function initialize(media, baseURL, loadedHandler, cardLoaderArg, calcHandlersAr
 
 let patchesUnresolvedKludgeLimit = 0;
 
-async function renderCell(cellID, variableId, newValue) {
-  const cellInfo = smartdownCells[cellID];
-
-  const element = document.getElementById(cellID);
-  // console.log('renderCell', cellInfo, newValue, element, element.type, element.tagName, cellInfo.cellType, cellInfo.datatype, s);
-  let s = JSON.stringify(newValue, null, 2);
-  if (s) {
-    s = s.slice(0, 20);
-  }
-
-  if (!element) {
-    console.log('...renderCell cellID not found', cellID, variableId, newValue);
-  }
-  else if (element.type === 'checkbox') {
-    element.checked = !!newValue;
-  }
-  else if (cellInfo.cellType === 'inputrange') {
-    element.value = newValue;
-  }
-  else if (cellInfo.datatype === 'code') {
-    if (newValue === undefined) {
-      element.innerHTML = '';
-    }
-    else {
-      element.innerHTML = '<pre class="infocell-output-pre">' + entityEscape(newValue) + '</pre>';
-    }
-  }
-  else if (cellInfo.datatype === 'json') {
-    if (newValue === undefined) {
-      element.innerHTML = '';
-    }
-    else {
-      const stringified = JSON.stringify(newValue, null, 2);
-      const escaped = entityEscape(stringified, true);
-      // console.log('stringified', stringified);
-      element.innerHTML = '<pre class="infocell-output-pre">' + escaped + '</pre>';
-    }
-  }
-  else if (cellInfo.datatype === 'url') {
-    element.innerHTML = `<a target="_blank" rel="noreferrer noopener" href="${newValue}" style="word-break:break-all;font-size:0.9em;line-height:1.15em;">${newValue}</a>`;
-  }
-  else if (cellInfo.datatype === 'markdown') {
-    if (typeof newValue === 'string') {
-      smartdown.setSmartdown(newValue, element);
-    }
-    else {
-      element.innerHTML = '';
-    }
-  }
-  else if (cellInfo.datatype === 'openjscad') {
-    const divId = cellInfo.cellID;
-    if (typeof newValue !== 'string') {
-      element.innerHTML = '';
-    }
-    else {
-      ensureExtension('openjscad', async function() {
-        const innerHTML = OpenJSCAD.generateInnerHTML(divId);
-        element.innerHTML = innerHTML;
-        const augmentedCode = OpenJSCAD.generateAugmentedPlayable(divId, newValue);
-        // console.log('augmentedCode');
-        // console.log(augmentedCode);
-
-        const asyncAugmentedCode =
-`
-return (async () => {
-  ${augmentedCode}
-})();
-`;
-        /* eslint-disable-next-line no-new-func */
-        // eslint-disable-next-line @typescript-eslint/no-implied-eval
-        const func = new Function([], asyncAugmentedCode);
-
-        try {
-          await func.apply(this, [null]);
-        }
-        catch (e) {
-          console.log('###runFunction catch func.apply()', e);
-          element.innerHTML = `<b># Error evaluating OpenJSCAD cell: ${e}</b>`;
-        }
-      });
-    }
-
-  }
-  else if (cellInfo.datatype.indexOf('abc') === 0) {
-    const abcBaseId = element.id;
-    element.innerHTML =
-`
-  <div class="abc-wrapper">
-    <div
-      id="${abcBaseId}-sheet"
-      class="smartdown-abcsheet">
-    </div>
-    <div
-      id="${abcBaseId}-midi"
-      class="smartdown-abcmidi">
-    </div>
-  </div>
-`;
-
-    if (typeof newValue === 'string' && newValue.length > 0) {
-      ensureExtension(
-        'abc',
-        function () {
-          renderABCIntoDivs(abcBaseId, cellInfo.datatype, newValue);
-        });
-    }
-  }
-  else if (cellInfo.datatype === 'graphviz') {
-    element.innerHTML = '';
-    if (typeof newValue === 'string' && newValue.length > 0) {
-      window.smartdownJSModules.graphviz.loader(function () {
-        const options = {
-          images: graphvizImages
-        };
-        (new window.Viz()).renderString(newValue, options).then((result) => {
-          element.innerHTML = result;
-        });
-      });
-    }
-  }
-  else if (cellInfo.datatype === 'svg') {
-    element.innerHTML = newValue;
-  }
-  else if (cellInfo.datatype === 'mermaid') {
-    if (newValue === undefined) {
-      element.innerHTML = '';
-    }
-    else {
-      Mermaid.mermaidRender(element, newValue);
-    }
-  }
-  else if (Array.isArray(newValue)) {
-    // console.log('array', newValue, newValue.elementType);
-    const isImage = newValue.elementType === 'image';
-    const isURLTitle = newValue.elementType === 'title/url';
-    let elementList = '<ul class="infocell-output-list">';
-    for (let elementIndex = 0; elementIndex < newValue.length; ++elementIndex) {
-      const newElement = newValue[elementIndex];
-      if (isImage) {
-        elementList += '<li><img src="' + newElement + '"></li>';
-      }
-      else if (isURLTitle) {
-        elementList += '<li><a target="_blank" rel="noreferrer noopener" href="' + newElement.url + '">' + newElement.title + '</a></li>';
-      }
-      else if (typeof newElement === 'string') {
-        elementList += '<li>' + newElement + '</li>';
-      }
-      else {
-        elementList += `<li><pre class="infocell-output-pre">${JSON.stringify(newElement, null, 2)}</pre></li>`;
-      }
-    }
-    elementList += '</ul>';
-    element.innerHTML = elementList;
-  }
-  else if (typeof newValue === 'object') {
-    element.innerHTML = '<pre class="infocell-output-pre">' + JSON.stringify(newValue, null, 2) + '</pre>';
-    // element.value = newValue;
-  }
-  else if (typeof newValue === 'string' && newValue.indexOf('https://upload.wikimedia.org') === 0) {
-    element.innerHTML = '<img src="' + newValue + '">';
-  }
-  else if (newValue === undefined) {
-    element.innerHTML = '';
-  }
-  else if (element.tagName === 'TEXTAREA') {
-    element.value = newValue; // newValue.replace('\n', '<br>');
-  }
-  else if (typeof newValue === 'string') {
-    element.innerHTML = entityEscape(newValue); // .replace(/\n/g, '<br>');
-  }
-  else {
-    element.innerHTML = newValue; //  = newValue.replace(/\n/g, '<br>');
-    element.value = newValue; //  = newValue.replace(/\n/g, '<br>');
-  }
-}
-
-
 function propagateModel() {
   ensureCells();
   ensureVariables();
-  lodashEach(smartdownVariables, function (v, k) {
+  lodashEach(smartdown.smartdownVariables, function (v, k) {
     propagateChangedVariable(k, v);
   });
 }
@@ -3580,10 +2507,10 @@ async function updateProcesses(id, newValue) {
   smartdown.computeExpressions();
 
   if (id) {
-    // lodashEach(smartdownCells, function(newCell, cellID) {
+    // lodashEach(smartdown.smartdownCells, function(newCell, cellID) {
     //   console.log('........newCellCheck', id, newCell, newCell.cellBinding, cellID);
     // });
-    lodashEach(smartdownCells, async function(newCell, cellID) {
+    lodashEach(smartdown.smartdownCells, async function(newCell, cellID) {
       // console.log('........newCell', id, newCell, newCell.cellBinding, cellID);
 
       if (id === newCell.cellBinding) {
@@ -3592,8 +2519,8 @@ async function updateProcesses(id, newValue) {
     });
   }
   else {
-    lodashEach(smartdownCells, async function(newCell, cellID) {
-      const oldValue = smartdownVariables[newCell.cellBinding];
+    lodashEach(smartdown.smartdownCells, async function(newCell, cellID) {
+      const oldValue = smartdown.smartdownVariables[newCell.cellBinding];
       await renderCell(cellID, newCell.cellBinding, oldValue);
     });
   }
@@ -3613,7 +2540,7 @@ async function updateProcesses(id, newValue) {
               let atLeastOneUndefined = false;
               dependOn.forEach((varname) => {
                 const oldValue = playable.dependLastValues[varname];
-                const newerValue = smartdownVariables[varname];
+                const newerValue = smartdown.smartdownVariables[varname];
                 playable.dependLastValues[varname] = newerValue;
                 if (newerValue === undefined) {
                   atLeastOneUndefined = true;
@@ -3642,7 +2569,7 @@ async function updateProcesses(id, newValue) {
         else if (dependOn) {
           Object.keys(dependOn).forEach((varname) => {
             const oldValue = playable.dependLastValues[varname];
-            const newerValue = smartdownVariables[varname];
+            const newerValue = smartdown.smartdownVariables[varname];
             playable.dependLastValues[varname] = newerValue;
 
             if (!areValuesSameEnough(varname, oldValue, newerValue)) {
@@ -3663,7 +2590,7 @@ async function updateProcesses(id, newValue) {
 
 
 function changeVariable(id, newValue) {
-  smartdownVariables[id] = newValue;
+  smartdown.smartdownVariables[id] = newValue;
   // console.log('changeVariable', id, newValue, useLocalForage, smartdown.persistence);
   if (useLocalForage && smartdown.persistence) {
     const key = localForageSmartdownPrefix + id;
@@ -3676,7 +2603,7 @@ function changeVariable(id, newValue) {
 }
 
 function propagateChangedVariable(id, newValue, force) {
-  const oldValue = smartdownVariables[id];
+  const oldValue = smartdown.smartdownVariables[id];
 
   if (force || !areValuesSameEnough(id, oldValue, newValue)) {
     changeVariable(id, newValue);
@@ -3686,25 +2613,25 @@ function propagateChangedVariable(id, newValue, force) {
 
 
 function ensureCells() {
-  lodashEach(smartdownCells, function(newCell, cellID) {
+  lodashEach(smartdown.smartdownCells, function(newCell, cellID) {
     const element = document.getElementById(cellID);
     if (!element) {
-      // console.log('...ensureCells element for cellID not found', cellID, smartdownCells[cellID]);
-      delete smartdownCells[cellID];
+      // console.log('...ensureCells element for cellID not found', cellID, smartdown.smartdownCells[cellID]);
+      delete smartdown.smartdownCells[cellID];
     }
   });
 }
 
 
 function ensureVariables() {
-  lodashEach(smartdownCells, function(newCell) {
-    const oldValue = smartdownVariables[newCell.cellBinding];
+  lodashEach(smartdown.smartdownCells, function(newCell) {
+    const oldValue = smartdown.smartdownVariables[newCell.cellBinding];
     changeVariable(newCell.cellBinding, oldValue);
   });
 }
 
 function resetVariables() {
-  smartdownVariables = {};
+  smartdown.smartdownVariables = {};
   changeVariable(null, null);
   ensureVariables();
 }
@@ -3763,13 +2690,13 @@ function getFrontmatter(md) {
 
 
 function setSmartdown(md, outputDiv, setSmartdownCompleted) {
-  if (currentRenderDiv) {
-    console.log('setSmartdown REENTRANCY FAIL', currentRenderDiv.id, md.slice(0, 40));
+  if (smartdown.currentRenderDiv) {
+    console.log('setSmartdown REENTRANCY FAIL', smartdown.currentRenderDiv.id, md.slice(0, 40));
   }
   else {
-    currentRenderDiv = outputDiv;
+    smartdown.currentRenderDiv = outputDiv;
   }
-  currentBackpatches[outputDiv.id] = [];
+  smartdown.currentBackpatches[outputDiv.id] = [];
 
   setupScrollHoverDisable();
   cleanupOrphanedStuff();
@@ -3819,7 +2746,7 @@ function setSmartdown(md, outputDiv, setSmartdownCompleted) {
           if (key.indexOf(localForageSmartdownPrefix) === 0) {
             const varName = key.slice(localForageSmartdownPrefix.length);
             if (value) {
-              smartdownVariables[varName] = value;
+              smartdown.smartdownVariables[varName] = value;
             }
           }
         }).then(function() {
@@ -4022,10 +2949,10 @@ function setSmartdown(md, outputDiv, setSmartdownCompleted) {
     result = sanitized;
   }
 
-  currentRenderDiv = null;
+  smartdown.currentRenderDiv = null;
 
   function applyBackpatches(done) {
-    const bp = currentBackpatches[outputDiv.id];
+    const bp = smartdown.currentBackpatches[outputDiv.id];
     let patchesUnresolved = 0;
     bp.forEach((patch) => {
       if (patch.key) {
@@ -4063,7 +2990,7 @@ function setSmartdown(md, outputDiv, setSmartdownCompleted) {
   }
 
   patchesUnresolvedKludgeLimit = 5;
-  // console.log('applyBackpatches BEGIN', outputDiv.id, currentRenderDiv);
+  // console.log('applyBackpatches BEGIN', outputDiv.id, smartdown.currentRenderDiv);
 
 
   applyBackpatches(function() {
@@ -4266,7 +3193,7 @@ function computeExpression(entry, done) {
         // PASS
       }
       else if (!rhs) {
-        //  smartdownVariables[lhs] = smartdownVariables[lhs] || '';
+        //  smartdown.smartdownVariables[lhs] = smartdown.smartdownVariables[lhs] || '';
       }
       else if (rhs[0] === '/') {
         rhs = rhs.slice(1);
@@ -4288,11 +3215,11 @@ function computeExpression(entry, done) {
       }
       else {
         let vars = '';
-        lodashEach(smartdownVariables, function (v, k) {
+        lodashEach(smartdown.smartdownVariables, function (v, k) {
           vars += ',' + k;
         });
         vars = vars.slice(1);
-        const vals = lodashMap(smartdownVariables, function (v) {
+        const vals = lodashMap(smartdown.smartdownVariables, function (v) {
           return v;
         });
 
@@ -4304,8 +3231,8 @@ function computeExpression(entry, done) {
           newValue = Number(newValue);
         }
         propagateChangedVariable(lhs, newValue);
-        // const oldValue = smartdownVariables[lhs];
-        // smartdownVariables[lhs] = newValue;
+        // const oldValue = smartdown.smartdownVariables[lhs];
+        // smartdown.smartdownVariables[lhs] = newValue;
         // console.log('...', lhs, oldValue, newValue, entry);
       }
     }
@@ -4318,7 +3245,6 @@ function computeExpression(entry, done) {
     }
   }
 }
-
 
 function goToCard(cardKey, event, outputDivId) {
   if (event) {
@@ -4373,7 +3299,7 @@ function loadCardsFromDocumentScripts() {
 }
 
 function getMedia(mediaKey) {
-  return mediaRegistry[mediaKey];
+  return smartdown.mediaRegistry[mediaKey];
 }
 
 let youtubeIframeAPILoaded = false;
@@ -4424,7 +3350,6 @@ function setupYouTubePlayer(div, varName) {
   }
 }
 
-
 module.exports = {
   initialize: initialize,
   configure: configure,
@@ -4432,7 +3357,6 @@ module.exports = {
   expressionsRegistered: perPageState.expressionsRegistered,
   playablesRegistered: perPageState.playablesRegistered,
   playablesRegisteredOrder: perPageState.playablesRegisteredOrder,
-  smartdownVariables: smartdownVariables,
   enhanceMarkedAndOpts: enhanceMarkedAndOpts,
   partitionMultipart: partitionMultipart,
   registerPlayable: registerPlayable,
@@ -4499,7 +3423,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.65',
+  version: '1.0.66',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,
@@ -4513,6 +3437,11 @@ module.exports = {
   loadExternal: loadExternal,
   ensureExtension: ensureExtension,
   es6Playables: es6Playables,
+  currentRenderDiv: null,
+  currentBackpatches: {},
+  smartdownVariables: null,
+  uniqueCellIndex: null,
+  mediaRegistry: null,
 };
 
 // kick off the polyfill!

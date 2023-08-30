@@ -8,13 +8,17 @@ const postConfigureTimeout = 3000;
 /* global it */
 /* global afterEach */
 
+// console.log('b.configure window.smartdown', window.smartdown);
+// console.log('b.configure global.smartdown', global.smartdown);
+// console.log('b.configure smartdown', smartdown);
+
 describe('b.configure', function() {
   this.slow(1500);
   this.timeout(5000); // Default is 2000ms. Must be larger than postConfigureTimeout
 
   describe('smartdown.version()', function() {
-    it('should return "1.0.65"', function(done) {
-      assert.equal(smartdown.version, '1.0.65');
+    it('should return "1.0.66"', function(done) {
+      assert.equal(smartdown.version, '1.0.66');
       done();
     });
   });
@@ -27,7 +31,6 @@ describe('b.configure', function() {
   });
 
   describe('smartdown.configure', function() {
-
     // This afterEach() delay appears to necessary when:
     //  - Running smartdown.configure() in a mocha (nodejs) environment
     // There appears to be some bug where if a subsequent smartdown.configure()
@@ -50,7 +53,6 @@ describe('b.configure', function() {
         // baseURL: 'https://localhost:4000/'
       };
       smartdown.configure(options, function() {
-        console.log('smartdown.configure() #1 completed', typeof MathJax, typeof window.MathJax);
         assert.equal(1, 1);
         done();
       });
