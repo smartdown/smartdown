@@ -1,7 +1,7 @@
 /* global smartdown */
 
-import expandHrefWithLinkRules from './expandHrefWithLinkRules';
-import decodeInlineScript from './decodeInlineScript';
+import expandHrefWithLinkRules from '../util/expandHrefWithLinkRules';
+import decodeInlineScript from '../parse/decodeInlineScript';
 
 export default function renderLink(href, title, text) {
   const smartdownTag = ':';

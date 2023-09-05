@@ -1,11 +1,11 @@
 /* global smartdown */
 
 import entityEscape from './entityEscape';
-import {ensureExtension} from './extensions';
+import {ensureExtension} from '../extensions';
 import renderABCIntoDivs from './renderABCIntoDivs';
-import OpenJSCAD from './extensions/OpenJSCAD';
-import Mermaid from './extensions/Mermaid';
-import graphvizImages from './extensions/Graphviz';
+import OpenJSCAD from '../extensions/OpenJSCAD';
+import Mermaid from '../extensions/Mermaid';
+import graphvizImages from '../extensions/Graphviz';
 
 export default async function renderCell(cellID, variableId, newValue) {
   const cellInfo = smartdown.smartdownCells[cellID];

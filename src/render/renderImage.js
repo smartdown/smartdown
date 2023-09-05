@@ -2,10 +2,10 @@
 
 import axios from 'axios';
 
-import expandHrefWithLinkRules from './expandHrefWithLinkRules';
-import convertYoutubeFragmentToEmbed from './convertYoutubeFragmentToEmbed';
-import convertVimeoFragmentToEmbed from './convertVimeoFragmentToEmbed';
-import {ensureExtension} from './extensions';
+import expandHrefWithLinkRules from '../util/expandHrefWithLinkRules';
+import convertYoutubeFragmentToEmbed from '../util/convertYoutubeFragmentToEmbed';
+import convertVimeoFragmentToEmbed from '../util/convertVimeoFragmentToEmbed';
+import {ensureExtension} from '../extensions';
 import renderABCIntoDivs from './renderABCIntoDivs';
 
 const imageStyles = {
