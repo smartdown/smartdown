@@ -129,7 +129,7 @@ function calcTSV(key, body, done) {
   if (body.indexOf('/http') === 0) {
     body = body.slice(1);
   }
-  const translatedURL = smartdown.expandHrefWithLinkRules(body);
+  const translatedURL = smartdown.expandHrefWithLinkRules(body, smartdown.linkRules);
   if (smartdown.d3) {
     const cacheKey = 'CACHE_' + key + '_' + translatedURL;
 
@@ -178,7 +178,7 @@ function calcCSV(key, body, done) {
   if (body.indexOf('/http') === 0) {
     body = body.slice(1);
   }
-  const translatedURL = smartdown.expandHrefWithLinkRules(body);
+  const translatedURL = smartdown.expandHrefWithLinkRules(body, smartdown.linkRules);
   if (smartdown.d3) {
     const cacheKey = 'CACHE_' + key + '_' + translatedURL;
 

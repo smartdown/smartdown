@@ -115,5 +115,6 @@ module.exports = {
         // '@typescript-eslint/no-use-before-define': 0,
       },
     },
-  ]
+  ],
+  ignorePatterns: ['src/external/*.js'],
 };

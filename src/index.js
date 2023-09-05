@@ -41,7 +41,7 @@ window.jsyaml = jsyaml;
 
 import {isExtensionRegistered, loadExternal, ensureExtension} from './extensions';
 
-import hljs from './hljs';
+import hljs from './render/hljs';
 import playableTypes from './playableTypes';
 import mathjaxConfigure from './extensions/MathJax';
 import P5 from './extensions/P5';
@@ -61,9 +61,16 @@ import React from './extensions/React';
 import Typescript from './extensions/Typescript';
 import Mermaid from './extensions/Mermaid';
 import Stdlib from './extensions/Stdlib';
-import expandHrefWithLinkRules from './expandHrefWithLinkRules';
-import renderImage from './renderImage';
-import renderLink from './renderLink';
+import expandHrefWithLinkRules from './util/expandHrefWithLinkRules';
+import setupYouTubePlayer from './util/setupYouTubePlayer';
+import recursivelyLoadIncludes from './parse/recursivelyLoadIncludes';
+import partitionMultipart from './parse/partitionMultipart';
+import getPrelude from './parse/getPrelude';
+
+import renderImage from './render/renderImage';
+import renderLink from './render/renderLink';
+import renderCell from './render/renderCell';
+import renderABCIntoDivs from './render/renderABCIntoDivs';
 
 import {
   importScriptUrl,
@@ -73,11 +80,9 @@ import {
   importCssUrl,
 } from './importers';
 
-import entityEscape from './entityEscape';
-import decodeInlineScript from './decodeInlineScript';
-import areValuesSameEnough from './areValuesSameEnough';
-import renderCell from './renderCell';
-import renderABCIntoDivs from './renderABCIntoDivs';
+import entityEscape from './render/entityEscape';
+import decodeInlineScript from './parse/decodeInlineScript';
+import areValuesSameEnough from './util/areValuesSameEnough';
 import graphvizImages from './extensions/Graphviz';
 
 const testing = process.env.BUILD === 'test';
@@ -159,107 +164,6 @@ registerDefaultExtensions();
 //
 
 
-function recursivelyLoadIncludes(prefixCode, includesRemaining, done) {
-  if (includesRemaining.length > 0) {
-    const nextInclude = includesRemaining.shift();
-    // console.log('nextInclude', nextInclude);
-
-    importTextUrl(
-      nextInclude,
-      function (nextIncludeText) {
-        // console.log('recursivelyLoadIncludes success', nextInclude, nextIncludeText.slice(0, 50));
-
-        recursivelyLoadIncludes(
-          prefixCode + nextIncludeText,
-          includesRemaining,
-          done);
-      },
-      function (error) {
-        console.log('recursivelyLoadIncludes error', nextInclude, error);
-
-        const errorText =
-`
-//
-// Unable to include ${nextInclude}: ${error}
-//
-`;
-        recursivelyLoadIncludes(
-          prefixCode + errorText,
-          includesRemaining,
-          done);
-      }
-    );
-  }
-  else if (done) {
-    done(prefixCode);
-  }
-}
-
-
-function getPrelude(language, code) {
-  const playableType = playableTypes[language];
-  const imports = [];
-  const includes = [];
-
-  const loadableLanguages = [
-    'd3',
-    'brython',
-    'filament',
-    'stdlib',
-    'p5js',
-    'P5JS',
-    'three',
-    'leaflet',
-    'plotly',
-    'openjscad',
-    'typescript',
-    'react',
-    'graphviz',
-    'abc',
-    'abcsheet',
-    'abcmidi',
-    'mermaid',
-  ];
-
-  // If a playable is declared with a specific language that has
-  // a shorthand in loadableLanguages, then add that language's extension
-  // as an import. Note that extension may be renamed to plugin, so think
-  // that there's a relation between language and extension/plugin.
-  // E.g., a d3-language playable would have an implicit import of the d3 extension.
-  //
-
-  if (loadableLanguages.indexOf(language) >= 0) {
-    imports.push([language, false]);
-  }
-
-  if (playableType && (playableType.javascript || language === 'graphviz')) {
-    const lines = code.split('\n');
-    const usePrefix = '//smartdown.import=';
-    const usePrefixM = '//smartdown.importmodule=';
-    const includePrefix = '//smartdown.include=';
-    lines.forEach((line) => {
-      if (line.indexOf(usePrefix) === 0) {
-        const rhs = line.slice(usePrefix.length);
-        imports.push([rhs, false]);
-      }
-      else if (line.indexOf(usePrefixM) === 0) {
-        const rhs = line.slice(usePrefixM.length);
-        imports.push([rhs, true]);
-      }
-      else if (line.indexOf(includePrefix) === 0) {
-        const rhs = line.slice(includePrefix.length);
-        includes.push(rhs);
-      }
-    });
-  }
-
-  // console.log('getPrelude', language, imports, includes);
-
-  return {
-    imports: imports,
-    includes: includes
-  };
-}
 
 function renderCodeInternal(renderDivId, code, language, languageOpts, prelude) {
   const playable = languageOpts.indexOf('playable') >= 0;
@@ -517,7 +421,7 @@ function renderCode(code, languageString) {
         patch.replace = renderedExpandedCode;
       }
       else {
-        console.log('renderCode patch anomaly', backpatchIndex);
+        console.log('#renderCode patch anomaly', backpatchIndex);
         console.log(deferredCode);
         console.log(patch.key);
       }
@@ -730,30 +634,6 @@ function enhanceMarkedAndOpts() {
 // End of marked.js extensions
 //
 
-
-function partitionMultipart(markdown) {
-  markdown = '\n' + markdown; // deal with lack of leading \n
-  const splits = markdown.split(/\n# ([a-zA-Z0-9_]+)\n---\n/);
-  const result = {
-  };
-  let firstKey = null;
-  for (let i = 1; i < splits.length; i += 2) {
-    result[splits[i]] = splits[i + 1];
-    if (!firstKey) {
-      firstKey = splits[i];
-    }
-  }
-
-  const defaultKeyName = '_default_';
-  if (!firstKey) {
-    result[defaultKeyName] = markdown;
-  }
-  else {
-    result[defaultKeyName] = result[firstKey];
-  }
-
-  return result;
-}
 
 function registerExpression(cellIndex, labelText, lhss, rhss, manual) {
   // console.log('registerExpression', cellIndex, labelText, lhss, rhss, manual);
@@ -2992,7 +2872,6 @@ function setSmartdown(md, outputDiv, setSmartdownCompleted) {
   patchesUnresolvedKludgeLimit = 5;
   // console.log('applyBackpatches BEGIN', outputDiv.id, smartdown.currentRenderDiv);
 
-
   applyBackpatches(function() {
     if (useMathJax) {
       //
@@ -3062,28 +2941,6 @@ function setHome(md, outputDiv, done) {
     done();
   });
 }
-
-/*
-function forceVariable(id, newValue, type) {
-  if (type === 'number') {
-    newValue = Number(newValue);
-  }
-  try {
-    ensureCells();
-  }
-  catch (e) {
-    console.log('exception during ensureCells', id, e);
-  }
-
-  try {
-    propagateChangedVariable(id, newValue, true);
-  }
-  catch (e) {
-    console.log('exception during propagateChangedVariable', id, e);
-  }
-}
-*/
-
 
 function setVariable(id, newValue, type) {
   // console.log('setVariable', id, JSON.stringify(newValue).slice(0, 20), type);
@@ -3302,54 +3159,6 @@ function getMedia(mediaKey) {
   return smartdown.mediaRegistry[mediaKey];
 }
 
-let youtubeIframeAPILoaded = false;
-let youtubeIframeAPILoadedCbs = [];
-
-function onYouTubeIframeAPIReady() {
-  // console.log('onYouTubeIframeAPIReady');
-  youtubeIframeAPILoaded = true;
-
-  youtubeIframeAPILoadedCbs.forEach((cb) => {
-    cb();
-  });
-
-  youtubeIframeAPILoadedCbs = [];
-}
-window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
-
-function loadYouTubeIframeAPI(done) {
-  youtubeIframeAPILoadedCbs.push(done);
-  importScriptUrl('https://www.youtube.com/iframe_api', function() {
-    // console.log('https://www.youtube.com/iframe_api loaded');
-  });
-}
-
-
-function setupYouTubePlayer(div, varName) {
-  // console.log('setupYouTubePlayer', div, varName, youtubeIframeAPILoaded);
-  if (youtubeIframeAPILoaded) {
-    const playerDiv = document.getElementById(div);
-
-    const player = new YT.Player(playerDiv, {
-        events: {
-          'onReady': function (/* event */) {
-              // console.log('onPlayerReady', event);
-              // console.log(player);
-              smartdown.setVariable(varName, player, 'json');
-          },
-          'onStateChange': function (/* event */) {
-            // console.log('onPlayerStateChange', event);
-          }
-        }
-    });
-  }
-  else {
-    loadYouTubeIframeAPI(function() {
-      setupYouTubePlayer(div, varName);
-    });
-  }
-}
-
 module.exports = {
   initialize: initialize,
   configure: configure,
@@ -3384,7 +3193,6 @@ module.exports = {
   computeExpressions: computeExpressions,
   computeStoredExpression: computeStoredExpression,
   setVariable: setVariable,
-  // forceVariable: forceVariable,
   set: set,
   setVariables: setVariables,
   setPersistence: setPersistence,
@@ -3423,7 +3231,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.66',
+  version: '1.0.67',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,
