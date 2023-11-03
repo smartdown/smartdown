@@ -1870,6 +1870,15 @@ img.media-image path {
   }
 }
 
+.smartdown-theme-dark .smartdown-container .decoration-outlinebox {
+  display: block;
+  color: black;
+  background: darkgray;
+  padding: 20px;
+  margin: 0;
+  border: 2px solid gray;
+  border-radius: 10px;
+}
 
 /* Chat theme (aka Scape) */
 

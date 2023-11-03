@@ -4,7 +4,7 @@ export default function registerThree() {
   registerExtension(
     'three',
     [
-      'https://cdnjs.cloudflare.com/ajax/libs/three.js/109/three.min.js',
+      'https://unpkg.com/three/build/three.min.js',
       function() {
         window.smartdown.THREE = window.THREE;
       },
