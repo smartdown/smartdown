@@ -11,7 +11,7 @@ import renderABCIntoDivs from '../render/renderABCIntoDivs';
 async function playPlayableInternal(language, divId) {
   // console.log('playPlayableInternal', divId);
 
-  const playable = smartdown.perPageState.playablesRegistered[divId];
+  const playable = smartdown.playablesRegistered[divId];
   const div = document.getElementById(playable.divId);
   const divPre = document.getElementById(playable.preId);
   // const divDbg = document.getElementById(playable.dbgId);
@@ -331,7 +331,7 @@ function recursivelyLoadImports(language, divId, importsRemaining, done) {
 
 export default function playPlayable(language, divId) {
   // console.log('playPlayable', divId);
-  const playable = smartdown.perPageState.playablesRegistered[divId];
+  const playable = smartdown.playablesRegistered[divId];
   if (playable) {
     const importsRemaining = playable.imports.slice(0);  // Copy
 
@@ -344,7 +344,7 @@ export default function playPlayable(language, divId) {
     });
   }
   else {
-    console.log('playPlayable... not found', language, divId, smartdown.perPageState.playablesRegistered, perPageState.playablesRegisteredOrder);
+    console.log('playPlayable... not found', language, divId, smartdown.playablesRegistered, perPageState.playablesRegisteredOrder);
   }
 }
 

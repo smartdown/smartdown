@@ -1,8 +1,10 @@
-export default function expandHrefWithLinkRules(href, linkRules) {
+import globalState from './globalState';
+
+export default function expandHrefWithLinkRules(href) {
   let result = href;
 
-  for (let i = 0; i < linkRules.length; ++i) {
-    const rule = linkRules[i];
+  for (let i = 0; i < globalState.linkRules.length; ++i) {
+    const rule = globalState.linkRules[i];
     if (href.indexOf(rule.prefix) === 0) {
       if ((typeof rule.replace) === 'string') {
         let newHRef = rule.replace + href.slice(rule.prefix.length);
@@ -19,8 +21,8 @@ export default function expandHrefWithLinkRules(href, linkRules) {
     }
   }
 
-  // console.log('expandHrefWithLinkRules', linkRules, href, result);
-  // console.log(JSON.stringify(linkRules, null, 2));
+  // console.log('expandHrefWithLinkRules', globalState.linkRules, href, result);
+  // console.log(JSON.stringify(globalState.linkRules, null, 2));
 
   return result;
 }

@@ -36,6 +36,7 @@ import Gifffer from 'gifffer';
 window.jsyaml = jsyaml;
 
 import {loadExternal, ensureExtension} from './extensions';
+import setVisibility from './util/setVisibility';
 
 import hljs from './render/hljs';
 import mathjaxConfigure from './extensions/MathJax';
@@ -43,6 +44,7 @@ import P5 from './extensions/P5';
 
 import './styles.css';
 
+import globalState from './util/globalState';
 import registerABC from './extensions/ABC';
 import registerD3 from './extensions/D3';
 import registerThree from './extensions/Three';
@@ -56,6 +58,7 @@ import Typescript from './extensions/Typescript';
 import Mermaid from './extensions/Mermaid';
 import Stdlib from './extensions/Stdlib';
 import expandHrefWithLinkRules from './util/expandHrefWithLinkRules';
+import setLinkRules from './util/setLinkRules';
 import setupYouTubePlayer from './util/setupYouTubePlayer';
 import partitionMultipart from './parse/partitionMultipart';
 import expandStringWithSubstitutions from './util/expandStringWithSubstitutions';
@@ -115,24 +118,6 @@ const testing = process.env.BUILD === 'test';
 const localForageSmartdownPrefix = 'smartdownVariable/';
 const inlinePrefix = '^^InLiNe^^';
 
-let twitterLoading = false;
-let cardLoader = null;
-let calcHandlers = null;
-const linkRules = [];
-let currentHomeDiv = null;
-let currentMD = null;
-
-const perPageState = {
-  expressionsRegistered: {},
-  playablesRegistered: {},
-  playablesRegisteredOrder: [],
-};
-
-let cardLoading = false;
-
-const smartdownScripts = [];
-const smartdownScriptsMap = {};
-const es6Playables = {};
 
 function registerDefaultExtensions() {
   registerABC();
@@ -151,38 +136,10 @@ function registerDefaultExtensions() {
 
 registerDefaultExtensions();
 
-function pause() {
-  lodashEach(perPageState.playablesRegisteredOrder, function (playable) {
-    if (playable && playable.p5) {
-      playable.p5.getAudioContext().suspend();
-    }
-  });
-}
-
-
-function resume() {
-  lodashEach(perPageState.playablesRegisteredOrder, function (playable) {
-    if (playable && playable.p5) {
-      playable.p5.getAudioContext().resume();
-    }
-  });
-}
-
-
-function handleVisibilityChange() {
-  if (document.hidden) {
-    pause();
-  }
-  else {
-    resume();
-  }
-}
-
-
 function startAutoplay(outputDiv) {
   // console.log('startAutoplay', outputDiv);
   if (outputDiv && outputDiv.id) {
-    lodashEach(perPageState.playablesRegisteredOrder, function(playable) {
+    lodashEach(globalState.playablesRegisteredOrder, function(playable) {
       // console.log('startAutoplay', outputDiv, outputDiv.id, playable);
       if (playable.autoplay && !playable.playing) {
         const sel = '#' + outputDiv.id + ' #' + playable.divId;
@@ -200,16 +157,25 @@ function startAutoplay(outputDiv) {
   }
 }
 
-function resetPerPageState() {
-  perPageState.expressionsRegistered = {};
-  perPageState.playablesRegistered = {};
-  perPageState.playablesRegisteredOrder = [];
+function replaceObject(obj, newObj) {
+  Object.keys(obj).forEach((k) => delete obj[k]);
+  Object.assign(obj, newObj);
 }
 
+function replaceArray(arr, newArr) {
+  arr.length = 0;
+  arr.concat(newArr);
+}
+
+function resetPerPageState() {
+  replaceObject(globalState.expressionsRegistered, {});
+  replaceObject(globalState.playablesRegistered, {});
+  replaceArray(globalState.playablesRegisteredOrder, []);
+}
 
 function cleanupOrphanedStuff() {
   const newER = {};
-  const expressions = perPageState.expressionsRegistered;
+  const expressions = globalState.expressionsRegistered;
 
   Object.keys(expressions).forEach((exprId) => {
     const expr = expressions[exprId];
@@ -230,12 +196,12 @@ function cleanupOrphanedStuff() {
     }
   });
 
-  perPageState.expressionsRegistered = newER;
+  replaceObject(globalState.expressionsRegistered, newER);
 
   const newPRO = [];
   const newPR = {};
 
-  lodashEach(perPageState.playablesRegisteredOrder, function (playable) {
+  lodashEach(globalState.playablesRegisteredOrder, function (playable) {
     // console.log('cleanupOrphanedStuff/playable', playable.divId, playable);
     const element1 = document.getElementById(playable.divId);
 
@@ -250,19 +216,18 @@ function cleanupOrphanedStuff() {
     }
   });
 
-
-  perPageState.playablesRegistered = newPR;
-  perPageState.playablesRegisteredOrder = newPRO;
+  replaceObject(globalState.playablesRegistered, newER);
+  replaceArray(globalState.playablesRegisteredOrder, newPRO);
 }
 
 
 function resetAllPlayables(outputDiv, throwAway) {
-  // console.log('resetAllPlayables', perPageState.playablesRegisteredOrder);
-  lodashEach(perPageState.playablesRegisteredOrder, function (playable) {
+  // console.log('resetAllPlayables', playablesRegisteredOrder);
+  lodashEach(globalState.playablesRegisteredOrder, function (playable) {
     if ((outputDiv.id === playable.rootDivId) && playable.divId) {
       const playableElement = document.getElementById(playable.divId);
       if (playableElement) {
-        // console.log('resetAllPlayables', playable.divId, playableElement, perPageState.playablesRegisteredOrder);
+        // console.log('resetAllPlayables', playable.divId, playableElement, playablesRegisteredOrder);
         resetPlayable(
           playable.language,
           playable.divId,
@@ -275,14 +240,13 @@ function resetAllPlayables(outputDiv, throwAway) {
     }
   });
 
-  pause();
+  setVisibility(false);
 }
-
 
 function transformPlayables(outputDiv, done) {
   const playablesToTransform = [];
   if (window.godownTranslate) {
-    lodashEach(perPageState.playablesRegisteredOrder, function (playable) {
+    lodashEach(globalState.playablesRegisteredOrder, function (playable) {
       if (playable.transform) {
         if (outputDiv.id) {
           const sel = '#' + outputDiv.id + ' #' + playable.divId;
@@ -332,13 +296,6 @@ console.log('window.godownDiv_${packageName}', window.godownDiv_${packageName});
   recursiveTransform(playablesToTransform, done);
 }
 
-
-function setLinkRules(_linkRules) {
-  linkRules.length = 0;
-  _linkRules.forEach((link) => {
-    linkRules.push(link);
-  });
-}
 
 
 /**
@@ -394,6 +351,10 @@ function configure(options, loadedHandler) {
   window.smartdown.baseURL = _baseURL || (window.location.origin + '/');
   window.xypicURL = options.xypicURL || (window.smartdown.baseURL + 'lib/xypic.js');
 
+  const handleVisibilityChange = () => {
+    setVisibility(!document.hidden);
+  };
+
   document.addEventListener('visibilitychange', handleVisibilityChange);
 
   if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
@@ -404,8 +365,8 @@ function configure(options, loadedHandler) {
       );
   }
 
-  cardLoader = _cardLoader;
-  calcHandlers = _calcHandlers;
+  globalState.cardLoader = _cardLoader;
+  globalState.calcHandlers = _calcHandlers;
 
   if (_linkRules) {
     setLinkRules(_linkRules);
@@ -440,14 +401,14 @@ function configure(options, loadedHandler) {
       oReq.addEventListener('load', svgLoaded);
       smartdown.mediaRegistry[key].type = 'svg';
       smartdown.mediaRegistry[key].url = url;
-      smartdown.mediaRegistry[key].expandedurl = expandHrefWithLinkRules(url, linkRules);
+      smartdown.mediaRegistry[key].expandedurl = expandHrefWithLinkRules(url);
       oReq.open('GET', smartdown.mediaRegistry[key].expandedurl);
       oReq.send();
     }
     else {
       smartdown.mediaRegistry[key].type = 'url';
       smartdown.mediaRegistry[key].url = url;
-      smartdown.mediaRegistry[key].expandedurl = expandHrefWithLinkRules(url, linkRules);
+      smartdown.mediaRegistry[key].expandedurl = expandHrefWithLinkRules(url);
     }
   });
 
@@ -573,7 +534,7 @@ async function updateProcesses(id, newValue) {
     });
   }
 
-  lodashEach(perPageState.playablesRegisteredOrder, async function (playable) {
+  lodashEach(globalState.playablesRegisteredOrder, async function (playable) {
     if (playable) {
       const progress = document.getElementById(playable.progressId);
 
@@ -759,7 +720,7 @@ function setSmartdown(md, outputDiv, setSmartdownCompleted) {
     let resizeTimeout;
 
     function actualResizeHandler() {
-      const playables = perPageState.playablesRegistered;
+      const playables = globalState.playablesRegistered;
       Object.keys(playables).forEach((k) => {
         const playable = playables[k];
         if (playable.playing) {
@@ -865,8 +826,8 @@ function setSmartdown(md, outputDiv, setSmartdownCompleted) {
 
 
       transformPlayables(outputDiv, function() {
-        if (cardLoading) {
-          cardLoading = false;
+        if (globalState.cardLoading) {
+          globalState.cardLoading = false;
           propagateModel();
           updateProcesses();
         }
@@ -883,8 +844,8 @@ function setSmartdown(md, outputDiv, setSmartdownCompleted) {
     const firstTweetIndex = md.search(/[^`]!\[[^\]]*\]\(https:\/\/twitter\.com\/[^`]/);
 
     if (firstTweetIndex >= 0) {
-      if (!twitterLoading) {
-        twitterLoading = true;
+      if (!globalState.twitterLoading) {
+        globalState.twitterLoading = true;
         importScriptUrl(
           'https://platform.twitter.com/widgets.js',
           function () {
@@ -1094,8 +1055,8 @@ function setSmartdown(md, outputDiv, setSmartdownCompleted) {
 
 function setHome(md, outputDiv, done) {
   // console.log('setHome', md.slice(0, 20), outputDiv);
-  currentMD = md;
-  currentHomeDiv = outputDiv;
+  globalState.currentMD = md;
+  globalState.currentHomeDiv = outputDiv;
   window.getSelection().removeAllRanges();
   resetAllPlayables(outputDiv, true);
   resetPerPageState();
@@ -1157,9 +1118,9 @@ function setVariables(assignments) {
 
 
 function computeStoredExpression(exprId) {
-  const entry = perPageState.expressionsRegistered[exprId];
+  const entry = globalState.expressionsRegistered[exprId];
   if (!entry) {
-    console.log('computeStoredExpression no such expression', exprId, perPageState.expressionsRegistered);
+    console.log('computeStoredExpression no such expression', exprId, globalState.expressionsRegistered);
     // debugger;
   }
   else if (entry.manual) {
@@ -1218,14 +1179,14 @@ function computeExpression(entry, done) {
       }
       else if (rhs[0] === '/') {
         rhs = rhs.slice(1);
-        if (calcHandlers) {
+        if (globalState.calcHandlers) {
           const calcParts = rhs.split(/[./[]/);
           // const bracketIndex = rhs.indexOf('[');
           // const slashIndex = rhs.indexOf('/');
 
           const calcKey = calcParts[0];
           const calcBody = rhs.slice(calcKey.length);
-          const calcHandler = calcHandlers[calcKey];
+          const calcHandler = globalState.calcHandlers[calcKey];
           if (calcHandler) {
             ++numPending;
             calcHandler(calcKey, calcBody, buildCompletionHandler(lhs));
@@ -1274,25 +1235,25 @@ function goToCard(cardKey, event, outputDivId) {
     outputDivId = 'smartdown-output';
   }
 
-  cardLoading = true;
-  if (cardLoader) {
-    cardLoader(cardKey, outputDivId);
+  globalState.cardLoading = true;
+  if (globalState.cardLoader) {
+    globalState.cardLoader(cardKey, outputDivId);
   }
   else {
     let modelAsMarkdown = null;
 
     if (!cardKey || cardKey === 'Home') {
-      modelAsMarkdown = currentMD;
+      modelAsMarkdown = globalState.currentMD;
     }
     else {
-      const scriptx = smartdownScriptsMap[cardKey];
+      const scriptx = globalState.smartdownScriptsMap[cardKey];
       if (scriptx) {
         modelAsMarkdown = scriptx.text;
       }
     }
 
     if (modelAsMarkdown) {
-      setSmartdown(modelAsMarkdown, currentHomeDiv, null);
+      setSmartdown(modelAsMarkdown, globalState.currentHomeDiv, null);
     }
   }
 }
@@ -1302,17 +1263,17 @@ function setPersistence(persistence) {
 }
 
 function loadCardsFromDocumentScripts() {
-  smartdownScripts.length = 0;
-  Object.keys(smartdownScriptsMap).forEach((k) => {
-    delete smartdownScriptsMap[k];
+  globalState.smartdownScripts.length = 0;
+  Object.keys(globalState.smartdownScriptsMap).forEach((k) => {
+    delete globalState.smartdownScriptsMap[k];
   });
 
   const scripts = document.scripts;
   Object.keys(scripts).forEach((s) => {
     const script = scripts[s];
     if (script && script.type && script.type === 'text/x-smartdown') {
-      smartdownScripts.push(script);
-      smartdownScriptsMap[script.id] = script;
+      globalState.smartdownScripts.push(script);
+      globalState.smartdownScriptsMap[script.id] = script;
     }
   });
 }
@@ -1324,10 +1285,9 @@ function getMedia(mediaKey) {
 module.exports = {
   initialize: initialize,
   configure: configure,
-  perPageState: perPageState,
-  expressionsRegistered: perPageState.expressionsRegistered,
-  playablesRegistered: perPageState.playablesRegistered,
-  playablesRegisteredOrder: perPageState.playablesRegisteredOrder,
+  expressionsRegistered: globalState.expressionsRegistered,
+  playablesRegistered: globalState.playablesRegistered,
+  playablesRegisteredOrder: globalState.playablesRegisteredOrder,
   enhanceMarkedAndOpts: enhanceMarkedAndOpts,
   partitionMultipart: partitionMultipart,
   registerPlayable: registerPlayable,
@@ -1360,17 +1320,17 @@ module.exports = {
   setPersistence: setPersistence,
   computeExpression: computeExpression,
   goToCard: goToCard,
-  smartdownScripts: smartdownScripts,
-  smartdownScriptsMap: smartdownScriptsMap,
-  currentHomeDiv: currentHomeDiv,
-  cardLoader: cardLoader,
-  calcHandlers: calcHandlers,
+  smartdownScripts: globalState.smartdownScripts,
+  smartdownScriptsMap: globalState.smartdownScriptsMap,
+  currentHomeDiv: globalState.currentHomeDiv,
+  cardLoader: globalState.cardLoader,
+  calcHandlers: globalState.calcHandlers,
   importCssCode: importCssCode,
   importCssUrl: importCssUrl,
   importScriptUrl: importScriptUrl,
   importModuleUrl: importModuleUrl,
   importTextUrl: importTextUrl,
-  linkRules: linkRules,
+  linkRules: globalState.linkRules,
   expandHrefWithLinkRules: expandHrefWithLinkRules,
   setLinkRules: setLinkRules,
   getMedia: getMedia,
@@ -1406,7 +1366,7 @@ module.exports = {
   runModule: runModule,
   loadExternal: loadExternal,
   ensureExtension: ensureExtension,
-  es6Playables: es6Playables,
+  es6Playables: globalState.es6Playables,
   currentRenderDiv: null,
   currentBackpatches: {},
   smartdownVariables: null,

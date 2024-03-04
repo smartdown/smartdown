@@ -3,7 +3,7 @@
 import expandStringWithSubstitutions from './expandStringWithSubstitutions';
 
 export default function computeExpressions() {
-  const expressions = smartdown.perPageState.expressionsRegistered;
+  const expressions = smartdown.expressionsRegistered;
   Object.keys(expressions).forEach((exprId) => {
     const entry = expressions[exprId];
     if (!entry) {

@@ -3,7 +3,7 @@
 import playableTypes from '../playableTypes';
 
 export default function resetPlayable(language, divId, throwAway) {
-  const playable = smartdown.perPageState.playablesRegistered[divId];
+  const playable = smartdown.playablesRegistered[divId];
   if (!playable.playing) {
     // console.log('resetPlayable NOT PLAYING', language, divId);
   }

@@ -44,7 +44,7 @@ export default function registerExpression(cellIndex, labelText, lhss, rhss, man
     dependsOn: [],
     computed: false,
   };
-  smartdown.perPageState.expressionsRegistered[exprId] = expr;
+  smartdown.expressionsRegistered[exprId] = expr;
 
   return expr;
 }

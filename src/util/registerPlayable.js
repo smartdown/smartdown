@@ -135,7 +135,7 @@ return (async () => {
     }
   }
 
-  smartdown.perPageState.playablesRegistered[divId] = {
+  smartdown.playablesRegistered[divId] = {
     language: language,
     rootDivId: renderDivId,
     divId: divId,
@@ -155,7 +155,7 @@ return (async () => {
     dependLastValues: {},
     p5: null,
     embedThis: {},
-    index: smartdown.perPageState.playablesRegisteredOrder.length,
+    index: smartdown.playablesRegisteredOrder.length,
     code: code,
     transform: transform,
     transformedCode: null,
@@ -165,7 +165,7 @@ return (async () => {
     targetDivId: targetDivId,
   };
 
-  smartdown.perPageState.playablesRegisteredOrder.push(smartdown.perPageState.playablesRegistered[divId]);
+  smartdown.playablesRegisteredOrder.push(smartdown.playablesRegistered[divId]);
 
-  return smartdown.perPageState.playablesRegistered[divId];
+  return smartdown.playablesRegistered[divId];
 }
