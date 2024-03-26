@@ -69,3 +69,4 @@
 - **1.0.66** - Update deps. Begin refactoring into a less-monolithic source code organization on the way to Full Typescript. Seal typescript@4.9.5 in package.json due to a problem compiling src/external/brython.js via Typescript (this will be fixed later).
 - **1.0.67** - Continue refactoring into finer-grained source modules. Fixed 'eslint' arguments to fully capture all files in 'src/'. Update Gallery to 0.0.85.
 - **1.0.68** - Update deps. Refactored global variables in index.js to be more isolated into globalState.js.
+- **1.0.69** - Update deps. More refactoring into smaller files. Lock down ThreeJS version to 0.122 until Gallery examples are updated.

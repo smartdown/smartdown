@@ -10,6 +10,7 @@
 /* global useLocalForage */
 /* global useGifffer */
 /* global useMathJax */
+/* global MathJax */
 
 import createDOMPurify from 'dompurify';
 
@@ -25,7 +26,6 @@ window.lodashEach = lodashEach;
 window.lodashIsEqual = lodashIsEqual;
 
 import vdomToHtml from 'vdom-to-html';
-import StackTrace from 'stacktrace-js/dist/stacktrace.min';
 
 import marked from 'marked';
 import jsyaml from 'js-yaml';
@@ -36,7 +36,6 @@ import Gifffer from 'gifffer';
 window.jsyaml = jsyaml;
 
 import {loadExternal, ensureExtension} from './extensions';
-import setVisibility from './util/setVisibility';
 
 import hljs from './render/hljs';
 import mathjaxConfigure from './extensions/MathJax';
@@ -45,21 +44,10 @@ import P5 from './extensions/P5';
 import './styles.css';
 
 import globalState from './util/globalState';
-import registerABC from './extensions/ABC';
-import registerD3 from './extensions/D3';
-import registerThree from './extensions/Three';
-import registerPlotly from './extensions/Plotly';
-import OpenJSCAD from './extensions/OpenJSCAD';
-import registerLeaflet from './extensions/Leaflet';
-import Brython from './extensions/Brython';
-import FilamentExtension from './extensions/Filament';
-import React from './extensions/React';
-import Typescript from './extensions/Typescript';
-import Mermaid from './extensions/Mermaid';
-import Stdlib from './extensions/Stdlib';
 import expandHrefWithLinkRules from './util/expandHrefWithLinkRules';
 import setLinkRules from './util/setLinkRules';
 import setupYouTubePlayer from './util/setupYouTubePlayer';
+import getFrontmatter from './parse/getFrontmatter';
 import partitionMultipart from './parse/partitionMultipart';
 import expandStringWithSubstitutions from './util/expandStringWithSubstitutions';
 import runFunction from './util/runFunction';
@@ -68,11 +56,20 @@ import registerExpression from './util/registerExpression';
 import computeExpressions from './util/computeExpressions';
 import playPlayable from './util/playPlayable';
 import registerPlayable from './util/registerPlayable';
+import transformPlayables from './util/transformPlayables';
 import resetPlayable from './util/resetPlayable';
+
 import runModule from './util/runModule';
 import { consoleWrite, toggleConsole } from './util/console';
 import { toggleDebug } from './util/debug';
 import toggleKiosk from './util/toggleKiosk';
+import startAutoplay from './runtime/startAutoplay';
+import resetAllPlayables from './runtime/resetAllPlayables';
+import cleanupOrphanedStuff from './runtime/cleanupOrphanedStuff';
+import updateProcesses from './runtime/updateProcesses';
+import resetPerPageState from './runtime/resetPerPageState';
+import registerDefaultExtensions from './runtime/registerDefaultExtensions';
+import configure from './runtime/configure';
 
 import { openFullscreen, closeFullscreen, isFullscreen } from './util/fullscreen';
 import {
@@ -83,8 +80,6 @@ import {
   activateOnMouseLeave,
   linkWrapperExit,
 } from './util/disclosable';
-
-import renderCell from './render/renderCell';
 
 import {
   importScriptUrl,
@@ -119,361 +114,7 @@ const localForageSmartdownPrefix = 'smartdownVariable/';
 const inlinePrefix = '^^InLiNe^^';
 
 
-function registerDefaultExtensions() {
-  registerABC();
-  registerD3();
-  registerThree();
-  registerPlotly();
-  registerLeaflet();
-  OpenJSCAD.register();
-  Brython.register();
-  FilamentExtension.register();
-  React.register();
-  Typescript.register();
-  Mermaid.register();
-  Stdlib.register();
-}
-
 registerDefaultExtensions();
-
-function startAutoplay(outputDiv) {
-  // console.log('startAutoplay', outputDiv);
-  if (outputDiv && outputDiv.id) {
-    lodashEach(globalState.playablesRegisteredOrder, function(playable) {
-      // console.log('startAutoplay', outputDiv, outputDiv.id, playable);
-      if (playable.autoplay && !playable.playing) {
-        const sel = '#' + outputDiv.id + ' #' + playable.divId;
-        const divHere = document.querySelectorAll(sel);
-        if (divHere && divHere.length > 0) {
-          playPlayable(
-            playable.language,
-            playable.divId);
-        }
-        else {
-          // console.log('...startAutoplay DIV NOT FOUND', sel, outputDiv, outputDiv.id, playable);
-        }
-      }
-    });
-  }
-}
-
-function replaceObject(obj, newObj) {
-  Object.keys(obj).forEach((k) => delete obj[k]);
-  Object.assign(obj, newObj);
-}
-
-function replaceArray(arr, newArr) {
-  arr.length = 0;
-  arr.concat(newArr);
-}
-
-function resetPerPageState() {
-  replaceObject(globalState.expressionsRegistered, {});
-  replaceObject(globalState.playablesRegistered, {});
-  replaceArray(globalState.playablesRegisteredOrder, []);
-}
-
-function cleanupOrphanedStuff() {
-  const newER = {};
-  const expressions = globalState.expressionsRegistered;
-
-  Object.keys(expressions).forEach((exprId) => {
-    const expr = expressions[exprId];
-    if (!expr) {
-      // console.log('cleanupOrphanedStuff expr DELETED', exprId);
-    }
-    else {
-      const element = document.getElementById(expr.rootDivId);
-      const labelElement = document.getElementById(expr.labelId);
-      // console.log('cleanupOrphanedStuff/expr', expr.rootDivId, expr);
-      if (element && labelElement) {
-        newER[expr.exprId] = expr;
-        // console.log('...cleanupOrphanedStuff/expr div found', expr.rootDivId, expr, element);
-      }
-      else {
-        // console.log('...cleanupOrphanedStuff/expr divs not found', expr.rootDivId, expr.labelId, expr, element, labelElement);
-      }
-    }
-  });
-
-  replaceObject(globalState.expressionsRegistered, newER);
-
-  const newPRO = [];
-  const newPR = {};
-
-  lodashEach(globalState.playablesRegisteredOrder, function (playable) {
-    // console.log('cleanupOrphanedStuff/playable', playable.divId, playable);
-    const element1 = document.getElementById(playable.divId);
-
-    if (element1) {
-      newPRO.push(playable);
-      newPR[playable.divId] = playable;
-      // console.log('...cleanupOrphanedStuff/playable div found', playable.playing, playable.divId, playable, element1, element2);
-    }
-    else {
-      playable.deleted = true;
-      // console.log('...cleanupOrphanedStuff/playable div not found', playable.playing, playable.divId, playable, element1, element2);
-    }
-  });
-
-  replaceObject(globalState.playablesRegistered, newER);
-  replaceArray(globalState.playablesRegisteredOrder, newPRO);
-}
-
-
-function resetAllPlayables(outputDiv, throwAway) {
-  // console.log('resetAllPlayables', playablesRegisteredOrder);
-  lodashEach(globalState.playablesRegisteredOrder, function (playable) {
-    if ((outputDiv.id === playable.rootDivId) && playable.divId) {
-      const playableElement = document.getElementById(playable.divId);
-      if (playableElement) {
-        // console.log('resetAllPlayables', playable.divId, playableElement, playablesRegisteredOrder);
-        resetPlayable(
-          playable.language,
-          playable.divId,
-          throwAway
-        );
-      }
-      else {
-        console.log('resetAllPlayables PLAYABLE DIV NOT FOUND', outputDiv.id, playable.divId, playable);
-      }
-    }
-  });
-
-  setVisibility(false);
-}
-
-function transformPlayables(outputDiv, done) {
-  const playablesToTransform = [];
-  if (window.godownTranslate) {
-    lodashEach(globalState.playablesRegisteredOrder, function (playable) {
-      if (playable.transform) {
-        if (outputDiv.id) {
-          const sel = '#' + outputDiv.id + ' #' + playable.divId;
-          const divHere = document.querySelectorAll(sel);
-          if (divHere && divHere.length > 0) {
-            playablesToTransform.push(playable);
-          }
-        }
-      }
-    });
-  }
-
-  function recursiveTransform(slicedPlayablesToTransform, slicedDone) {
-    if (slicedPlayablesToTransform.length === 0) {
-      slicedDone();
-    }
-    else {
-      const playable = slicedPlayablesToTransform[0];
-      const code = playable.code;
-      const packageIndex = code.indexOf('package ');
-
-      if (packageIndex === 0) {
-        const packageEndIndex = code.indexOf('\n');
-        if (packageEndIndex !== 0) {
-          const packageName = code.slice('package '.length, packageEndIndex);
-
-          const divAccessCode =
-`
-window.godownDiv_${packageName} = '${playable.divId}';
-console.log('window.godownDiv_${packageName}', window.godownDiv_${packageName});
-`;
-          try {
-            window.godownTranslate(packageName, code, function (transformedCodeResult) {
-              playable.isGodownMain = packageName === 'main';
-              playable.transformedCode = divAccessCode + transformedCodeResult;
-              recursiveTransform(slicedPlayablesToTransform.slice(1), slicedDone);
-            });
-          }
-          catch (e) {
-            console.log('# Exception during transform', e);
-          }
-        }
-      }
-    }
-  }
-
-  recursiveTransform(playablesToTransform, done);
-}
-
-
-
-/**
- * Configure the smartdown runtime.
- *
- * This function should be called once per page, and is responsible
- * for loading Smartdown and its dependent libraries, initializing per-page
- * data structures, and optionally loading an initial Smartdown document.
- * Upon the asynchronous completion of these tasks, the loadedHandler
- * will be called.
- *
- * @param {object} [options={}] - Configuration options
- * @param {object} options.media - media
- * @param {string} options.baseURL - baseURL
- * @param {function} options.cardLoader
- * This cardLoader function is called whenever Smartdown needs to load
- * a new Smartdown document into a particular div. This can be on initial
- * load, and via the result of a {@link tunnel} operation.
- * @param {object} options.calcHandlers - calcHandlers
- * @param {object} options.linkRules - linkRules
- * @param {function} [loadedHandler=null] - Called when loading and configuration
- * is completed.
- *
- */
-
-function svgLoaded() {
-  const sourceText = this.responseText;
-  const svgMedia = smartdown.mediaRegistry[this.svgKey];
-  svgMedia.svgData = sourceText;
-  svgMedia.type = 'svginline';
-}
-
-function configure(options, loadedHandler) {
-  global.smartdown = window.smartdown; // Needed for MochaJS/JSDom usage
-
-  smartdown.currentRenderDiv = null;
-  smartdown.currentBackpatches = {};
-  smartdown.smartdownCells = {};
-  smartdown.smartdownVariables = {};
-  smartdown.uniqueCellIndex = 0;
-  smartdown.mediaRegistry = {};
-
-  const media = options.media;
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  const _baseURL = options.baseURL;
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  const _cardLoader = options.cardLoader;
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  const _calcHandlers = options.calcHandlers;
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  const _linkRules = options.linkRules;
-
-  window.smartdown.baseURL = _baseURL || (window.location.origin + '/');
-  window.xypicURL = options.xypicURL || (window.smartdown.baseURL + 'lib/xypic.js');
-
-  const handleVisibilityChange = () => {
-    setVisibility(!document.hidden);
-  };
-
-  document.addEventListener('visibilitychange', handleVisibilityChange);
-
-  if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
-    document.querySelector('meta[name=viewport]')
-      .setAttribute(
-        'content',
-        'initial-scale=1.0001, minimum-scale=1.0001, maximum-scale=1.0001, user-scalable=no'
-      );
-  }
-
-  globalState.cardLoader = _cardLoader;
-  globalState.calcHandlers = _calcHandlers;
-
-  if (_linkRules) {
-    setLinkRules(_linkRules);
-  }
-
-  smartdown.mediaRegistry = media || {};
-  window.mediaRegistry = smartdown.mediaRegistry;
-
-  /* global MathJax */
-  /* eslint new-cap: 0 */
-  /* eslint no-native-reassign: 0 */
-  /* eslint no-trailing-spaces: 0 */
-  
-  Object.keys(smartdown.mediaRegistry).forEach((key) => {
-    const url = smartdown.mediaRegistry[key];
-    smartdown.mediaRegistry[key] = {
-      type: '',
-      url: '',
-      expandedurl: '',
-      svgData: '',
-    };
-
-    if (url.indexOf('<svg ') === 0) {
-      smartdown.mediaRegistry[key].type = 'svg';
-      smartdown.mediaRegistry[key].url = key;
-      smartdown.mediaRegistry[key].expandedurl = key;
-      smartdown.mediaRegistry[key].svgData = url;
-    }
-    else if (url.endsWith('.svg')) {
-      const oReq = new XMLHttpRequest();
-      oReq.svgKey = key;
-      oReq.addEventListener('load', svgLoaded);
-      smartdown.mediaRegistry[key].type = 'svg';
-      smartdown.mediaRegistry[key].url = url;
-      smartdown.mediaRegistry[key].expandedurl = expandHrefWithLinkRules(url);
-      oReq.open('GET', smartdown.mediaRegistry[key].expandedurl);
-      oReq.send();
-    }
-    else {
-      smartdown.mediaRegistry[key].type = 'url';
-      smartdown.mediaRegistry[key].url = url;
-      smartdown.mediaRegistry[key].expandedurl = expandHrefWithLinkRules(url);
-    }
-  });
-
-  const st = StackTrace.getSync();
-  let currentBase = st[0].fileName;
-  if (currentBase.indexOf('http') === -1) {
-    // hack because stacktrace doesn't work with safari on unpkg.com
-    currentBase = window.smartdown.baseURL + 'lib/smartdown.js';
-    // console.log('currentBase adjusted because stacktrace.js does not like Safari', currentBase);
-  }
-  const lastSlash = currentBase.lastIndexOf('/');
-  __webpack_public_path__ = currentBase.slice(0, lastSlash + 1);
-  // console.log('__webpack_# smartdown.configurepublic_path__', __webpack_public_path__, currentBase);
-
-  if (window.smartdown.baseURL === 'https://mochalocalhost/') {
-    window.xypicURL = 'https://unpkg.com/smartdown/dist/lib/xypic.js';
-  }
-
-  window.MathJax = global.MathJax = {
-    delayStartupUntil: 'configured',
-    AuthorInit: function() {
-      const MathJax = window.MathJax;
-      MathJax.Ajax.fileRev = function (file) {
-        let ver = MathJax.cdnFileVersions[file] || MathJax.cdnVersion || '';
-        if (ver) {
-          ver = '?ver=' + ver;
-        }
-        if (file.indexOf('xypic.js') !== -1) {
-          ver = '';
-        }
-        return ver;
-      };
-    }
-  };
-
-  function completeStartup() {
-    enhanceMarkedAndOpts();
-    window.setTimeout(() => {
-      loadedHandler();
-    }, 0);
-  }
-
-  if (useMathJax) {
-    const mathjaxURL = 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured';
-
-    importScriptUrl(
-      mathjaxURL,
-      // xyjax doesn't work here
-      function() {
-        mathjaxConfigure();
-
-        MathJax.Hub.Register.StartupHook(
-          'End',
-          function() {
-            completeStartup();
-          });
-
-        MathJax.Hub.Configured();
-      });
-  }
-  else {
-    completeStartup();
-  }
-}
-
 
 /**
  * Initialize the smartdown runtime.
@@ -501,99 +142,11 @@ function initialize(media, baseURL, loadedHandler, cardLoaderArg, calcHandlersAr
   configure(options, loadedHandler);
 }
 
-let patchesUnresolvedKludgeLimit = 0;
-
 function propagateModel() {
   ensureCells();
   ensureVariables();
   lodashEach(smartdown.smartdownVariables, function (v, k) {
     propagateChangedVariable(k, v);
-  });
-}
-
-
-async function updateProcesses(id, newValue) {
-  smartdown.computeExpressions();
-
-  if (id) {
-    // lodashEach(smartdown.smartdownCells, function(newCell, cellID) {
-    //   console.log('........newCellCheck', id, newCell, newCell.cellBinding, cellID);
-    // });
-    lodashEach(smartdown.smartdownCells, async function(newCell, cellID) {
-      // console.log('........newCell', id, newCell, newCell.cellBinding, cellID);
-
-      if (id === newCell.cellBinding) {
-        await renderCell(cellID, newCell.cellBinding, newValue);
-      }
-    });
-  }
-  else {
-    lodashEach(smartdown.smartdownCells, async function(newCell, cellID) {
-      const oldValue = smartdown.smartdownVariables[newCell.cellBinding];
-      await renderCell(cellID, newCell.cellBinding, oldValue);
-    });
-  }
-
-  lodashEach(globalState.playablesRegisteredOrder, async function (playable) {
-    if (playable) {
-      const progress = document.getElementById(playable.progressId);
-
-      if (playable.playing) {
-        const {depend, dependOn} = playable.embedThis;
-        // console.log('.........playable', playable, dependOn, depend);
-        if (Array.isArray(dependOn)) {
-          if (depend) {
-            let signal = false;
-
-            if (dependOn) {
-              let atLeastOneUndefined = false;
-              dependOn.forEach((varname) => {
-                const oldValue = playable.dependLastValues[varname];
-                const newerValue = smartdown.smartdownVariables[varname];
-                playable.dependLastValues[varname] = newerValue;
-                if (newerValue === undefined) {
-                  atLeastOneUndefined = true;
-                }
-
-                if (!areValuesSameEnough(varname, oldValue, newerValue)) {
-                  signal = true;
-                }
-              });
-              if (atLeastOneUndefined) {
-                signal = false;
-              }
-            }
-            else {
-              signal = true;
-            }
-
-            if (signal) {
-              if (progress) {
-                progress.style.display = 'none';
-              }
-              depend.apply(playable.embedThis);
-            }
-          }
-        }
-        else if (dependOn) {
-          Object.keys(dependOn).forEach((varname) => {
-            const oldValue = playable.dependLastValues[varname];
-            const newerValue = smartdown.smartdownVariables[varname];
-            playable.dependLastValues[varname] = newerValue;
-
-            if (!areValuesSameEnough(varname, oldValue, newerValue)) {
-              if (progress) {
-                progress.style.display = 'none';
-              }
-              dependOn[varname].apply(playable.embedThis);
-            }
-          });
-        }
-      }
-      else if (progress) {
-        progress.style.display = 'none';
-      }
-    }
   });
 }
 
@@ -672,31 +225,7 @@ function setupScrollHoverDisable() {
 }
 
 
-function getFrontmatter(md) {
-  md = md.trim() + '\n';
-  let resultFMText = null;
-  let resultFM = null;
-  let resultMD = md;
-  const fmPrefix = '---\n';
-  const fmSuffix = '\n---\n';
-  if (md.indexOf(fmPrefix) === 0) {
-    const frontMatterBegin = md.slice(fmPrefix.length - 1);
-    const frontMatterEndIndex = frontMatterBegin.indexOf(fmSuffix);
-    if (frontMatterEndIndex >= 0) {
-      const frontMatterText = frontMatterBegin.slice(0, frontMatterEndIndex);
-      resultFMText = frontMatterText; // frontMatterBegin.slice(frontMatterEndIndex + fmSuffix.length);
-      resultFM = frontMatterText === '' ? {} : jsyaml.load(resultFMText);
-      resultMD = frontMatterBegin.slice(frontMatterEndIndex + fmSuffix.length);
-    }
-  }
-
-  return {
-    frontmatterText: resultFMText,
-    frontmatter: resultFM,
-    markdown: resultMD
-  };
-}
-
+let patchesUnresolvedKludgeLimit = 0;
 
 function setSmartdown(md, outputDiv, setSmartdownCompleted) {
   if (smartdown.currentRenderDiv) {
@@ -1353,7 +882,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.68',
+  version: '1.0.69',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,
