@@ -8,10 +8,12 @@ Brython.register = function register() {
   registerExtension(
     'brython',
     [
-      // 'https://cdn.rawgit.com/brython-dev/brython/3.9.2/www/src/brython.js',
-      'smartdownBase:lib/brython.js',
-      // 'https://cdn.rawgit.com/brython-dev/brython/3.9.2/www/src/brython_stdlib.js',
-      'smartdownBase:lib/brython_stdlib.js',
+      // 'https://cdn.jsdelivr.net/npm/brython@3/brython.min.js',
+      // 'https://cdn.jsdelivr.net/npm/brython@3/brython_stdlib.js',
+      'https://cdn.rawgit.com/brython-dev/brython/3.9.2/www/src/brython.js',
+      'https://cdn.rawgit.com/brython-dev/brython/3.9.2/www/src/brython_stdlib.js',
+      // 'smartdownBase:lib/brython.js',
+      // 'smartdownBase:lib/brython_stdlib.js',
     ]);
 };
 

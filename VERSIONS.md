@@ -70,3 +70,4 @@
 - **1.0.67** - Continue refactoring into finer-grained source modules. Fixed 'eslint' arguments to fully capture all files in 'src/'. Update Gallery to 0.0.85.
 - **1.0.68** - Update deps. Refactored global variables in index.js to be more isolated into globalState.js.
 - **1.0.69** - Update deps. More refactoring into smaller files. Lock down ThreeJS version to 0.122 until Gallery examples are updated.
+- **1.0.70** - Update deps. Fix Brython so that it can be included via CDN. Adjusted tsconfig.json to exclude /src/external.

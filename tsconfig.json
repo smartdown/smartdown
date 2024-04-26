@@ -11,5 +11,9 @@
     "lib": ["es6", "dom"],
     "strictFunctionTypes": true,
     "moduleResolution": "node",
-  }
+  },
+  "exclude": [
+    "**/src/external",
+    "**/dist"
+  ]
 }
