@@ -17,8 +17,8 @@ describe('b.configure', function() {
   this.timeout(5000); // Default is 2000ms. Must be larger than postConfigureTimeout
 
   describe('smartdown.version()', function() {
-    it('should return "1.0.70"', function(done) {
-      assert.equal(smartdown.version, '1.0.70');
+    it('should return "1.0.71"', function(done) {
+      assert.equal(smartdown.version, '1.0.71');
       done();
     });
   });
