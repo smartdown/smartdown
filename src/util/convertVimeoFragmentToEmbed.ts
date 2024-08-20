@@ -1,4 +1,4 @@
-export default function convertVimeoFragmentToEmbed(href, title, text) {
+export default function convertVimeoFragmentToEmbed(href: string, title: string, text: string): string {
   let result = null;
   const hrefNoProtocol = href.replace(/^https?:\/\//, '');
   const classList = (text === 'thumbnail') ? 'thumbnail' : 'fullwidth';

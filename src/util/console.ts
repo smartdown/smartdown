@@ -1,4 +1,4 @@
-export function consoleWrite(playable, args) {
+export function consoleWrite(playable: any, args: string[]): void {
   let msg = '';
   args.forEach((arg) => {
     if (typeof arg === 'object') {
@@ -28,7 +28,7 @@ export function consoleWrite(playable, args) {
   }
 }
 
-export function toggleConsole(divId) {
+export function toggleConsole(divId: string): void {
   const div = document.getElementById(divId);
   if (div) {
     const newStyle = (div.style.display === 'block' ? 'none' : 'block');

@@ -76,7 +76,7 @@ return (async () => {
 })();
 `;
         /* eslint-disable-next-line no-new-func */
-        // eslint-disable-next-line @typescript-eslint/no-implied-eval
+        // eslint-disable-next-line no-implied-eval
         const func = new Function([], asyncAugmentedCode);
 
         try {

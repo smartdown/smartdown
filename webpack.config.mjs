@@ -2,15 +2,25 @@
 
 /* eslint-disable */
 
-const webpack = require('webpack');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const FileManagerPlugin = require('filemanager-webpack-plugin');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
+import webpack from 'webpack';
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import CopyWebpackPlugin from 'copy-webpack-plugin';
+import FileManagerPlugin from 'filemanager-webpack-plugin';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+
+// const webpack = require('webpack');
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+// const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+// const CopyWebpackPlugin = require('copy-webpack-plugin');
+// const FileManagerPlugin = require('filemanager-webpack-plugin');
+// var HtmlWebpackPlugin = require('html-webpack-plugin');
 // const GoogleFontsPlugin = require("google-fonts-webpack-plugin")
 
-const path = require('path');
+import path from 'path';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
+const __dirname = path.dirname(__filename); // get the name of the directory
 
 // process.noDeprecation = true;   // https://github.com/babel/babel-loader/issues/392
 
@@ -54,13 +64,13 @@ var galleryRoot = '/Users/bud/DoctorBud/smartdown-gallery/';
 // var galleryResourcesRoot = path.join(nm, 'smartdown-gallery/resources/');
 
 var useOlderBrowsers = false;
-var useFileSaver = true && !test;
-var useLocalForage = true && !test;
-var useLeaflet = true && !test;
-var useBrython = true && !test;
-var useGifffer = true && !test;
-var useP5JS = true && !test;
-var useMathJax = true;
+var useFileSaver = false && !test;
+var useLocalForage = false && !test;
+var useLeaflet = false && !test;
+var useBrython = false && !test;
+var useGifffer = false && !test;
+var useP5JS = false && !test;
+var useMathJax = false;
 
 var mode = (nodeEnvironment === 'production' || nodeEnvironment === 'development') ?
             nodeEnvironment : 'production';
@@ -178,7 +188,7 @@ var config = {
 
     new CopyWebpackPlugin({
       patterns: [
-        { from: '../distdoc/', to: '../doc/' },
+        // { from: '../distdoc/', to: '../doc/' },
         { from: 'SimpleSiteExample/index_unpkg.html', to: '../index_unpkg.html' },
         { from: 'favicons', to: '../' },
         { from: '../CODE_OF_CONDUCT.md', to: '../' },
@@ -256,11 +266,11 @@ var config = {
             { source: outputPath + 'smartdown.css', destination: outputPath + '../gist/' },
 
             { source: outputPath + 'smartdown.js.map', destination: outputPath + '../gist/' },
-            { source: outputPath + 'smartdown.css.map', destination: outputPath + '../gist/' },
+            // { source: outputPath + 'smartdown.css.map', destination: outputPath + '../gist/' },
 
-            { source: outputPath + 'smartdown_p5Sound.js', destination: outputPath + '../gist/' },
+            // { source: outputPath + 'smartdown_p5Sound.js', destination: outputPath + '../gist/' },
 
-            { source: outputPath + 'smartdown_p5Sound.js.map', destination: outputPath + '../gist/' },
+            // { source: outputPath + 'smartdown_p5Sound.js.map', destination: outputPath + '../gist/' },
           ]
         }
       }
@@ -423,7 +433,7 @@ switch (nodeEnvironment) {
     console.warn('Unknown or Undefined Node Environment. Please refer to package.json for available build commands.');
 }
 
-var nodeExternals = require('webpack-node-externals');
+import nodeExternals from 'webpack-node-externals';
 
 if (test) {
   require.extensions['.css'] = function () {
@@ -447,4 +457,4 @@ if (test) {
   config.externals = [nodeExternals()]; // in order to ignore all modules in node_modules folder
 }
 
-module.exports = config;
+export default config;

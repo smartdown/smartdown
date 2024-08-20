@@ -47,7 +47,7 @@ function importScriptUrlWithModule(sSrc: string, isModule: boolean, fOnload: Fun
     };
   }
 
-  (oHead as any).appendChild(oScript);
+  oHead.appendChild(oScript);
 
 }
 
@@ -97,8 +97,8 @@ export function importTextUrl(sSrc: string, fOnload: (error: string) => void, fO
 export function importCssCode(cssCode: string): void {
   const styleElement: HTMLStyleElement = document.createElement('style');
   styleElement.type = 'text/css';
-  (styleElement as any).appendChild(document.createTextNode(cssCode));
-  (document.getElementsByTagName('head')[0] as any).appendChild(styleElement);
+  styleElement.appendChild(document.createTextNode(cssCode));
+  document.getElementsByTagName('head')[0].appendChild(styleElement);
 }
 
 
@@ -122,7 +122,7 @@ export function importCssUrl(sSrc: string, fOnload: Function, fOnerror: Function
   oLink.type = 'text/css';
   oLink.onerror = loadError;
   oLink.href = expandedSrc;
-  (oHead as any).appendChild(oLink);
+  oHead.appendChild(oLink);
   if (fOnload) {
     oLink.onload = function (evt: Event): void {
       fOnload(evt);

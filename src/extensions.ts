@@ -4,7 +4,7 @@
 import {
   importScriptUrl,
   importModuleUrl,
-  importCssUrl
+  importCssUrl,
 } from './importers';
 
 window.smartdownJSModules = {};
@@ -13,10 +13,10 @@ const registeredExtensions: any = {};
 
 // https://stackoverflow.com/a/12709880/5667222
 declare global {
-    interface Window {
-      smartdown: any;
-      smartdownJSModules: any;
-    }
+  interface Window {
+    smartdown: any;
+    smartdownJSModules: any;
+  }
 }
 
 export function isExtensionRegistered(name: string): boolean {
@@ -54,7 +54,7 @@ export function registerExtension(
       configure: configure,
       resources: resources,
       resourceToLoad: 0,
-      loadedCallbacks: []
+      loadedCallbacks: [],
     };
   }
 }

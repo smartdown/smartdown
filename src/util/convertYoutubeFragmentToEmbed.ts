@@ -12,7 +12,7 @@ const youtubeClasses = {
 
 let uniqueYouTubeId = 0;
 
-export default function convertYoutubeFragmentToEmbed(href, title, text) {
+export default function convertYoutubeFragmentToEmbed(href: string, title: string, text: string): void {
   // console.log('convertYoutubeFragmentToEmbed', href, title, text);
   let result = null;
   const textParts = text.split('|');

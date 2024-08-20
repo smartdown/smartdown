@@ -2,7 +2,7 @@ import playableArgNames from './playableArgNames';
 
 export default async function runFunction(code, embedThis, argValues, language, div) {
   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/AsyncFunction#examples
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  // eslint-disable-next-line no-empty-function
   const AsyncFunction = (async function () {}).constructor;
   const func = new AsyncFunction(...playableArgNames, code);
 

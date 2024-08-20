@@ -1,8 +1,8 @@
 /* global useP5JS */
 
-const P5UserFunctions = require('./P5UserFunctions');
-const P5SystemVars = require('./P5SystemVars');
-const P5LoaderPrototypeInfo = require('./P5LoaderPrototypeInfo');
+import P5UserFunctions from './P5UserFunctions';
+import P5SystemVars from './P5SystemVars';
+import P5LoaderPrototypeInfo from './P5LoaderPrototypeInfo';
 
 const P5 = {
   Loader: {},

@@ -1,4 +1,5 @@
-const each = window.lodashEach = require('lodash/forEach');
+import each from 'lodash/forEach';
+ window.lodashEach = each;
 
 // https://github.com/mdaines/viz.js/wiki/API#render-options
 const graphvizImages = [];

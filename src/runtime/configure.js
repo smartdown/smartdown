@@ -59,13 +59,9 @@ export default function configure(options, loadedHandler) {
   smartdown.mediaRegistry = {};
 
   const media = options.media;
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   const _baseURL = options.baseURL;
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   const _cardLoader = options.cardLoader;
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   const _calcHandlers = options.calcHandlers;
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   const _linkRules = options.linkRules;
 
   window.smartdown.baseURL = _baseURL || (window.location.origin + '/');

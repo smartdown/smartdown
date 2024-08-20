@@ -1,6 +1,6 @@
-const isEqual = require('lodash/isEqual');
+import { isEqual } from 'lodash';
 
-export default function areValuesSameEnough(varname, oldValue, newValue) {
+export default function areValuesSameEnough(varname: string, oldValue: any, newValue: any): boolean {
   // const oldValueJSON = JSON.stringify(oldValue);
   // const newValueJSON = JSON.stringify(newValue);
   // const result = oldValueJSON === newValueJSON;

@@ -143,7 +143,7 @@ async function playPlayableInternal(language, divId) {
         }
       };
 
-      /* eslint-disable-next-line @typescript-eslint/no-implied-eval */
+      /* eslint-disable-next-line no-implied-eval */
       let func = new Function(...playableArgNames, playable.augmentedCode);
       playable.embedThis.IAMP5 = 'IAMP5';
       func = func.bind(

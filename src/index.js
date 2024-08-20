@@ -732,7 +732,7 @@ function computeExpression(entry, done) {
           return v;
         });
 
-        /* eslint-disable-next-line @typescript-eslint/no-implied-eval */
+        /* eslint-disable-next-line no-implied-eval */
         const f = new Function(vars, 'return ' + rhs + ';');
         let newValue = f.apply({}, vals);
         // console.log('#rhs', f, vars, rhs, vals, type);
@@ -811,7 +811,7 @@ function getMedia(mediaKey) {
   return smartdown.mediaRegistry[mediaKey];
 }
 
-module.exports = {
+const exports = {
   initialize: initialize,
   configure: configure,
   expressionsRegistered: globalState.expressionsRegistered,
@@ -882,7 +882,7 @@ module.exports = {
   getFrontmatter: getFrontmatter,
   updateProcesses: updateProcesses,
   cleanupOrphanedStuff: cleanupOrphanedStuff,
-  version: '1.0.71',
+  version: '1.0.72',
   baseURL: null, // Filled in by initialize/configure
   setupYouTubePlayer: setupYouTubePlayer,
   entityEscape: entityEscape,
@@ -906,4 +906,6 @@ module.exports = {
 // kick off the polyfill!
 smoothscroll.polyfill();
 
-window.smartdown = module.exports;
+window.smartdown = exports;
+
+export default exports;
