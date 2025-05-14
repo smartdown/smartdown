@@ -1,0 +1,95 @@
+[
+  {
+    "comment": "/**\n * Initialize the smartdown runtime.\n *\n * @constructor\n * @param {object} media - media\n * @param {string} baseURL - baseURL\n * @param {function} loadedHandler - loadedHandler\n * @param {function} cardLoader - cardLoader\n * @param {object} calcHandlers - calcHandlers\n * @param {object} linkRules - linkRules\n *\n */",
+    "meta": {
+      "range": [
+        3791,
+        4073
+      ],
+      "filename": "index.js",
+      "lineno": 133,
+      "columnno": 0,
+      "path": "/Users/bud/DoctorBud/smartdown/src",
+      "code": {
+        "id": "astnode100000267",
+        "name": "initialize",
+        "type": "FunctionDeclaration",
+        "paramnames": [
+          "media",
+          "baseURL",
+          "loadedHandler",
+          "cardLoaderArg",
+          "calcHandlersArg",
+          "linkRulesArg"
+        ]
+      },
+      "vars": {
+        "options": "initialize~options"
+      }
+    },
+    "description": "Initialize the smartdown runtime.",
+    "kind": "class",
+    "params": [
+      {
+        "type": {
+          "names": [
+            "object"
+          ]
+        },
+        "description": "media",
+        "name": "media"
+      },
+      {
+        "type": {
+          "names": [
+            "string"
+          ]
+        },
+        "description": "baseURL",
+        "name": "baseURL"
+      },
+      {
+        "type": {
+          "names": [
+            "function"
+          ]
+        },
+        "description": "loadedHandler",
+        "name": "loadedHandler"
+      },
+      {
+        "type": {
+          "names": [
+            "function"
+          ]
+        },
+        "description": "cardLoader",
+        "name": "cardLoader"
+      },
+      {
+        "type": {
+          "names": [
+            "object"
+          ]
+        },
+        "description": "calcHandlers",
+        "name": "calcHandlers"
+      },
+      {
+        "type": {
+          "names": [
+            "object"
+          ]
+        },
+        "description": "linkRules",
+        "name": "linkRules"
+      }
+    ],
+    "name": "initialize",
+    "longname": "initialize",
+    "scope": "global",
+    "$longname": "initialize",
+    "$kind": "constructor",
+    "$docmaLink": "api/#initialize"
+  }
+]
