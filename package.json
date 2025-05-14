@@ -1,6 +1,6 @@
 {
   "name": "smartdown",
-  "version": "1.0.71",
+  "version": "1.0.72",
   "description": "A library for translating, rendering and interacting with Smartdown documents. Smartdown is an extension of Markdown that provides richer media support and reactive programming capability.",
   "main": "dist/lib/smartdown.js",
   "scripts": {
@@ -94,6 +94,7 @@
     "@stdlib/dist-datasets-sotu": "0.0.96",
     "@stdlib/dist-datasets-tree-exclude": "0.0.96",
     "@stdlib/dist-tree": "0.0.96",
+    "@types/linkify-it": "^3.0.5",
     "@webcomponents/webcomponentsjs": "^2.8.0",
     "axios": "^1.6.8",
     "base64-js": "^1.5.1",
@@ -109,7 +110,7 @@
     "lodash": "^4.17.21",
     "marked": "^3.0.8",
     "p5": "^1.9.3",
-    "smartdown-gallery": "0.0.85",
+    "smartdown-gallery": "0.0.86",
     "smoothscroll-polyfill": "^0.4.4",
     "stacktrace-js": "^2.0.2",
     "vdom-to-html": "^2.3.1",

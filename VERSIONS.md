@@ -71,4 +71,6 @@
 - **1.0.68** - Update deps. Refactored global variables in index.js to be more isolated into globalState.js.
 - **1.0.69** - Update deps. More refactoring into smaller files. Lock down ThreeJS version to 0.122 until Gallery examples are updated.
 - **1.0.70** - Update deps. Fix Brython so that it can be included via CDN. Adjusted tsconfig.json to exclude /src/external.
-- **1.0.71** - Update deps.
+- **1.0.71** - Update deps. Fix issue with building docs and Typescript.
+- **1.0.72** - Mostly just a sanity check version. I went down a rathole with too many dependency updates with a prior version of 1.0.72, and am now backtracking. Updated tsconfig.json to use es2017 target. Added support for GALLERY_DEV_MODE environment variable to allow choice of default or local gallery.
+
