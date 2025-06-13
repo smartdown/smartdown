@@ -73,3 +73,4 @@
 - **1.0.70** - Update deps. Fix Brython so that it can be included via CDN. Adjusted tsconfig.json to exclude /src/external.
 - **1.0.71** - Update deps. Fix issue with building docs and Typescript.
 - **1.0.73** - Updated tooling to support 18.20.8. Updated as many packages as I could safely handle this release.
+- **1.0.74** - Updated tooling to support NodeJS 20.19.2. Updated as many packages as I could safely handle this release.
