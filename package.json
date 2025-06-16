@@ -94,7 +94,7 @@
     "@stdlib/dist-datasets-sotu": "0.0.96",
     "@stdlib/dist-datasets-tree-exclude": "0.0.96",
     "@stdlib/dist-tree": "0.0.96",
-    "@types/linkify-it": "^5.0.0",
+    "@types/linkify-it": "^3.0.5",
     "@webcomponents/webcomponentsjs": "^2.8.0",
     "axios": "^1.9.0",
     "base64-js": "^1.5.1",
