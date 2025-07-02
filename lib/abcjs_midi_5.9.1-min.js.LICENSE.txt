@@ -1,0 +1,5 @@
+/*! For license information please see abcjs_midi_5.9.1-min.js.LICENSE */
+
+/*! abcjs_midi v5.9.1 Copyright © 2009-2019 Paul Rosen and Gregory Dyke (https://abcjs.net) */
+
+/*! midi.js Copyright © Michael Deal (http://mudcu.be) */
