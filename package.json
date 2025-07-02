@@ -1,6 +1,6 @@
 {
   "name": "smartdown",
-  "version": "1.0.74",
+  "version": "1.0.75",
   "description": "A library for translating, rendering and interacting with Smartdown documents. Smartdown is an extension of Markdown that provides richer media support and reactive programming capability.",
   "main": "dist/lib/smartdown.js",
   "scripts": {
@@ -11,7 +11,8 @@
     "pack": "npm run rmdsstore && npm run build && npm run builddoc && npm pack",
     "analyze": "npm run clean && BUILD=analyze node_modules/.bin/webpack --progress",
     "devdoc": "node doc/build.js",
-    "builddoc": "rm -rf distdoc/ distdocts/ && tsc --build doc/tsconfig_for_docs.json && BUILD=production node doc/build.js",
+    "builddoc": "doc/build.sh",
+    "testdoc": "npm run builddoc && http-server -c-1 -o distdoc/doc",
     "buildnoclean": "BUILD=production node_modules/.bin/webpack --progress",
     "build": "npm run clean && npm run builddoc && npm run buildnoclean",
     "devbuild": "npm run buildnoclean && (mkdir devdist/ && mv dist devdist/smartdown/ && mv devdist dist) && npm run serve",
@@ -47,7 +48,7 @@
   },
   "homepage": "https://github.com/smartdown/smartdown#readme",
   "devDependencies": {
-    "@babel/core": "^7.27.4",
+    "@babel/core": "^7.27.7",
     "@babel/plugin-syntax-dynamic-import": "^7.8.3",
     "@babel/plugin-transform-modules-umd": "7.27.1",
     "@babel/plugin-transform-runtime": "^7.27.4",
@@ -63,7 +64,7 @@
     "docma": "^3.2.2",
     "eslint": "^8.57.0",
     "eslint-config-airbnb-typescript": "^18.0.0",
-    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-import": "^2.32.0",
     "file-loader": "^6.2.0",
     "filemanager-webpack-plugin": "^8.0.0",
     "html-webpack-plugin": "^5.6.3",

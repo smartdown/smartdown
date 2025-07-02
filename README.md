@@ -6,8 +6,8 @@ Smartdown is a *declarative*, *literate* and *reactive* authoring technology for
 
 Smartdown extends the simple expressivity of the [Markdown](https://en.wikipedia.org/wiki/Markdown) language commonly used on blogs, messaging systems, technical forums, and on [GitHub](https://help.github.com/articles/basic-writing-and-formatting-syntax/). The Smartdown **engine** is a Javascript library that interprets the content in these Smartdown source files and enacts the desired behavior and presentation.
 
-- [Smartdown Documentation](doc/)
-- [Smartdown API](doc/api/)
+- [Smartdown Documentation](/doc/)
+- [Smartdown API](/doc/api/)
 - [Version History](doc/versions/)
 - [License](doc/license/)
 - [Contributing](doc/contributing/)

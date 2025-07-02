@@ -181,7 +181,7 @@ var config = {
 
     new CopyWebpackPlugin({
       patterns: [
-        { from: '../distdoc/', to: '../doc/' },
+        { from: '../distdoc/doc/', to: '../doc/' },
         { from: 'SimpleSiteExample/index_unpkg.html', to: '../index_unpkg.html' },
         { from: 'favicons', to: '../' },
         { from: '../CODE_OF_CONDUCT.md', to: '../' },

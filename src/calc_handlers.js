@@ -4,6 +4,9 @@ const smartdown = window.smartdown;
  * calc_handlers.js
  *
  * This file contains useful examples of Smartdown 'calc-handlers'.
+ *
+ * @module
+ *
  */
 
 function calcWikidataImageUtil(thumb, key, body, done) {

@@ -1,3 +1,6 @@
+// This is obsolete and for reference only.
+// The Docma package is no longer supported well, and JSDoc
+// is being used for Smartdown documentation.
 const Docma = require('docma');
 
 var nodeEnvironment = process.env.BUILD;
