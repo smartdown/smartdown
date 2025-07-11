@@ -75,3 +75,5 @@
 - **1.0.73** - Updated tooling to support 18.20.8. Updated as many packages as I could safely handle this release.
 - **1.0.74** - Updated tooling to support NodeJS 20.19.2. Updated as many packages as I could safely handle this release.
 - **1.0.75** - Updated tooling to support Node 22.16.0. Removed use of Docma for API and documentation generation; using JSDoc instead.
+- **1.0.76** - Updated deps. Fixed how README.md is copied to the /doc directory, due to a change in copy-webpack-plugin.
+

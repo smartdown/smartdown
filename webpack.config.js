@@ -255,6 +255,7 @@ var config = {
       events: {
         onEnd: {
           copy: [
+            { source: outputPath + '../README.md', destination: outputPath + '../gallery/' },
             { source: outputPath + 'smartdown.js', destination: outputPath + '../gist/' },
             { source: outputPath + 'smartdown.css', destination: outputPath + '../gist/' },
 
