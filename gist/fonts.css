@@ -1,0 +1,120 @@
+/* === Asap - regular */
+@font-face {
+	font-family: 'Asap';
+	font-style: normal;
+	font-weight: 400;
+	src: url("./fonts/Asap-Regular.eot");
+	src: local("Asap Regular"),
+		local("Asap-Regular"),
+		url("./fonts/Asap-Regular.eot") format("embedded-opentype"),
+		url("./fonts/Asap-Regular.woff2") format("woff2"),
+		url("./fonts/Asap-Regular.woff") format("woff"),
+		url("./fonts/Asap-Regular.ttf") format("truetype"),
+		url("./fonts/Asap-Regular.svg") format("svg");
+}
+
+/* === Asap - 500 */
+@font-face {
+	font-family: 'Asap';
+	font-style: normal;
+	font-weight: 500;
+	src: url("./fonts/Asap-Medium.eot");
+	src: local("Asap Medium"),
+		local("Asap-Medium"),
+		url("./fonts/Asap-Medium.eot") format("embedded-opentype"),
+		url("./fonts/Asap-Medium.woff2") format("woff2"),
+		url("./fonts/Asap-Medium.woff") format("woff"),
+		url("./fonts/Asap-Medium.ttf") format("truetype"),
+		url("./fonts/Asap-Medium.svg") format("svg");
+}
+
+/* === Asap - 700 */
+@font-face {
+	font-family: 'Asap';
+	font-style: normal;
+	font-weight: 700;
+	src: url("./fonts/Asap-Bold.eot");
+	src: local("Asap Bold"),
+		local("Asap-Bold"),
+		url("./fonts/Asap-Bold.eot") format("embedded-opentype"),
+		url("./fonts/Asap-Bold.woff2") format("woff2"),
+		url("./fonts/Asap-Bold.woff") format("woff"),
+		url("./fonts/Asap-Bold.ttf") format("truetype"),
+		url("./fonts/Asap-Bold.svg") format("svg");
+}
+
+/* === Ubuntu Mono - regular */
+@font-face {
+	font-family: 'Ubuntu Mono';
+	font-style: normal;
+	font-weight: 400;
+	src: url("./fonts/UbuntuMono-Regular.eot");
+	src: local("Ubuntu Mono"),
+		local("UbuntuMono-Regular"),
+		url("./fonts/UbuntuMono-Regular.eot") format("embedded-opentype"),
+		url("./fonts/UbuntuMono-Regular.woff2") format("woff2"),
+		url("./fonts/UbuntuMono-Regular.woff") format("woff"),
+		url("./fonts/UbuntuMono-Regular.ttf") format("truetype"),
+		url("./fonts/UbuntuMono-Regular.svg") format("svg");
+}
+
+/* === Ubuntu Mono - 700 */
+@font-face {
+	font-family: 'Ubuntu Mono';
+	font-style: normal;
+	font-weight: 700;
+	src: url("./fonts/UbuntuMono-Bold.eot");
+	src: local("Ubuntu Mono Bold"),
+		local("UbuntuMono-Bold"),
+		url("./fonts/UbuntuMono-Bold.eot") format("embedded-opentype"),
+		url("./fonts/UbuntuMono-Bold.woff2") format("woff2"),
+		url("./fonts/UbuntuMono-Bold.woff") format("woff"),
+		url("./fonts/UbuntuMono-Bold.ttf") format("truetype"),
+		url("./fonts/UbuntuMono-Bold.svg") format("svg");
+}
+
+/* === Ubuntu Mono - 700italic */
+@font-face {
+	font-family: 'Ubuntu Mono';
+	font-style: italic;
+	font-weight: 700;
+	src: url("./fonts/UbuntuMono-BoldItalic.eot");
+	src: local("Ubuntu Mono Bold Italic"),
+		local("UbuntuMono-BoldItalic"),
+		url("./fonts/UbuntuMono-BoldItalic.eot") format("embedded-opentype"),
+		url("./fonts/UbuntuMono-BoldItalic.woff2") format("woff2"),
+		url("./fonts/UbuntuMono-BoldItalic.woff") format("woff"),
+		url("./fonts/UbuntuMono-BoldItalic.ttf") format("truetype"),
+		url("./fonts/UbuntuMono-BoldItalic.svg") format("svg");
+}
+
+/* latin */
+@font-face {
+  font-family: 'Cabin Sketch';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Cabin Sketch Regular'),
+  local('CabinSketch-Regular'),
+  url('./fonts/Cabin_Sketch-400-latin1.woff2') format('woff2');
+  unicode-range: U+0000-00FF,
+  U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Neucha';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Neucha'),
+  url('./fonts/Neucha-400-cyrillic2.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* latin */
+@font-face {
+  font-family: 'Neucha';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Neucha'),
+  url('./fonts/Neucha-400-latin3.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+

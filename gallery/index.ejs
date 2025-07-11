@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <title>Smartdown Example Gallery</title>
+  <link
+    rel=stylesheet
+    href="https://unpkg.com/smartdown/dist/lib/fonts.css">
+  <link
+    rel=stylesheet
+    href="https://unpkg.com/smartdown/dist/lib/smartdown.css">
+  <script
+    src="https://unpkg.com/smartdown/dist/lib/smartdown.js">
+  </script>
+
+  <style>
+.smartdown_p .infocell-output {
+  //width: 100%;
+  outline: 1px solid red !important;
+  border: 1px solid cyan !important;
+}
+  </style>
+</head>
+
+<body
+  id="smartdown-outer-container"
+  class="smartdown-outer-container">
+
+  <div
+    class="smartdown-container"
+    id="smartdown-output">
+  </div>
+
+
+  <script src="https://unpkg.com/smartdown/dist/lib/calc_handlers.js"></script>
+  <script src="https://unpkg.com/smartdown/dist/lib/starter.js"></script>
+  <script>
+    window.smartdownBaseURL = 'https://unpkg.com/smartdown/dist/';
+    window.smartdownResourceURL = '/resources/';
+    if ('<%= targetType %>' === 'github') {
+      window.smartdownResourceURL = '/gallery/resources/';
+    }
+    else if ('<%= targetType %>' === 'gitlab') {
+      window.smartdownResourceURL = '/gallerydemo/resources/';
+    }
+
+    window.smartdownDefaultHome = 'Home';
+    window.smartdownStarter();
+  </script>
+
+
+</body>
+</html>
