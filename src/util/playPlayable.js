@@ -87,95 +87,109 @@ async function playPlayableInternal(language, divId) {
       /* xeslint no-eval: 0 */
 
       /* eslint no-inner-declarations: 0 */
-      function patchedDisposeSound() {
-        /* eslint no-invalid-this: 0 */
-        for (let i = 0; i < P5.Loader.soundOut.soundArray.length; i++) {
-          const soundResource = P5.Loader.soundOut.soundArray[i];
-          if (!soundResource.owner ||
-              soundResource.owner === this) {
-            // console.log('DISPOSE [' + i + '] disposeSound soundResource:', soundResource);
-            soundResource.dispose();
-          }
-        }
-      }
+      // function patchedDisposeSound() {
+      //   /* eslint no-invalid-this: 0 */
+      //   for (let i = 0; i < P5.Loader.soundOut.soundArray.length; i++) {
+      //     const soundResource = P5.Loader.soundOut.soundArray[i];
+      //     if (!soundResource.owner ||
+      //         soundResource.owner === this) {
+      //       // console.log('DISPOSE [' + i + '] disposeSound soundResource:', soundResource);
+      //       soundResource.dispose();
+      //     }
+      //   }
+      // }
 
-      const removeHandlers = P5.Loader.prototype._registeredMethods.remove;
-      for (let i = 0; i < removeHandlers.length; ++i) {
-        if (removeHandlers[i] === P5.Loader.prototype.disposeSound) {
-          removeHandlers[i] = patchedDisposeSound;
-        }
-      }
+      // const removeHandlers = P5.Loader.prototype._registeredMethods.remove;
+      // for (let i = 0; i < removeHandlers.length; ++i) {
+      //   if (removeHandlers[i] === P5.Loader.prototype.disposeSound) {
+      //     removeHandlers[i] = patchedDisposeSound;
+      //   }
+      // }
 
       // const oldmousemove = P5.Loader.prototype._onmousemove;
       // P5.Loader.prototype._onmousemove = function(e) {
       //   console.log('onmousemove', e);
       // };
       // const oldtouchend = P5.Loader.prototype._ontouchend;
-      P5.Loader.prototype._ontouchend = function (e) {
-        // Smartdown addition to capture page dimensions
-        e.clientX = e.pageX;
-        e.clientY = e.pageY;
-        // return oldtouchend.apply(this, arguments);
+
+      // P5.Loader.prototype._ontouchend = function (e) {
+      //   // Smartdown addition to capture page dimensions
+      //   e.clientX = e.pageX;
+      //   e.clientY = e.pageY;
+      //   // return oldtouchend.apply(this, arguments);
 
 
-        // This code will be needed until a fix is made to 0.5.8 of P5JS
-        // Copied from 0.5.8 of P5JS
-        // Working around bug in https://github.com/processing/p5.js/pull/1820/files
+      //   // This code will be needed until a fix is made to 0.5.8 of P5JS
+      //   // Copied from 0.5.8 of P5JS
+      //   // Working around bug in https://github.com/processing/p5.js/pull/1820/files
 
-        this._updateTouchCoords(e);
-        this._updateNextMouseCoords(e);
-        if (this.touches.length === 0) {
-          this._setProperty('touchIsDown', false);
-        }
-        const context = this._isGlobal ? window : this;
-        let executeDefault;
-        if (typeof context.touchEnded === 'function') {
-          executeDefault = context.touchEnded(e);
-          if (executeDefault === false) {
-            e.preventDefault();
-          }
-        }
-        else if (typeof context.mouseReleased === 'function') {
-          executeDefault = context.mouseReleased(e);
-          if (executeDefault === false) {
-            e.preventDefault();
-          }
-        }
-      };
+      //   this._updateTouchCoords(e);
+      //   this._updateNextMouseCoords(e);
+      //   if (this.touches.length === 0) {
+      //     this._setProperty('touchIsDown', false);
+      //   }
+      //   const context = this._isGlobal ? window : this;
+      //   let executeDefault;
+      //   if (typeof context.touchEnded === 'function') {
+      //     executeDefault = context.touchEnded(e);
+      //     if (executeDefault === false) {
+      //       e.preventDefault();
+      //     }
+      //   }
+      //   else if (typeof context.mouseReleased === 'function') {
+      //     executeDefault = context.mouseReleased(e);
+      //     if (executeDefault === false) {
+      //       e.preventDefault();
+      //     }
+      //   }
+      // };
 
+      console.log('playable.augmentedCode', playable.augmentedCode);
       /* eslint-disable-next-line @typescript-eslint/no-implied-eval */
       let func = new Function(...playableArgNames, playable.augmentedCode);
+//       const debugCode =
+// `
+// console.log(arguments);
+// `;
+
+//       let func = new Function(...playableArgNames, debugCode);
       playable.embedThis.IAMP5 = 'IAMP5';
-      func = func.bind(
-        playable.embedThis,
-        ...(argValues.slice(0, -1))
-      );
-
       try {
-        const myP5 = new P5.Loader(func, div);
-        if (myP5._targetFrameRate === 60) {
-          myP5.frameRate(16);
-        }
-        myP5._onresize();
-        function keydownHandler(e) {
-          // console.log('keydownHandler', e.target.tagName, e);
-          const ignoreKeys = [
-            myP5.LEFT_ARROW,
-            myP5.RIGHT_ARROW,
-            myP5.UP_ARROW,
-            myP5.DOWN_ARROW,
-            32
-          ];
-
-          if (e.target.tagName === 'BODY' && ignoreKeys.indexOf(e.keyCode) >= 0) {
-            // console.log('ignoring', e);
-            e.preventDefault();
+        const glue = (p5) => {
+          console.log('p5', p5);
+          if (p5._targetFrameRate === 60) {
+            p5.frameRate(16);
           }
-        }
-        myP5.keydownHandler = keydownHandler;
-        window.addEventListener('keydown', keydownHandler, false);
+          p5._onresize();
+          function keydownHandler(e) {
+            // console.log('keydownHandler', e.target.tagName, e);
+            const ignoreKeys = [
+              p5.LEFT_ARROW,
+              p5.RIGHT_ARROW,
+              p5.UP_ARROW,
+              p5.DOWN_ARROW,
+              32
+            ];
 
-        playable.p5 = myP5;
+            if (e.target.tagName === 'BODY' && ignoreKeys.indexOf(e.keyCode) >= 0) {
+              // console.log('ignoring', e);
+              e.preventDefault();
+            }
+          }
+          p5.keydownHandler = keydownHandler;
+          window.addEventListener('keydown', keydownHandler, false);
+
+          func = func.bind(
+            playable.embedThis,
+            ...(argValues.slice(0, -1)),
+            p5
+          );
+
+          func();
+          playable.p5 = p5;
+        };
+
+        new P5.Loader(glue, div);
       }
       catch (e) {
         console.log('#### Error initializing P5JS', e);

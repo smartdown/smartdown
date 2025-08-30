@@ -12,10 +12,10 @@ export default function setVisibility(visible) {
   lodashEach(globalState.playablesRegisteredOrder, function (playable) {
     if (playable && playable.p5) {
       if (visible) {
-        playable.p5.getAudioContext().resume();
+        // playable.p5.getAudioContext().resume();
       }
       else {
-        playable.p5.getAudioContext().suspend();
+        // playable.p5.getAudioContext().suspend();
       }
     }
   });

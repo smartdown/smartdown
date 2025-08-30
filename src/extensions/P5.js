@@ -26,22 +26,22 @@ function loadP5JS(loaded) {
     window.smartdownJSModules.p5js.loadedCallbacks.push(loaded);
     // console.log('loadP5JS...p5js initiate load', window.smartdownJSModules.p5js.loadedCallbacks[0]);
 
-    import(/* webpackChunkName: "p5js" */ 'p5')
-      .then((p5js) => {
+    import('p5')
+      .then((p5Module) => {
+        const p5js = p5Module.default;
+        console.log('p5Module', p5Module);
+        console.log('p5js', p5js);
+        console.log('p5js', JSON.stringify(p5js));
         window.smartdownJSModules.p5js.loaded = p5js;
-        P5.Loader = p5js.default;
+        P5.Loader = p5js;
 
         window.p5js = p5js;
         window.P5 = P5.Loader;
         window.p5 = P5.Loader;
 
-        import(/* webpackChunkName: "p5Sound" */ 'p5/lib/addons/p5.sound.min')
-          .then(() => {
-
-            // for (const f in P5.Loader.prototype) {
-            //   console.log(f, typeof P5.Loader.prototype[f]);
-            // }
-
+        import('p5.sound')
+          .then((...args) => {
+            console.log('p5.sound loaded', args);
             const callThese = window.smartdownJSModules.p5js.loadedCallbacks;
             window.smartdownJSModules.p5js.loadedCallbacks = [];
             callThese.forEach((loadedCb) => {
@@ -49,8 +49,25 @@ function loadP5JS(loaded) {
             });
           })
           .catch((error) => {
-            console.log('loadP5Sound error', error);
+            console.log('p5.sound load error', error);
           });
+
+        // import(/* webpackChunkName: "p5Sound" */ 'p5/lib/addons/p5.sound.min')
+        //   .then(() => {
+
+        //     // for (const f in P5.Loader.prototype) {
+        //     //   console.log(f, typeof P5.Loader.prototype[f]);
+        //     // }
+
+        //     const callThese = window.smartdownJSModules.p5js.loadedCallbacks;
+        //     window.smartdownJSModules.p5js.loadedCallbacks = [];
+        //     callThese.forEach((loadedCb) => {
+        //       loadedCb();
+        //     });
+        //   })
+        //   .catch((error) => {
+        //     console.log('loadP5Sound error', error);
+        //   });
 
         // import(/* webpackChunkName: "p5DOM" */ 'p5/lib/addons/p5.dom.min.js')
         //   .then(p5DOM => {

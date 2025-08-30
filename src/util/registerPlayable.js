@@ -76,9 +76,9 @@ ${P5.UserFunctionDefs}
 // Begin Augmented script
 // function(${playableArgNames.join(', ')})
 
-p5.TriOsc = P5.TriOsc;
-p5.FFT = P5.FFT;
-p5.Vector = P5.Vector;
+// p5.TriOsc = P5.TriOsc;
+// p5.FFT = P5.FFT;
+// p5.Vector = P5.Vector;
 
 // End Augmented script
 
