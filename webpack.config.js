@@ -9,6 +9,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const FileManagerPlugin = require('filemanager-webpack-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 // const GoogleFontsPlugin = require("google-fonts-webpack-plugin")
+const GalleryWatchCopyPlugin = require('./GalleryWatchCopyPlugin');
 
 const path = require('path');
 
@@ -146,8 +147,6 @@ var config = {
       'esprima$': path.join(__dirname, 'NOP.js'),
 
       topojson$: topojsonJS,
-      p5JS$: p5JS,
-      p5$: p5JS,
       'rx$': 'rx/dist/rx.all.js'
     },
     modules: [
@@ -156,7 +155,9 @@ var config = {
       nm
     ],
     extensions: ['.json', '.js', '.tsx', '.ts' ],
-
+    fallback: {
+      path: require.resolve('path-browserify'),
+    },
   },
 
   plugins: [
@@ -262,13 +263,24 @@ var config = {
             { source: outputPath + 'smartdown.js.map', destination: outputPath + '../gist/' },
             { source: outputPath + 'smartdown.css.map', destination: outputPath + '../gist/' },
 
-            { source: outputPath + 'smartdown_p5Sound.js', destination: outputPath + '../gist/' },
+            // { source: outputPath + 'smartdown_p5Sound.js', destination: outputPath + '../gist/' },
 
-            { source: outputPath + 'smartdown_p5Sound.js.map', destination: outputPath + '../gist/' },
+            // { source: outputPath + 'smartdown_p5Sound.js.map', destination: outputPath + '../gist/' },
           ]
         }
       }
-    })
+    }),
+
+    new GalleryWatchCopyPlugin({
+      src: galleryRoot,
+      dest: outputPath + '../gallery',
+      ignore: [
+        '.git/**',
+        'node_modules/**',
+        '.DS_Store',
+        '.gitignore',
+      ]
+    }),
 
   ],
 
