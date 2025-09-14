@@ -77,3 +77,4 @@
 - **1.0.75** - Updated tooling to support Node 22.16.0. Removed use of Docma for API and documentation generation; using JSDoc instead.
 - **1.0.76** - Updated deps. Fixed how README.md is copied to the /doc directory, due to a change in copy-webpack-plugin.
 - **1.0.77** - Updated deps. Improved 'npm clean'. Tweaked Typescript.js and tsconfig.json to inhibit processing of regular JS (for some reason I don't recall). Eliminated use of P5, P5JS webpack aliases. Added GalleryWatchPlugin.js to replace 'watch' functionality removed from copy-webpack-plugin v13.0.0.
+- **1.0.78** - Updated deps before the big Typescript upgrade.
