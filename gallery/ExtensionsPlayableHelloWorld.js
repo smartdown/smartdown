@@ -1,0 +1,1 @@
+console.log("W00t! This is ExtensionsPlayableHelloWorld.js");const playableDiv=this.div;playableDiv.style.border="5px solid purple",playableDiv.style.background="lightgreen",playableDiv.innerHTML="<h1>Hello World</h1>";

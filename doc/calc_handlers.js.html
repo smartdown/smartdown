@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: calc_handlers.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: calc_handlers.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const smartdown = window.smartdown;
+
+/**
+ * calc_handlers.js
+ *
+ * This file contains useful examples of Smartdown 'calc-handlers'.
+ *
+ * @module
+ *
+ */
+
+function calcWikidataImageUtil(thumb, key, body, done) {
+  body = decodeURIComponent(body);
+  function lookupComplete() {
+    /* eslint no-invalid-this: 0 */
+    const lookupResult = this.responseText;
+    // console.log('lookupResult', JSON.parse(lookupResult));
+    const parsedResult = JSON.parse(lookupResult).query.pages;
+
+    const thumbs = [];
+    parsedResult.forEach(function(val) {
+      if (thumb &amp;&amp; val.thumbnail) {
+        thumbs.push(val.thumbnail.source);
+      }
+      else if (!thumb &amp;&amp; val.original) {
+        thumbs.push(val.original.source);
+      }
+    });
+    thumbs.elementType = 'image';
+    done(thumbs);
+  }
+
+  let wdKey = body;
+  if (body.indexOf('[') === 0) {
+    const possibleJSONArray = JSON.parse(body);
+    if (Array.isArray(possibleJSONArray)) {
+      wdKey = '';
+      possibleJSONArray.forEach(function(val, idx) {
+        wdKey += val;
+        if (idx &lt; possibleJSONArray.length - 1) {
+          wdKey += '|';
+        }
+      });
+    }
+  }
+
+  const xhr = new XMLHttpRequest();
+  xhr.addEventListener('load', lookupComplete);
+
+  // https://en.wikipedia.org/wiki/Special:ApiSandbox#action=query&amp;format=json&amp;prop=pageimages&amp;titles=Albert+Einstein&amp;piprop=thumbnail%7Cname%7Coriginal&amp;pithumbsize=300
+  // /w/api.php?action=query&amp;format=json&amp;prop=pageimages&amp;titles=Albert+Einstein&amp;piprop=thumbnail%7Cname%7Coriginal&amp;pithumbsize=300
+
+  let url = 'https://en.wikipedia.org/w/api.php?action=query&amp;prop=pageimages%7Cpageterms&amp;format=json&amp;origin=*&amp;wbptterms=description&amp;redirects=&amp;formatversion=2';
+  url += '&amp;titles=' + encodeURI(wdKey);
+  url += '&amp;piprop=thumbnail%7Cname%7Coriginal&amp;pithumbsize=300';
+
+  /*
+  const xhr = new XMLHttpRequest();
+  xhr.addEventListener('load', lookupComplete);
+  const url = 'https://en.wikipedia.org/w/api.php?action=query&amp;formatversion=2&amp;prop=pageimages%7Cpageterms&amp;';
+  url += 'titles=' + encodeURI(wdKey);
+  url += '&amp;pilimit=3&amp;piprop=thumbnail&amp;wbptterms=description&amp;redirects=&amp;format=json&amp;origin=*';
+  */
+
+  xhr.open('GET', url);
+  xhr.send();
+}
+
+function calcWikidataImages(key, body, done) {
+  return calcWikidataImageUtil(false, key, body, done);
+}
+
+
+function calcWikidataThumbs(key, body, done) {
+  return calcWikidataImageUtil(true, key, body, done);
+}
+
+
+function calcWikidata(key, body, done) {
+  body = decodeURIComponent(body);
+  function lookupComplete() {
+    /* eslint no-invalid-this: 0 */
+    const lookupResult = this.responseText;
+    // console.log('calcWikidata', JSON.parse(lookupResult));
+    const parsedResult = JSON.parse(lookupResult).query.pages;
+    // console.log('calcWikidata parsedResult', parsedResult);
+
+    const info = [];
+    window.lodashEach(parsedResult, function(val) {
+      // console.log('...val', val);
+      info.push({
+        title: val.displaytitle,
+        url: val.canonicalurl
+      });
+    });
+    info.elementType = 'title/url';
+    done(info);
+  }
+
+  let wdKey = body;
+  if (body.indexOf('[') === 0) {
+    const possibleJSONArray = JSON.parse(body);
+    if (Array.isArray(possibleJSONArray)) {
+      wdKey = '';
+      possibleJSONArray.forEach(function(val, idx) {
+        wdKey += val;
+        if (idx &lt; possibleJSONArray.length - 1) {
+          wdKey += '|';
+        }
+      });
+    }
+  }
+  const xhr = new XMLHttpRequest();
+  xhr.addEventListener('load', lookupComplete);
+
+  let url = 'https://en.wikipedia.org/w/api.php?action=query&amp;format=json&amp;prop=info&amp;origin=*&amp;redirects=';
+  url += '&amp;titles=' + encodeURI(wdKey);
+  url += '&amp;inprop=displaytitle%7Curl';
+
+  // const url = 'https://en.wikipedia.org/w/api.php?action=query&amp;formatversion=2&amp;prop=pageimages%7Cpageterms&amp;';
+  // url += 'titles=' + encodeURI(wdKey);
+  // url += '&amp;pilimit=3&amp;piprop=thumbnail&amp;wbptterms=description&amp;redirects=&amp;format=json&amp;origin=*';
+
+  xhr.open('GET', url);
+  xhr.send();
+}
+
+
+const tsvCalcHandlerCache = {};
+function calcTSV(key, body, done) {
+  body = decodeURIComponent(body);
+  if (body.indexOf('/http') === 0) {
+    body = body.slice(1);
+  }
+  const translatedURL = smartdown.expandHrefWithLinkRules(body, smartdown.linkRules);
+  if (smartdown.d3) {
+    const cacheKey = 'CACHE_' + key + '_' + translatedURL;
+
+    let hit = tsvCalcHandlerCache[cacheKey];
+    if (hit) {
+      if (hit.inProgressHandlers.length > 0) {
+        // console.log('MISS cacheKey adding handler', cacheKey);
+        hit.inProgressHandlers.push(done);
+      }
+      else {
+        // console.log('HIT cacheKey', cacheKey);
+        done(hit.cachedResult);
+      }
+    }
+    else {
+      // console.log('MISS cacheKey', cacheKey);
+      hit = tsvCalcHandlerCache[cacheKey] = {
+        inProgressHandlers: [done],
+        cachedResult: null,
+      };
+
+      smartdown.axios.get(translatedURL).then(function(result) {
+        const tsvRows = smartdown.d3.tsvParseRows(result.data);
+        hit.cachedResult = tsvRows;
+        // console.log('hit.inProgressHandlers.length', cacheKey, hit.inProgressHandlers.length);
+        while (hit.inProgressHandlers.length > 0) {
+          const doneHandler = hit.inProgressHandlers.pop();
+          doneHandler(tsvRows);
+        }
+      }).catch(function(err) {
+        console.log('err', err);
+      });
+    }
+  }
+  else {
+    smartdown.ensureExtension('d3', function() {
+      calcTSV(key, translatedURL, done);
+    });
+  }
+}
+
+
+const csvCalcHandlerCache = {};
+function calcCSV(key, body, done) {
+  body = decodeURIComponent(body);
+  if (body.indexOf('/http') === 0) {
+    body = body.slice(1);
+  }
+  const translatedURL = smartdown.expandHrefWithLinkRules(body, smartdown.linkRules);
+  if (smartdown.d3) {
+    const cacheKey = 'CACHE_' + key + '_' + translatedURL;
+
+    let hit = csvCalcHandlerCache[cacheKey];
+    if (hit) {
+      if (hit.inProgressHandlers.length > 0) {
+        console.log('MISS cacheKey adding handler', cacheKey);
+        hit.inProgressHandlers.push(done);
+      }
+      else {
+        // console.log('HIT cacheKey', cacheKey);
+        done(hit.cachedResult);
+      }
+    }
+    else {
+      console.log('MISS cacheKey', cacheKey);
+      hit = csvCalcHandlerCache[cacheKey] = {
+        inProgressHandlers: [done],
+        cachedResult: null,
+      };
+
+      smartdown.axios.get(translatedURL).then(function(result) {
+        const csvRows = smartdown.d3.csvParseRows(result.data);
+        hit.cachedResult = csvRows;
+        // console.log('hit.inProgressHandlers.length', cacheKey, hit.inProgressHandlers.length);
+        while (hit.inProgressHandlers.length > 0) {
+          const doneHandler = hit.inProgressHandlers.pop();
+          doneHandler(csvRows);
+        }
+      }).catch(function(err) {
+        console.log('err', err);
+      });
+    }
+  }
+  else {
+    smartdown.ensureExtension('d3', function() {
+      calcCSV(key, translatedURL, done);
+    });
+  }
+}
+
+
+smartdown.defaultCalcHandlers = {
+  wikidataImages: calcWikidataImages,
+  wikidataThumbs: calcWikidataThumbs,
+  wikidata: calcWikidata,
+  tsv: calcTSV,
+  csv: calcCSV,
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-calc_handlers.html">calc_handlers</a></li></ul><h3>Classes</h3><ul><li><a href="initialize.html">initialize</a></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-CODE_OF_CONDUCT.html">Code of Conduct</a></li><li><a href="tutorial-CONTRIBUTING.html">CONTRIBUTING</a></li><li><a href="tutorial-FAQ.html">Frequently Asked Questions</a></li><li><a href="tutorial-LICENSE.html">LICENSE</a></li><li><a href="tutorial-README.html">README</a></li><li><a href="tutorial-VERSIONS.html">VERSIONS</a></li></ul><h3>Global</h3><ul><li><a href="global.html#starter">starter</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Tue Oct 07 2025 19:51:03 GMT-0700 (Pacific Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

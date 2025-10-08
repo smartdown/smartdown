@@ -1,0 +1,291 @@
+/*
+MIT License
+
+Copyright (c) 2019 Viresh Ratnakar
+
+See the full license notice in exolve-m.js.
+
+Version: Exolve v0.36 October 22 2019
+*/
+
+.background {
+  fill: black;
+}
+.cell {
+  fill: white;
+  cursor: pointer;
+}
+.cell-num {
+  font-size: 9px;
+  font-family: sans-serif;
+}
+.cell-text {
+  font-size: 16px;
+  font-family: sans-serif;
+  cursor: text;
+}
+.prefill {
+  fill: blue;
+}
+.wordend {
+  fill: rgb(0,0,255);
+}
+[id^="exolve-"][id$="-outermost-stack"] table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+[id^="exolve-"][id$="-outermost-stack"] td {
+  padding: 4px 6px 0 0;
+  vertical-align: top;
+}
+[id^="exolve-"][id$="-outermost-stack"] td:first-child:not(.filler) {
+  width: 25px;
+  font-weight: bold;
+}
+
+[id^="exolve-"][id$="-outermost-stack"] .clues-box td:first-child:not(.filler) div.clue-label {
+  width: 25px;
+}
+
+.anno-text {
+  font-style: italic;
+  color: darkgreen;
+}
+.flex-row {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: flex-start;
+}
+.flex-col {
+  display: flex;
+  flex-flow: column wrap;
+}
+.wide-box {
+  margin: auto;
+  padding: 0 10px;
+  width: inherit !important;
+}
+
+/*#outermost-stack {*/
+[id^="exolve-"][id$="-outermost-stack"] {
+  padding: 5px;
+  margin: 0;
+  font-size: 0.9em;
+  /*font-family: serif;*/
+}
+
+/* #title { */
+[id^="exolve-"][id$="-title"] {
+  text-align: center;
+  font-weight: bold;
+}
+/*#setter {*/
+[id^="exolve-"][id$="-setter"] {
+  text-align: center;
+  color: darkgreen;
+  margin: 0 0 8px 0;
+}
+/*#prelude {*/
+[id^="exolve-"][id$="-prelude"] {
+  margin: 8px 8px 0 8px;
+  padding: 0;
+}
+/*#small-print {*/
+[id^="exolve-"][id$="-small-print"] {
+  font-size: small;
+  margin: 0 0 4px 0;
+}
+/*#small-print > a {*/
+[id^="exolve-"][id$="-small-print"] > a {
+  padding: 0 4px 0 0;
+}
+/*#errors {*/
+[id^="exolve-"][id$="-errors"] {
+  font-weight: bold;
+  color: red;
+}
+/*#current-clue-parent {*/
+[id^="exolve-"][id$="-current-clue-parent"] {
+  height: 40px;
+  width: 100%;
+  position:relative;
+  margin: 4px;
+}
+/*#current-clue {*/
+[id^="exolve-"][id$="-current-clue"] {
+  position: absolute;
+  z-index: 2;
+  word-wrap: break-word;
+  font-weight: bold;
+  margin: 0 0 0 8px;
+  padding: 4px 4px 4px 0;
+}
+/*#grid-panel {*/
+[id^="exolve-"][id$="-grid-panel"] {
+  margin: 0;
+  width: 100%;
+}
+/*#grid-parent-centerer {*/
+[id^="exolve-"][id$="-grid-parent-centerer"] {
+  text-align: center;
+}
+/*#grid-parent {*/
+[id^="exolve-"][id$="-grid-parent"] {
+  position: relative;
+  margin: 0 20px 0 0;
+  display: inline-block;
+}
+/*#grid-input-wrapper {*/
+[id^="exolve-"][id$="-grid-input-wrapper"] {
+  position: absolute;
+  border: none;
+  border-width:0;
+}
+/*#grid-input {*/
+[id^="exolve-"][id$="-grid-input"] {
+  text-align: center;
+  text-anchor: middle;
+  border: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  background: rgba(255,255,255,0.0);
+}
+/*#controls-etc {*/
+[id^="exolve-"][id$="-controls-etc"] {
+  padding: 8px 0 6px 0;
+}
+.controls-row {
+  margin: 6px 0 6px 0;
+}
+/*#clues {*/
+[id^="exolve-"][id$="-clues"] {
+  max-width: 100%;  /* 940px; */
+}
+.clues-box {
+  width: 45%;
+  min-width: 400px;
+  margin: 0;
+  overflow-y: auto;
+  padding: 0 10px;
+}
+
+/*#explanations {*/
+[id^="exolve-"][id$="-explanations"] {
+  margin: 10px 0 0 0;
+}
+[id^="exolve-"][id$="-outermost-stack"] hr {
+  margin: 0 4px;
+  height: 4px;
+  background-color: darkgray !important;
+}
+[id^="exolve-"][id$="-outermost-stack"] .button {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  outline: none;
+  color: white;
+  padding: 4px 8px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 12px;
+  font-family: monospace;
+  font-size: 14px;
+}
+.button:hover {
+  background-color: darkgreen;
+  cursor: pointer;
+}
+.button:disabled {
+  background-color: gray;
+  cursor: not-allowed;
+}
+.small-button {
+  background-color: mistyrose;
+  border: 1px solid lightpink;
+  outline: none;
+  padding: 4px 8px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 4px;
+  font-family: monospace;
+  font-weight: bold;
+  font-size: 14px;
+}
+.small-button:hover {
+  background-color: lightpink;
+  cursor: pointer;
+}
+/*#nina-group {*/
+[id^="exolve-"][id$="-nina-group"] {
+  position: absolute;
+  border: none;
+  border-width:0;
+  outline: none;
+}
+.nina {
+  position: absolute;
+  border: none;
+  border-width:0;
+  outline: none;
+  cursor: pointer;
+}
+/*#status {*/
+[id^="exolve-"][id$="-status"] {
+  font-family: monospace;
+  font-size: 12px;
+  margin: 6px 0 6px 0;
+  color: darkgreen;
+}
+/*#saving {*/
+[id^="exolve-"][id$="-saving"] {
+  font-size: small;
+  font-family: monospace;
+  color: darkslateblue;
+  margin: 0;
+  padding: 4px;
+}
+.question {
+  margin: 20px 0 20px 0;
+}
+.answer {
+  border: none;
+  padding: 0 0 6px 0;
+  outline: none;
+  font-family: monospace;
+  font-size: 12px;
+  color: darkgreen;
+  background-image:
+    repeating-linear-gradient(to bottom, white, white 13px, black 14px);
+}
+/*#scratchpad {*/
+[id^="exolve-"][id$="-scratchpad"] {
+  border: 1px solid darkgreen;
+  padding: 8px;
+  outline: none;
+  font-family: monospace;
+  font-size: 12px;
+  color: darkgreen;
+}
+/*#shuffle {*/
+[id^="exolve-"][id$="-shuffle"] {
+  font-family: monospace;
+  font-size: 12px;
+  cursor: pointer;
+}
+@media print {
+  @page {
+    margin: 0.5in;
+  }
+  body {
+    zoom: 100%;
+  }
+  /*#controls-etc {*/
+  [id^="exolve-"][id$="-controls-etc"] {
+    display: none;
+  }
+  .clues-box {
+    overflow-y: visible;
+  }
+}

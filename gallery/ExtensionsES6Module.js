@@ -1,0 +1,1 @@
+const PI=3.1415926;function sum(...o){return log("sum",o),o.reduce((o,n)=>n+o)}function mult(...o){return log("mult",o),o.reduce((o,n)=>n*o)}function log(...o){console.log("ExtensionsES6Module: ",...o)}console.log("ExtensionsES6Module.js loading");let note={note:""};export{PI,sum,mult,note};
