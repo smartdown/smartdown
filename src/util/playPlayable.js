@@ -1,6 +1,9 @@
 /* global smartdown */
 
+import lodashEach from 'lodash/forEach';
+
 import playableTypes from '../playableTypes';
+import globalState from './globalState';
 import P5 from '../extensions/P5';
 import Mermaid from '../extensions/Mermaid';
 import graphvizImages from '../extensions/Graphviz';
@@ -330,8 +333,7 @@ function recursivelyLoadImports(language, divId, importsRemaining, done) {
 }
 
 export default function playPlayable(language, divId) {
-  // console.log('playPlayable', divId);
-  const playable = smartdown.playablesRegistered[divId];
+  const playable = globalState.playablesRegistered[divId];
   if (playable) {
     const importsRemaining = playable.imports.slice(0);  // Copy
 
@@ -344,7 +346,7 @@ export default function playPlayable(language, divId) {
     });
   }
   else {
-    console.log('playPlayable... not found', language, divId, smartdown.playablesRegistered, perPageState.playablesRegisteredOrder);
+    console.log('playPlayable... not found', language, divId, globalState.playablesRegistered, globalState.playablesRegisteredOrder);
   }
 }
 

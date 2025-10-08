@@ -4,7 +4,7 @@ import replaceArray from '../util/replaceArray';
 import replaceObject from '../util/replaceObject';
 import globalState from '../util/globalState';
 
-export default function cleanupOrphanedStuff() {
+export default function cleanupOrphanedStuff(outputDiv) {
   const newER = {};
   const expressions = globalState.expressionsRegistered;
 
@@ -33,20 +33,26 @@ export default function cleanupOrphanedStuff() {
   const newPR = {};
 
   lodashEach(globalState.playablesRegisteredOrder, function (playable) {
-    // console.log('cleanupOrphanedStuff/playable', playable.divId, playable);
+    // console.log(`cleanupOrphanedStuff/playable ${playable.divId} in ${outputDiv.id}`);
     const element1 = document.getElementById(playable.divId);
 
     if (element1) {
-      newPRO.push(playable);
-      newPR[playable.divId] = playable;
-      // console.log('...cleanupOrphanedStuff/playable div found', playable.playing, playable.divId, playable, element1, element2);
+      if (outputDiv.id !== playable.rootDivId) {
+        // console.log(`...cleanupOrphanedStuff/playable PRESERVING ${playable.divId} in ${outputDiv.id}`);
+        newPRO.push(playable);
+        newPR[playable.divId] = playable;
+      }
+      else {
+        console.log(`...cleanupOrphanedStuff/playable DELETING ${playable.divId} in ${outputDiv.id}`);
+      }
     }
     else {
-      playable.deleted = true;
-      // console.log('...cleanupOrphanedStuff/playable div not found', playable.playing, playable.divId, playable, element1, element2);
+      console.log(`...cleanupOrphanedStuff/playable NOTFOUND ${playable.divId} in ${outputDiv.id}`);
     }
   });
 
-  replaceObject(globalState.playablesRegistered, newER);
   replaceArray(globalState.playablesRegisteredOrder, newPRO);
+  replaceObject(globalState.playablesRegistered, newPR);
+
+  // console.log(`cleanupOrphanedStuff after replace ${JSON.stringify(globalState.playablesRegisteredOrder)}`);
 }

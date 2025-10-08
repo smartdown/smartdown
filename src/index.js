@@ -237,7 +237,7 @@ function setSmartdown(md, outputDiv, setSmartdownCompleted) {
   smartdown.currentBackpatches[outputDiv.id] = [];
 
   setupScrollHoverDisable();
-  cleanupOrphanedStuff();
+  cleanupOrphanedStuff(outputDiv);
   resetAllPlayables(outputDiv, true);
 
   const fm = getFrontmatter(md);
