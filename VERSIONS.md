@@ -78,3 +78,4 @@
 - **1.0.76** - Updated deps. Fixed how README.md is copied to the /doc directory, due to a change in copy-webpack-plugin.
 - **1.0.77** - Updated deps. Improved 'npm clean'. Tweaked Typescript.js and tsconfig.json to inhibit processing of regular JS (for some reason I don't recall). Eliminated use of P5, P5JS webpack aliases. Added GalleryWatchPlugin.js to replace 'watch' functionality removed from copy-webpack-plugin v13.0.0.
 - **1.0.78** - Updated deps. Fixed an obscure bug that caused 'markdown' cells to delete other playable divs on the page; cleaned up cleanupOrphanedStuff() to only cleanup relevant divs in the case of multiple smartdown instances (e.g., 'markdown' cells).
+- **1.0.79** - Updated deps. 
